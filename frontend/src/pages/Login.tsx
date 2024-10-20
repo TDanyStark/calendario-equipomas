@@ -7,6 +7,7 @@ import { URL_BASE, URL_BACKEND } from "../variables";
 import { ValidateJWT } from "../utils/ValidateJWT"; // Importa tu validación de JWT
 import {jwtDecode} from "jwt-decode";
 import { rolRedirect } from "../utils/rolRedirect";
+import { RolesExisting } from "../types/Roles";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -18,8 +19,22 @@ const Login = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Código que obtiene el JWT desde el localStorage y redirige según el rol
   const JWT = localStorage.getItem("JWT");
-  let from = JWT ? rolRedirect(jwtDecode<{ role: string }>(JWT).role) : "/";
+
+  let from = "/"; // Fallback en caso de que no haya JWT o no sea válido
+
+  try {
+    if (JWT) {
+      const decodedToken = jwtDecode<{ role: RolesExisting }>(JWT);
+      
+      // Aquí usamos rolRedirect para obtener la ruta según el rol
+      from = rolRedirect(decodedToken.role);
+    }
+  } catch (error) {
+    console.error("Error decodificando el JWT", error);
+    from = "/error";
+  }
 
   useEffect(() => {
     if (JWT) {
@@ -68,7 +83,7 @@ const Login = () => {
       const { JWT } = res.data;
 
       dispatch(login({ JWT }));
-      from = rolRedirect(jwtDecode<{ role: string }>(JWT).role);
+      from = rolRedirect(jwtDecode<{ role: RolesExisting }>(JWT).role);
 
       // Redirigir al usuario
       navigate(from, { replace: true });

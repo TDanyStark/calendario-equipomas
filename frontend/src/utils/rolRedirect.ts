@@ -1,14 +1,6 @@
-import {Roles} from "../data/Roles";
+import { rolRedirectInfo } from '../data/Roles';
+import { RolesExisting } from '../types/Roles';
 
-export const rolRedirect = (rol: string) => {
-  switch (rol) {
-    case Roles.admin:
-      return "/dashboard";
-    case Roles.student:
-      return "/student-schedule";
-    case Roles.professor:
-      return "/my-classes";
-    default:
-      return "/error";
-  }
+export const rolRedirect = (rol: RolesExisting) => {
+  return rolRedirectInfo[rol] || rolRedirectInfo.default;
 };

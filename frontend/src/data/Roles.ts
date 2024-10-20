@@ -1,12 +1,13 @@
-import { MenusByRole } from "../types/Roles";
+import { TypeMenusByRole, TypeRolRedirectInfo } from "../types/Roles";
 
 export const Roles = {
-  admin: "admin",
+  admin: "administrador",
   student: "student",
   professor: "professor",
+  default: "default",
 } as const;
 
-export const Menus: MenusByRole = {
+export const Menus: TypeMenusByRole = {
   [Roles.admin]: [
     { name: "Dashboard", icon: "dashboard", path: "/dashboard" },
     { name: "Clases grupales", icon: "group-class", path: "/group-class" },
@@ -33,4 +34,12 @@ export const Menus: MenusByRole = {
   [Roles.professor]: [
     { name: "Mis Clases", icon: "classes", path: "/my-classes" },
   ],
+  default: [],
 };
+
+export const rolRedirectInfo: TypeRolRedirectInfo = {
+  [Roles.admin]: "/dashboard",
+  [Roles.student]: "/student-schedule",
+  [Roles.professor]: "/my-classes",
+  default: "/error",
+}

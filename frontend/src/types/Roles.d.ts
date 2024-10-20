@@ -1,17 +1,20 @@
 import { Roles } from "../data/Roles";
 
 // Definir el tipo de un ítem del menú
-type MenuItem = {
+export type MenuItem = {
   name: string;
   icon: string;
   path: string;
   subMenu?: MenuItem[]; // Submenú opcional, que es una lista de MenuItem
 };
 
-// Definir el tipo de menú por rol
-type MenusByRole = {
-  [key in keyof typeof Roles]: MenuItem[]; // Un array de MenuItem por cada rol
+export type RolesExisting = typeof Roles[keyof typeof Roles];
+
+export type TypeRolRedirectInfo = {
+  [K in RolesExisting]: string; // Cada clave será un valor de Roles y su valor será una string (la ruta de redirección)
 };
 
-// exportar un enum con los roles
-export type RolesExisting = "admin" | "student" | "professor";
+// Tipo para el objeto `Menus`, donde las claves son los valores de Roles y los valores son arreglos de `MenuItem`
+export type TypeMenusByRole = {
+  [K in RolesExisting]: MenuItem[];
+};
