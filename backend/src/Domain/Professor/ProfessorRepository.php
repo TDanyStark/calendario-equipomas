@@ -7,11 +7,11 @@ namespace App\Domain\Professor;
 interface ProfessorRepository
 {
     /**
-     * Encuentra un profesor por su email.
+     * Encuentra un profesor por su ID.
      * 
-     * @param string $email
+     * @param string $id
      * @return Professor|null
      */
-    public function findProfessorByEmail(string $email): ?Professor;
+    public function findProfessorById(string $id): ?Professor;
 
 }

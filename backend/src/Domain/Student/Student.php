@@ -5,35 +5,36 @@ declare(strict_types=1);
 namespace App\Domain\Student;
 
 use JsonSerializable;
+use App\Domain\User\User; // Importa la clase User
 
 class Student implements JsonSerializable
 {
-    private string $StudentID;
+    private string $studentID;
     private string $firstName;
     private string $lastName;
-    private string $email;
     private ?string $phone;
     private string $status;
+    private User $user; // Relación con la clase User
 
     public function __construct(
-        string $StudentID,
+        string $studentID,
         string $firstName,
         string $lastName,
-        string $email,
         ?string $phone,
-        string $status
+        string $status,
+        User $user // Pasar el objeto User
     ) {
-        $this->StudentID = $StudentID;
+        $this->studentID = $studentID;
         $this->firstName = ucfirst($firstName);
         $this->lastName = ucfirst($lastName);
-        $this->email = $email;
         $this->phone = $phone;
         $this->status = $status;
+        $this->user = $user; // Asignar el objeto User
     }
 
     public function getStudentID(): string
     {
-        return $this->StudentID;
+        return $this->studentID;
     }
 
     public function getFirstName(): string
@@ -46,11 +47,6 @@ class Student implements JsonSerializable
         return $this->lastName;
     }
 
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
     public function getPhone(): ?string
     {
         return $this->phone;
@@ -61,15 +57,20 @@ class Student implements JsonSerializable
         return $this->status;
     }
 
+    public function getUser(): User
+    {
+        return $this->user; // Método para obtener el objeto User
+    }
+
     public function jsonSerialize(): array
     {
         return [
-            'StudentID' => $this->StudentID,
+            'studentID' => $this->studentID,
             'firstName' => $this->firstName,
             'lastName' => $this->lastName,
-            'email' => $this->email,
             'phone' => $this->phone,
             'status' => $this->status,
+            'user' => $this->user, // Incluir información del usuario
         ];
     }
 }

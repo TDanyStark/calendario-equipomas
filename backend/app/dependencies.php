@@ -19,6 +19,16 @@ use App\Infrastructure\Repository\DatabaseProfessorRepository;
 use App\Application\Actions\Auth\LoginAction;
 
 use App\Application\Actions\Auth\ValidateJWTAction;
+use App\Domain\Admin\Admin;
+use App\Domain\Admin\AdminRepository;
+use App\Domain\User\UserRepository;
+
+use App\Domain\Role\RoleRepository;
+use App\Domain\User\User;
+use App\Domain\Role\Role;
+use App\Infrastructure\Repository\DatabaseAdminRepository;
+use App\Infrastructure\Repository\DatabaseRoleRepository;
+use App\Infrastructure\Repository\DatabaseUserRepository;
 
 
 return function (ContainerBuilder $containerBuilder) {
@@ -56,13 +66,31 @@ return function (ContainerBuilder $containerBuilder) {
             return new DatabaseProfessorRepository($database);
         },
 
+        UserRepository::class => function ($container) {
+            $database = $container->get(Database::class);
+            return new DatabaseUserRepository($database);
+        },
+
+        RoleRepository::class => function($container) {
+            $database = $container->get(Database::class);
+            return new DatabaseRoleRepository($database);
+        },
+
+        AdminRepository::class => function($container) {
+            $database = $container->get(Database::class);
+            return new DatabaseAdminRepository($database);
+        },
+
         // Registrar LoginAction
         LoginAction::class => function (ContainerInterface $c) {
             $logger = $c->get(LoggerInterface::class);
+            $userRepository = $c->get(UserRepository::class);
+            $adminRepository = $c->get(AdminRepository::class);
             $studentRepository = $c->get(StudentRepository::class);
             $professorRepository = $c->get(ProfessorRepository::class);
+            $roleRepository = $c->get(RoleRepository::class);
             $jwtSecret = $c->get('jwtSecret');
-            return new LoginAction($logger, $studentRepository, $professorRepository, $jwtSecret);
+            return new LoginAction($logger, $userRepository, $adminRepository, $studentRepository, $professorRepository, $roleRepository, $jwtSecret);
         },
 
         ValidateJWTAction::class => function (ContainerInterface $c) {

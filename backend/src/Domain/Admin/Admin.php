@@ -2,39 +2,33 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Professor;
+namespace App\Domain\Admin;
 
 use JsonSerializable;
 use App\Domain\User\User; // Importa la clase User
 
-class Professor implements JsonSerializable
+class Admin implements JsonSerializable
 {
-    private string $professorID;
+    private string $adminID;
     private string $firstName;
     private string $lastName;
-    private ?string $phone;
-    private string $status;
     private User $user; // Relación con la clase User
 
     public function __construct(
-        string $professorID,
+        string $adminID,
         string $firstName,
         string $lastName,
-        ?string $phone,
-        string $status,
         User $user // Pasar el objeto User
     ) {
-        $this->professorID = $professorID;
+        $this->adminID = $adminID;
         $this->firstName = ucfirst($firstName);
         $this->lastName = ucfirst($lastName);
-        $this->phone = $phone;
-        $this->status = $status;
         $this->user = $user; // Asignar el objeto User
     }
 
-    public function getProfessorID(): string
+    public function getAdminID(): string
     {
-        return $this->professorID;
+        return $this->adminID;
     }
 
     public function getFirstName(): string
@@ -47,16 +41,6 @@ class Professor implements JsonSerializable
         return $this->lastName;
     }
 
-    public function getPhone(): ?string
-    {
-        return $this->phone;
-    }
-
-    public function getStatus(): string
-    {
-        return $this->status;
-    }
-
     public function getUser(): User
     {
         return $this->user; // Método para obtener el objeto User
@@ -65,11 +49,9 @@ class Professor implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'professorID' => $this->professorID,
+            'adminID' => $this->adminID,
             'firstName' => $this->firstName,
             'lastName' => $this->lastName,
-            'phone' => $this->phone,
-            'status' => $this->status,
             'user' => $this->user, // Incluir información del usuario
         ];
     }

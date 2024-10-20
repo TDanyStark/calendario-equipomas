@@ -8,50 +8,56 @@ use JsonSerializable;
 
 class User implements JsonSerializable
 {
-    private ?int $id;
+    private string $userID; // Este será la cédula
+    private string $email;
+    private string $password; // Este es el hash de la contraseña
+    private int $roleID; // Relacionado con el rol
 
-    private string $username;
-
-    private string $firstName;
-
-    private string $lastName;
-
-    public function __construct(?int $id, string $username, string $firstName, string $lastName)
-    {
-        $this->id = $id;
-        $this->username = strtolower($username);
-        $this->firstName = ucfirst($firstName);
-        $this->lastName = ucfirst($lastName);
+    public function __construct(
+        string $userID,
+        string $email,
+        string $password,
+        int $roleID
+    ) {
+        $this->userID = $userID;
+        $this->email = $email;
+        // Encriptar la contraseña usando password_hash
+        $this->password = $password;
+        $this->roleID = $roleID;
     }
 
-    public function getId(): ?int
+    public function getUserID(): string
     {
-        return $this->id;
+        return $this->userID;
     }
 
-    public function getUsername(): string
+    public function getEmail(): string
     {
-        return $this->username;
+        return $this->email;
     }
 
-    public function getFirstName(): string
+    public function getPassword(): string
     {
-        return $this->firstName;
+        return $this->password; // Este es el hash de la contraseña
     }
 
-    public function getLastName(): string
+    public function getRoleID(): int
     {
-        return $this->lastName;
+        return $this->roleID;
     }
 
-    #[\ReturnTypeWillChange]
     public function jsonSerialize(): array
     {
         return [
-            'id' => $this->id,
-            'username' => $this->username,
-            'firstName' => $this->firstName,
-            'lastName' => $this->lastName,
+            'userID' => $this->userID,
+            'email' => $this->email,
+            'roleID' => $this->roleID,
         ];
+    }
+
+    // Método para verificar la contraseña
+    public function verifyPassword(string $password): bool
+    {
+        return password_verify($password, $this->password);
     }
 }

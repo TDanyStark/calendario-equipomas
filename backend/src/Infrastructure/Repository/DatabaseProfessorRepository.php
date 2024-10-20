@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Infrastructure\Repository;
 
 use App\Domain\Professor\Professor;
+use App\Domain\Professor\ProfessorNotFoundException;
 use App\Domain\Professor\ProfessorRepository;
 use App\Infrastructure\Database;
+use App\Domain\User\User;
 use PDO;
 
 class DatabaseProfessorRepository implements ProfessorRepository
@@ -15,29 +17,32 @@ class DatabaseProfessorRepository implements ProfessorRepository
 
     public function __construct(Database $database)
     {
-        // Usamos la conexión proporcionada por la clase Database
+        // Obtiene la conexión desde la clase Database
         $this->pdo = $database->getConnection();
     }
 
-    public function findProfessorByEmail(string $email): ?Professor
+    public function findProfessorById(string $id): ?Professor
     {
-        $stmt = $this->pdo->prepare('SELECT ProfessorID, ProfessorFirstName, ProfessorLastName, ProfessorEmail, ProfessorPhone, ProfessorStatus FROM Professors WHERE ProfessorEmail = :email');
-        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+        $stmt = $this->pdo->prepare('
+            SELECT p.ProfessorID, p.ProfessorFirstName, p.ProfessorLastName, p.ProfessorPhone, p.ProfessorStatus, 
+                   u.UserID, u.UserEmail, u.UserPassword, u.RoleID 
+            FROM professors p
+            JOIN users u ON p.ProfessorID = u.UserID
+            WHERE p.ProfessorID = :id
+        ');
+        $stmt->bindParam(':id', $id, PDO::PARAM_STR);
         $stmt->execute();
 
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($row) {
-            return new Professor(
-                $row['ProfessorID'],
-                $row['ProfessorFirstName'],
-                $row['ProfessorLastName'],
-                $row['ProfessorEmail'],
-                $row['ProfessorPhone'] ?? null,
-                $row['ProfessorStatus']
-            );
+        if ($data === false) {
+            throw new ProfessorNotFoundException("Professor not found for ID: $id");
         }
 
-        return null;
+        // Crear el objeto User usando los datos obtenidos
+        $user = new User($data['UserID'], $data['UserEmail'], $data['UserPassword'], $data['RoleID']);
+
+        // Crea y devuelve el objeto Professor
+        return new Professor($data['ProfessorID'], $data['ProfessorFirstName'], $data['ProfessorLastName'],$data['ProfessorPhone'], $data['ProfessorStatus'], $user);
     }
 }

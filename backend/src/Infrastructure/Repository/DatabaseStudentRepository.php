@@ -8,6 +8,7 @@ use App\Domain\Student\Student;
 use App\Domain\Student\StudentNotFoundException;
 use App\Domain\Student\StudentRepository;
 use App\Infrastructure\Database;
+use App\Domain\User\User;
 use PDO;
 
 class DatabaseStudentRepository implements StudentRepository
@@ -20,83 +21,27 @@ class DatabaseStudentRepository implements StudentRepository
         $this->pdo = $database->getConnection();
     }
 
-    /**
-     * @return Student[]
-     */
-    public function findAll(): array
-    {
-        $stmt = $this->pdo->query('SELECT StudentID, StudentFirstName, StudentLastName, StudentEmail, StudentPhone, StudentStatus FROM Students');
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        $students = [];
-        foreach ($results as $row) {
-            $students[] = new Student(
-                $row['StudentID'],
-                $row['StudentFirstName'],
-                $row['StudentLastName'],
-                $row['StudentEmail'],
-                $row['StudentPhone'] ?? null,
-                $row['StudentStatus']
-            );
-        }
-
-        return $students;
-    }
-
-    /**
-     * Encuentra un estudiante por su ID.
-     * 
-     * @param string $id
-     * @return Student
-     * @throws StudentNotFoundException
-     */
     public function findStudentOfId(string $id): Student
     {
-        $stmt = $this->pdo->prepare('SELECT StudentID, StudentFirstName, StudentLastName, StudentEmail, StudentPhone, StudentStatus FROM Students WHERE StudentID = :id');
+        $stmt = $this->pdo->prepare('
+        SELECT s.StudentID, s.StudentFirstName, s.StudentLastName, s.StudentPhone, s.StudentStatus,
+               u.UserID, u.UserEmail, u.UserPassword, u.RoleID 
+        FROM students s
+        JOIN users u ON s.StudentID = u.UserID
+        WHERE s.StudentID = :id
+    ');
         $stmt->bindParam(':id', $id, PDO::PARAM_STR);
         $stmt->execute();
 
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$row) {
-            throw new StudentNotFoundException();
+        if ($data === false) {
+            throw new StudentNotFoundException("Student not found for ID: $id");
         }
 
-        return new Student(
-            $row['StudentID'],
-            $row['StudentFirstName'],
-            $row['StudentLastName'],
-            $row['StudentEmail'],
-            $row['StudentPhone'] ?? null,
-            $row['StudentStatus']
-        );
-    }
+        // Crear el objeto User usando los datos obtenidos
+        $user = new User($data['UserID'], $data['UserEmail'], $data['UserPassword'], $data['RoleID']);
 
-    /**
-     * Encuentra un estudiante por su email.
-     * 
-     * @param string $email
-     * @return Student|null
-     */
-    public function findStudentByEmail(string $email): ?Student
-    {
-        $stmt = $this->pdo->prepare('SELECT StudentID, StudentFirstName, StudentLastName, StudentEmail, StudentPhone, StudentStatus FROM Students WHERE StudentEmail = :email');
-        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-        $stmt->execute();
-
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($row) {
-            return new Student(
-                $row['StudentID'],
-                $row['StudentFirstName'],
-                $row['StudentLastName'],
-                $row['StudentEmail'],
-                $row['StudentPhone'] ?? null,
-                $row['StudentStatus']
-            );
-        }
-
-        return null;
+        return new Student($data['StudentID'], $data['StudentFirstName'], $data['StudentLastName'], $data['StudentPhone'], $data['StudentStatus'], $user);
     }
 }
