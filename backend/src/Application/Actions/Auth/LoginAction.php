@@ -48,7 +48,6 @@ class LoginAction extends Action
         $student = $this->studentRepository->findStudentByEmail($email);
         if ($student && $student->getStudentID() === $password) {
             $token = $this->generateJWT($student->getFirstName(), $student->getEmail(), 'student');
-            $this->logger->info("Login successful for student: {$email}");
             return $this->respondWithToken($token);
         }
 
@@ -56,12 +55,10 @@ class LoginAction extends Action
         $professor = $this->professorRepository->findProfessorByEmail($email);
         if ($professor && $professor->getProfessorID() === $password) {
             $token = $this->generateJWT($professor->getFirstName(), $professor->getEmail(), 'professor');
-            $this->logger->info("Login successful for professor: {$email}");
             return $this->respondWithToken($token);
         }
 
         // Si no se encuentra ni en estudiantes ni en profesores
-        $this->logger->warning("Login failed for email: {$email}");
         return $this->respondWithError('Invalid email or password', 401);
     }
 

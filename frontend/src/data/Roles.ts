@@ -9,6 +9,10 @@ export const Roles = {
 export const Menus: MenusByRole = {
   [Roles.admin]: [
     { name: "Dashboard", icon: "dashboard", path: "/dashboard" },
+    { name: "Clases grupales", icon: "group-class", path: "/group-class" },
+    { name: "Matriculas", icon: "enrolls", path: "/enrolls" },
+    { name: "Estudiantes", icon: "students", path: "/students" },
+    { name: "Profesores", icon: "professors", path: "/professors" },
     { 
       name: "Configuraciones", 
       icon: "settings", 
@@ -18,10 +22,10 @@ export const Menus: MenusByRole = {
       { name: "Salones", icon: "rooms", path: "/rooms" },
       { name: "Cursos", icon: "courses", path: "/courses" },
       { name: "Semestres", icon: "semesters", path: "/semesters" },
+      { name: "Usuarios", icon: "users", path: "/users" },
       { name: "Generales", icon: "general-settings", path: "/general-settings" },
     ],
   },
-    { name: "Gestión de Usuarios", icon: "users", path: "/manage-users" },
   ],
   [Roles.student]: [
     { name: "Horario", icon: "schedule", path: "/student-schedule" },

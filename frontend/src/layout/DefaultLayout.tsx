@@ -1,14 +1,19 @@
 import Sidebar from '../components/Sidebar/index';
 import { Outlet } from 'react-router-dom';
+import { RolesExisting } from '../types/Roles';
 
-const DefaultLayout = () => {
+interface Props {
+  role: RolesExisting;
+}
+
+const DefaultLayout = ({role}: Props) => {
 
   return (
     <div className="dark:bg-boxdark-2 dark:text-bodydark">
       {/* <!-- ===== Page Wrapper Start ===== --> */}
       <div className="flex h-screen overflow-hidden relative">
         {/* <!-- ===== Sidebar Start ===== --> */}
-        <Sidebar />
+        <Sidebar role={role} />
         {/* <!-- ===== Sidebar End ===== --> */}
 
         {/* <!-- ===== Content Area Start ===== --> */}

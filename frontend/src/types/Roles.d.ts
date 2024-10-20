@@ -12,3 +12,6 @@ type MenuItem = {
 type MenusByRole = {
   [key in keyof typeof Roles]: MenuItem[]; // Un array de MenuItem por cada rol
 };
+
+// exportar un enum con los roles
+export type RolesExisting = "admin" | "student" | "professor";

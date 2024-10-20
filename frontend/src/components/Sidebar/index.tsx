@@ -1,13 +1,19 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { RolesExisting } from "../../types/Roles";
+import {Menus} from "../../data/Roles";
 
-
-const Sidebar = () => {
-
+interface Props {
+  role: RolesExisting;
+}
+const Sidebar = ({role}: Props) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   // Estado para manejar múltiples submenús
   const [openSections, setOpenSections] = useState<{ [key: string]: boolean }>({});
+
+  const Menu = Menus[role];
+
+  console.log('Menu', Menu);
 
   const handleClickToggle = () => {
     setIsSidebarOpen(!isSidebarOpen);

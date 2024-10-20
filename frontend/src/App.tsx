@@ -23,7 +23,7 @@ function App() {
       {/* Rutas que usan DefaultLayout */}
       <Route path="/" element={
           <ProtectedRoute requiredRole={Roles.admin}>
-            <DefaultLayout />
+            <DefaultLayout role={Roles.admin} />
           </ProtectedRoute>
         }>
         <Route path="dashboard" element={<h1>Home</h1>} /> 
@@ -36,7 +36,7 @@ function App() {
 
       <Route path="/" element={
           <ProtectedRoute requiredRole={Roles.student}>
-            <DefaultLayout />
+            <DefaultLayout role={Roles.student} />
           </ProtectedRoute>
         }>
         <Route path="/student-schedule" element={<h1>Student Schedule</h1>} /> 
@@ -44,7 +44,7 @@ function App() {
 
       <Route path="/" element={
           <ProtectedRoute requiredRole={Roles.professor}>
-            <DefaultLayout />
+            <DefaultLayout role={Roles.professor} />
           </ProtectedRoute>
         }>
         <Route path="/my-classes" element={<h1>My CLasses</h1>} /> 
