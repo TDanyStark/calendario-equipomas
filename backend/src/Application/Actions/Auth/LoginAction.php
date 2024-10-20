@@ -107,8 +107,6 @@ class LoginAction extends Action
         // Responder con el token
         return $this->respondWithToken($token);
 
-        // Si no se encuentra ni en estudiantes ni en profesores
-        return $this->respondWithError('Invalid email or password', 401);
     }
 
     private function generateJWT(string $name, string $email, string $role): string
