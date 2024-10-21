@@ -13,6 +13,8 @@ export default {
           200: '#888883',
         },
         'principal-text': '#ffffff',
+        'principal-bg': '#000000',
+        'secondary-bg': '#1f2937',
       },
     },
   },

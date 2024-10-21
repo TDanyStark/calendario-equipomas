@@ -1,60 +1,69 @@
 // src/App.js
-import "./App.css";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import DefaultLayout from "./layout/DefaultLayout";
 import ErrorPage from "./pages/ErrorPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Logout from "./pages/Logout";
 import { Roles } from "./data/Roles";
+import { generateRoutes } from "./utils/getComponentForPath";
+import { rolRedirect } from "./utils/rolRedirect";
+import getUserRole from "./utils/getUserRole";
 
 
 function App() {
+  const userRole = getUserRole();
+
   return (
     <Routes>
-
       {/* Rutas publicas */}
-      <Route path="/login" element={<Login/>} />
+      <Route path="/login" element={<Login />} />
       <Route path="/logout" element={<Logout />} />
 
-      <Route path="/" element={<h1>Home</h1>} />
+      {/* Redirección en la ruta raíz según el rol activo */}
+      <Route
+        path="/"
+        element={<Navigate to={rolRedirect(userRole ?? Roles.default)} />}
+      />
 
-
-      {/* Rutas que usan DefaultLayout */}
-      <Route path="/" element={
+      {/* Rutas para Admin */}
+      <Route
+        path="/"
+        element={
           <ProtectedRoute requiredRole={Roles.admin}>
             <DefaultLayout role={Roles.admin} />
           </ProtectedRoute>
-        }>
-        <Route path="dashboard" element={<h1>Home</h1>} /> 
-        <Route path="instruments" element={<h1>instruments</h1>} />
-        <Route path="rooms" element={<h1>rooms</h1>} />
-        <Route path="courses" element={<h1>courses</h1>} />
-        <Route path="semesters" element={<h1>semesters</h1>} />
-        <Route path="general-settings" element={<h1>general-settings</h1>} />
+        }
+      >
+        {generateRoutes(Roles.admin)}
       </Route>
 
-      <Route path="/" element={
+      {/* Rutas para Estudiantes */}
+      <Route
+        path="/"
+        element={
           <ProtectedRoute requiredRole={Roles.student}>
             <DefaultLayout role={Roles.student} />
           </ProtectedRoute>
-        }>
-        <Route path="/student-schedule" element={<h1>Student Schedule</h1>} /> 
+        }
+      >
+        {generateRoutes(Roles.student)}
       </Route>
 
-      <Route path="/" element={
+      {/* Rutas para Profesores */}
+      <Route
+        path="/"
+        element={
           <ProtectedRoute requiredRole={Roles.professor}>
             <DefaultLayout role={Roles.professor} />
           </ProtectedRoute>
-        }>
-        <Route path="/my-classes" element={<h1>My CLasses</h1>} /> 
+        }
+      >
+        {generateRoutes(Roles.professor)}
       </Route>
 
       {/* Ruta comodín para manejar errores */}
-      <Route
-        path="*"
-        element={<ErrorPage />}
-      />
+      <Route path="*" element={<ErrorPage />} />
     </Routes>
   );
 }

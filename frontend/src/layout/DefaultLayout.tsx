@@ -9,7 +9,7 @@ interface Props {
 const DefaultLayout = ({role}: Props) => {
 
   return (
-    <div className="dark:bg-boxdark-2 dark:text-bodydark">
+    <div >
       {/* <!-- ===== Page Wrapper Start ===== --> */}
       <div className="flex h-screen overflow-hidden relative">
         {/* <!-- ===== Sidebar Start ===== --> */}

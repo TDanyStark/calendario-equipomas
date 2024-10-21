@@ -18,7 +18,7 @@ const Sidebar = ({ role }: Props) => {
   };
 
   return (
-    <div className="aside relative">
+    <div className="aside relative bg-secondary-bg">
       <aside
         id="sidebar-multi-level-sidebar"
         className={`relative z-40 w-64 h-screen transition-transform ${
@@ -26,31 +26,33 @@ const Sidebar = ({ role }: Props) => {
         }  sm:block sm:translate-x-0`}
         aria-label="Sidebar"
       >
-        <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
-          <div className="flex items-center justify-center py-4 mb-4">
-            <img
-              src="/images/logos/maslogo.webp"
-              alt="Logo MAS"
-              width="150px"
-              height="80px"
-            />
-          </div>
-          <ul className="space-y-2 font-medium">
-            {Menu.map((item) => {
-              if (item.subMenu) {
-                return <SubMenuNav key={item.id} item={item} />; 
-              } else {
-                return <RegularNav key={item.id} item={item} />; 
-              }
-            })}
-          </ul>
+        <div className="h-full px-3 pt-4 pb-8 overflow-y-auto flex flex-col justify-between">
           <div>
+            <div className="flex items-center justify-center py-4 mb-4">
+              <img
+                src="/images/logos/maslogo.webp"
+                alt="Logo MAS"
+                width="150px"
+                height="80px"
+              />
+            </div>
+            <ul className="space-y-2 font-medium">
+              {Menu.map((item) => {
+                if (item.subMenu) {
+                  return <SubMenuNav key={item.id} item={item} />;
+                } else {
+                  return <RegularNav key={item.id} item={item} />;
+                }
+              })}
+            </ul>
+          </div>
+          <div className="mt-2">
             <NavLink
               to="/logout"
-              className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+              className="flex items-center justify-center p-2 rounded-lg font-normal text-white hover:bg-gray-700 group "
             >
               <svg
-                className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                className="flex-shrink-0 w-5 h-5 transition duration-75 text-gray-400 group-hover:text-white"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -64,7 +66,7 @@ const Sidebar = ({ role }: Props) => {
                   d="M1 8h11m0 0L8 4m4 4-4 4m4-11h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-3"
                 />
               </svg>
-              <span className="flex-1 ms-3 whitespace-nowrap">
+              <span className="ms-3 whitespace-nowrap">
                 Cerrar Sesión
               </span>
             </NavLink>

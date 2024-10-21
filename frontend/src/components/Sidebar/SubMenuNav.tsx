@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { MenuItem } from "../../types/Roles";
+import { URL_BASE } from "../../variables";
 
 interface Props {
   key: number;
@@ -13,15 +14,24 @@ export const SubMenuNav = ({ item }: Props) => {
   const toggleSection = () => {
     setIsOpen(!isOpen);
   };
+
   return (
     <li>
       <button
         onClick={() => toggleSection()}
-        className="flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-gray-600 rounded-lg dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+        className="flex items-center justify-between w-full p-2 rounded-lg text-white hover:bg-gray-700"
       >
-        <span>{item.name}</span>
+
+        <div className="flex gap-2">
+          <img
+            className="w-7 h-7"
+            src={URL_BASE + "images/icons/" + item.icon + ".png"}
+            alt={item.name}
+          />
+          <span>{item.name}</span>
+        </div>
         <svg
-          className="w-4 h-4 text-gray-500 dark:text-gray-400"
+          className="w-6 h-6 text-gray-400"
           fill="currentColor"
           viewBox="0 0 20 20"
           xmlns="http://www.w3.org/2000/svg"
@@ -33,13 +43,13 @@ export const SubMenuNav = ({ item }: Props) => {
           ></path>
         </svg>
       </button>
-      <ul className={`${isOpen ? "block" : "hidden"} pl-4 mt-2 space-y-1`}>
+      <ul className={`${isOpen ? "block" : "hidden"} pl-8 mt-2 space-y-1`}>
         {item.subMenu &&
           item.subMenu.map((subitem) => (
             <li key={subitem.id}>
               <NavLink
                 to={subitem.path}
-                className="block px-4 py-2 text-sm text-gray-600 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                className="flex items-center p-2 rounded-lg font-normal text-white hover:bg-gray-700"
               >
                 {subitem.name}
               </NavLink>
