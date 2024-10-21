@@ -2,6 +2,7 @@ import { Roles } from "../data/Roles";
 
 // Definir el tipo de un ítem del menú
 export type MenuItem = {
+  id: number;
   name: string;
   icon: string;
   path: string;

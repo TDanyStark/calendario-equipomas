@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode"; // Asegúrate de tener este import
 import { ValidateJWT } from "../../utils/ValidateJWT";
 import { Loader } from "../Loader/Loader";
+import { RolesExisting } from "../../types/Roles";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -17,7 +18,6 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
   const location = useLocation();
 
   useEffect(() => {
-    console.log("ProtectedRoute JWT:");
     const validateToken = async () => {
       if (!JWT) {
         setIsValidToken(false);
@@ -25,7 +25,7 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
       }
 
       try {
-        const { exp, role } = jwtDecode<{ exp: number, role:string }>(JWT); // Desestructurar solo lo que necesitas
+        const { exp, role } = jwtDecode<{ exp: number, role: RolesExisting }>(JWT);
         const now = Date.now() / 1000;
 
         if (exp && exp < now) {
@@ -53,9 +53,6 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
     };
 
     validateToken();
-    return () => {
-      console.log("ProtectedRoute cleanup");
-    }
   }, [JWT, location.pathname, requiredRole]);
 
   if (isValidToken === null) {

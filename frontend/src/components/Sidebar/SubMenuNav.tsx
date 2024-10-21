@@ -5,17 +5,16 @@ import { MenuItem } from "../../types/Roles";
 interface Props {
   key: number;
   item: MenuItem;
-} 
+}
 
-
-export const SubMenuNav = ({ key, item }: Props) => {
+export const SubMenuNav = ({ item }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleSection = () => {
     setIsOpen(!isOpen);
   };
   return (
-    <li key={key}>
+    <li>
       <button
         onClick={() => toggleSection()}
         className="flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-gray-600 rounded-lg dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
@@ -35,16 +34,17 @@ export const SubMenuNav = ({ key, item }: Props) => {
         </svg>
       </button>
       <ul className={`${isOpen ? "block" : "hidden"} pl-4 mt-2 space-y-1`}>
-        {item.subMenu && item.subMenu.map((subitem, index) => (
-          <li key={index}>
-            <NavLink
-              to={subitem.path}
-              className="block px-4 py-2 text-sm text-gray-600 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-            >
-              {subitem.name}
-            </NavLink>
-          </li>
-        ))}
+        {item.subMenu &&
+          item.subMenu.map((subitem) => (
+            <li key={subitem.id}>
+              <NavLink
+                to={subitem.path}
+                className="block px-4 py-2 text-sm text-gray-600 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+              >
+                {subitem.name}
+              </NavLink>
+            </li>
+          ))}
       </ul>
     </li>
   );

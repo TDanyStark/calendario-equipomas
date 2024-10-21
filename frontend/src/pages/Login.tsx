@@ -82,6 +82,9 @@ const Login = () => {
       const res = await response.json();
       const { JWT } = res.data;
 
+      console.log("JWT", JWT);
+      console.log("Decoded JWT", jwtDecode<{ role: RolesExisting }>(JWT));
+
       dispatch(login({ JWT }));
       from = rolRedirect(jwtDecode<{ role: RolesExisting }>(JWT).role);
 

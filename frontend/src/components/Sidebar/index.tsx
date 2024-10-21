@@ -13,8 +13,6 @@ const Sidebar = ({ role }: Props) => {
 
   const Menu = Menus[role];
 
-  console.log("Menu", Menu);
-
   const handleClickToggle = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
@@ -38,11 +36,11 @@ const Sidebar = ({ role }: Props) => {
             />
           </div>
           <ul className="space-y-2 font-medium">
-            {Menu.map((item, index) => {
+            {Menu.map((item) => {
               if (item.subMenu) {
-                return <SubMenuNav key={index} item={item} />;
+                return <SubMenuNav key={item.id} item={item} />; 
               } else {
-                return <RegularNav key={index} item={item} />;
+                return <RegularNav key={item.id} item={item} />; 
               }
             })}
           </ul>
