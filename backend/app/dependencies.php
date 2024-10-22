@@ -19,16 +19,19 @@ use App\Infrastructure\Repository\DatabaseProfessorRepository;
 use App\Application\Actions\Auth\LoginAction;
 
 use App\Application\Actions\Auth\ValidateJWTAction;
-use App\Domain\Admin\Admin;
 use App\Domain\Admin\AdminRepository;
 use App\Domain\User\UserRepository;
 
 use App\Domain\Role\RoleRepository;
-use App\Domain\User\User;
-use App\Domain\Role\Role;
 use App\Infrastructure\Repository\DatabaseAdminRepository;
 use App\Infrastructure\Repository\DatabaseRoleRepository;
 use App\Infrastructure\Repository\DatabaseUserRepository;
+
+use App\Domain\Instrument\InstrumentRepository;
+use App\Infrastructure\Repository\DatabaseInstrumentRepository;
+
+use App\Application\Middleware\RoleMiddleware;
+
 
 
 return function (ContainerBuilder $containerBuilder) {
@@ -98,5 +101,15 @@ return function (ContainerBuilder $containerBuilder) {
             $jwtSecret = $c->get('jwtSecret');
             return new ValidateJWTAction($logger, $jwtSecret);
         },
+
+        InstrumentRepository::class => function ($container) {
+            $database = $container->get(Database::class);
+            return new DatabaseInstrumentRepository($database);
+        },
+
+        RoleMiddleware::class => function (ContainerInterface $c) {
+            $jwtSecret = $c->get('jwtSecret');
+            return new RoleMiddleware($jwtSecret);
+        }
     ]);
 };
