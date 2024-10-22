@@ -44,4 +44,24 @@ class DatabaseStudentRepository implements StudentRepository
 
         return new Student($data['StudentID'], $data['StudentFirstName'], $data['StudentLastName'], $data['StudentPhone'], $data['StudentStatus'], $user);
     }
+
+    public function findAll(): array
+    {
+        $stmt = $this->pdo->query('
+        SELECT s.StudentID, s.StudentFirstName, s.StudentLastName, s.StudentPhone, s.StudentStatus,
+               u.UserID, u.UserEmail, u.UserPassword, u.RoleID 
+        FROM students s
+        JOIN users u ON s.StudentID = u.UserID
+    ');
+
+        $students = [];
+        while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            // Crear el objeto User usando los datos obtenidos
+            $user = new User($data['UserID'], $data['UserEmail'], $data['UserPassword'], $data['RoleID']);
+
+            $students[] = new Student($data['StudentID'], $data['StudentFirstName'], $data['StudentLastName'], $data['StudentPhone'], $data['StudentStatus'], $user);
+        }
+
+        return $students;
+    }
 }

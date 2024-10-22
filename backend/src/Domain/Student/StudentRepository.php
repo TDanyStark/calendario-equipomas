@@ -15,4 +15,11 @@ interface StudentRepository
      */
     public function findStudentOfId(string $id): Student;
 
+    /**
+     * Devuelve todos los estudiantes.
+     * 
+     * @return array
+     */
+    public function findAll(): array;
+
 }
