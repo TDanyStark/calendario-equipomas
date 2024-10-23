@@ -10,5 +10,5 @@ $containerBuilder->addDefinitions([
   RoleMiddleware::class => function (ContainerInterface $c) {
     $jwtSecret = $c->get('jwtSecret');
     return new RoleMiddleware($jwtSecret);
-}
+  }
 ]);

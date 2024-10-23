@@ -25,11 +25,11 @@ $containerBuilder->addDefinitions([
     $roleRepository = $c->get(RoleRepository::class);
     $jwtSecret = $c->get('jwtSecret');
     return new LoginAction($logger, $userRepository, $adminRepository, $studentRepository, $professorRepository, $roleRepository, $jwtSecret);
-},
+  },
 
-ValidateJWTAction::class => function (ContainerInterface $c) {
+  ValidateJWTAction::class => function (ContainerInterface $c) {
     $logger = $c->get(LoggerInterface::class);
     $jwtSecret = $c->get('jwtSecret');
     return new ValidateJWTAction($logger, $jwtSecret);
-},
+  },
 ]);
