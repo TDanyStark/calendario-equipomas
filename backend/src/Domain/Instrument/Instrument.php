@@ -8,26 +8,26 @@ use JsonSerializable;
 
 class Instrument implements JsonSerializable
 {
-    private int $instrumentID;
+    private ?int $id;
     private string $instrumentName;
     private string $createdAt;
     private string $updatedAt;
 
     public function __construct(
-        int $instrumentID,
+        ?int $id,
         string $instrumentName,
         string $createdAt,
         string $updatedAt
     ) {
-        $this->instrumentID = $instrumentID;
+        $this->id = $id;
         $this->instrumentName = $instrumentName;
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
     }
 
-    public function getInstrumentID(): int
+    public function getid(): int
     {
-        return $this->instrumentID;
+        return $this->id;
     }
 
     public function getInstrumentName(): string
@@ -54,7 +54,7 @@ class Instrument implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'instrumentID' => $this->instrumentID,
+            'id' => $this->id,
             'instrumentName' => $this->instrumentName,
             'createdAt' => $this->createdAt,
             'updatedAt' => $this->updatedAt,

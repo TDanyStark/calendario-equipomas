@@ -13,7 +13,7 @@ class CreateInstrumentAction extends InstrumentAction
     protected function action(): Response
     {
         $data = $this->request->getParsedBody();
-        $instrument = new Instrument($data['InstrumentID'], $data['InstrumentName'], '', '');
+        $instrument = new Instrument(null, $data['instrumentName'], '', '');
         $this->instrumentRepository->create($instrument);
 
         return $this->respondWithData(['message' => 'Instrument created successfully']);

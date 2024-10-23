@@ -15,7 +15,7 @@ class UpdateInstrumentAction extends InstrumentAction
         $instrument = $this->instrumentRepository->findById($id);
 
         if ($instrument) {
-            $instrument->setInstrumentName($data['InstrumentName']);
+            $instrument->setInstrumentName($data['instrumentName']);
             $this->instrumentRepository->update($id, $instrument);
             return $this->respondWithData(['message' => 'Instrument updated successfully']);
         }

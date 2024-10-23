@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.3",
     "@headlessui/react": "^2.1.10",
     "@reduxjs/toolkit": "^2.3.0",
+    "@table-library/react-table-library": "^4.1.7",
     "axios": "^1.7.7",
     "jwt-decode": "^4.0.0",
     "react": "^18.3.1",
