@@ -119,14 +119,14 @@ const Instruments = () => {
     <div className="p-4">
       <ToastContainer />
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold">Instrumentos</h1>
+        <h1 className="text-6xl font-bold">Instrumentos</h1>
         <button onClick={() => setIsOpen(true)} className="btn-primary">
           Crear Instrumento
         </button>
       </div>
 
       {/* Tabla de instrumentos */}
-      <table className="min-w-full bg-white border">
+      <table className="min-w-full border">
         <thead>
           <tr>
             <th className="border px-4 py-2">ID</th>
