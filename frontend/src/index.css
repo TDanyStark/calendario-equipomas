@@ -13,3 +13,8 @@
 body{
   background-color: #000000;
 }
+
+
+.btn-primary {
+  @apply bg-primary text-white font-semibold py-2 px-4 rounded;
+}
