@@ -29,5 +29,5 @@ body{
 }
 
 .input-primary {
-  @apply border border-primary rounded px-3 py-2;
+  @apply border border-white rounded px-3 py-2;
 }
