@@ -21,7 +21,7 @@ const Sidebar = ({ role }: Props) => {
     <div className="aside relative bg-secondary-bg">
       <aside
         id="sidebar-multi-level-sidebar"
-        className={`relative z-40 w-64 h-screen transition-transform ${
+        className={`relative z-30 w-64 h-screen transition-transform ${
           isSidebarOpen ? "" : "-translate-x-full hidden"
         }  sm:block sm:translate-x-0`}
         aria-label="Sidebar"

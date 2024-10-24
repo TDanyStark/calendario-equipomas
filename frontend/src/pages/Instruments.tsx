@@ -2,11 +2,11 @@ import { useQuery, useMutation, useQueryClient } from "react-query";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import axios from "axios";
-import { Dialog } from "@headlessui/react";
+import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useSelector } from "react-redux"; // Importar useSelector para acceder al JWT del store
-import { RootState } from "../store/store"; // Importa el tipo RootState para tipar el selector
+import { useSelector } from "react-redux"; 
+import { RootState } from "../store/store"; 
 import { URL_BACKEND } from "../variables";
 import { Loader } from "../components/Loader/Loader";
 
@@ -18,20 +18,19 @@ import {
   Row,
   Cell,
 } from "@table-library/react-table-library/table";
-
 import { useTheme } from "@table-library/react-table-library/theme";
-
 import {
   useSort,
   HeaderCellSort,
 } from "@table-library/react-table-library/sort";
-
 import {
   useRowSelect,
   HeaderCellSelect,
   CellSelect,
 } from "@table-library/react-table-library/select";
 import { usePagination } from "@table-library/react-table-library/pagination";
+
+
 // Tipo para el instrumento
 type Instrument = {
   id: string;
@@ -64,7 +63,7 @@ const Instruments = () => {
   } = useQuery(
     "instruments",
     () => fetchInstruments(token),
-    { enabled: !!token } // Solo ejecutar la query si existe el token
+    { enabled: !!token } 
   );
 
   // Mutations para crear, actualizar y eliminar
@@ -226,6 +225,7 @@ const Instruments = () => {
   );
 
   const select = useRowSelect(data, {}, {});
+  const selectedIds = select.state.ids;
 
   const pagination = usePagination(data, {
     state: {
@@ -250,12 +250,12 @@ const Instruments = () => {
 
   return (
     <div className="p-4">
-      <ToastContainer />
+      <ToastContainer theme="dark" />
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-6xl font-bold">Instrumentos</h1>
       </div>
-      <div className="pt-12 pb-6 flex items-center justify-between">
-        <div>
+      <div className="pt-12 pb-6 flex flex-col gap-3 md:flex-row items-center justify-between">
+        <div className="flex gap-2">
           <input
             type="text"
             placeholder="Buscar instrumento"
@@ -263,6 +263,19 @@ const Instruments = () => {
             onChange={handleSearch}
             className="input-primary w-full max-w-60"
           />
+          {
+            selectedIds.length > 0 ? (
+              <button
+                onClick={() => {
+                  selectedIds.map((id: string) => deleteInstrument.mutate(id));
+                  select.fns.onRemoveAll();
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded"
+              >
+                Eliminar
+              </button>
+            ) : null
+          }
         </div>
         <button
           onClick={() => {
@@ -429,14 +442,14 @@ const Instruments = () => {
         <Dialog
           open={isOpen}
           onClose={() => setIsOpen(false)}
-          className="relative z-10"
+          className="relative z-50"
         >
           <div className="fixed inset-0 bg-principal-bg bg-opacity-80" />
           <div className="fixed inset-0 flex items-center justify-center p-4">
-            <Dialog.Panel className="bg-principal-bg rounded-lg p-6 w-full max-w-md">
-              <Dialog.Title className="text-lg font-bold">
+            <DialogPanel className="bg-principal-bg border border-white border-opacity-40 rounded-lg p-6 w-full max-w-md">
+              <DialogTitle  className="text-lg font-bold">
                 {editInstrument ? "Editar Instrumento" : "Crear Instrumento"}
-              </Dialog.Title>
+              </DialogTitle>
               <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
                 <div className="mb-4">
                   <label
@@ -465,7 +478,7 @@ const Instruments = () => {
                   </button>
                 </div>
               </form>
-            </Dialog.Panel>
+            </DialogPanel>
           </div>
         </Dialog>
       )}

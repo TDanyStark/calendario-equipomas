@@ -7,7 +7,7 @@ import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./store/store.ts";
 
-import { QueryClient, QueryClientProvider } from "react-query"; // Importa QueryClient y QueryClientProvider
+import { QueryClient, QueryClientProvider } from "react-query";
 
 // Crea una instancia de QueryClient
 const queryClient = new QueryClient();
