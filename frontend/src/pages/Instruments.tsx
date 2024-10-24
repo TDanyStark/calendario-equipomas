@@ -31,7 +31,7 @@ import {
   HeaderCellSelect,
   CellSelect,
 } from "@table-library/react-table-library/select";
-
+import { usePagination } from "@table-library/react-table-library/pagination";
 // Tipo para el instrumento
 type Instrument = {
   id: string;
@@ -150,6 +150,7 @@ const Instruments = () => {
 
   const THEME = {
     Table: `
+    --data-table-library_grid-template-columns:  100px 100px 1fr 180px;
       border-spacing: 0;
       border-collapse: collapse;
       width: 100%;
@@ -226,6 +227,23 @@ const Instruments = () => {
 
   const select = useRowSelect(data, {}, {});
 
+  const pagination = usePagination(data, {
+    state: {
+      page: 0,
+      size: 10,
+    },
+    onChange: (action, state) =>
+      onPaginationChange(action, state as { page: number; size: number }),
+  });
+
+  function onPaginationChange(
+    action: { type: string },
+    state: { page: number; size: number }
+  ) {
+    console.log(action, state);
+  }
+
+
   // Si hay error o está cargando
   if (isLoading) return <Loader />;
   if (isError) return <p>Error cargando instrumentos.</p>;
@@ -262,9 +280,10 @@ const Instruments = () => {
       <Table
         data={data}
         theme={theme}
-        layout={{ fixedHeader: true }}
+        layout={{ fixedHeader: true, horizontalScroll: true, custom: true }}
         sort={sort}
         select={select}
+        pagination={pagination}
       >
         {(tableList: Instrument[]) => (
           <>
@@ -272,7 +291,7 @@ const Instruments = () => {
               <HeaderRow>
                 <HeaderCellSelect />
                 <HeaderCellSort sortKey="ID">ID</HeaderCellSort>
-                <HeaderCellSort sortKey="Instrument">
+                <HeaderCellSort  sortKey="Instrument">
                   Instrumento
                 </HeaderCellSort>
                 <HeaderCellSort sortKey="">Acciones</HeaderCellSort>
@@ -283,9 +302,9 @@ const Instruments = () => {
               {tableList ? (
                 tableList.map((item) => (
                   <Row key={item.id} item={item}>
-                    <CellSelect item={item} />
+                    <CellSelect  item={item}/>
                     <Cell>{item.id}</Cell>
-                    <Cell>{item.instrumentName}</Cell>
+                    <Cell >{item.instrumentName}</Cell>
                     <Cell>
                       <div className="flex gap-1 justify-center">
                         <button
@@ -339,7 +358,7 @@ const Instruments = () => {
                   </Row>
                 ))
               ) : (
-                <Row item={{ id: '', instrumentName: '' }}>
+                <Row item={{ id: "", instrumentName: "" }}>
                   <Cell>No hay instrumentos</Cell>
                 </Row>
               )}
@@ -347,6 +366,63 @@ const Instruments = () => {
           </>
         )}
       </Table>
+
+      <br />
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <span>Total Pages: {pagination.state.getTotalPages(data.nodes)}</span>
+
+        <div className="flex gap-2">
+          <button
+            className={`${pagination.state.page === 0 ? "bg-gray-500": "bg-primary"} p-3 rounded`}
+            type="button"
+            disabled={pagination.state.page === 0}
+            onClick={() => pagination.fns.onSetPage(pagination.state.page - 1)}
+          >
+            <span className="sr-only">Previous</span>
+            <svg
+              className="w-3 h-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 6 10"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M5 1 1 5l4 4"
+              />
+            </svg>
+          </button>
+          <button
+            className={`${pagination.state.page + 1 === pagination.state.getTotalPages(data.nodes) ? "bg-gray-500": "bg-primary"} p-3 rounded`}
+            type="button"
+            disabled={
+              pagination.state.page + 1 ===
+              pagination.state.getTotalPages(data.nodes)
+            }
+            onClick={() => pagination.fns.onSetPage(pagination.state.page + 1)}
+          >
+            <span className="sr-only">Next</span>
+            <svg
+              className="w-3 h-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 6 10"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="m1 9 4-4-4-4"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
 
       {/* Modal para crear o editar instrumento */}
       {isOpen && (
