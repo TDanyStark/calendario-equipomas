@@ -61,4 +61,18 @@ class DatabaseInstrumentRepository implements InstrumentRepository
         $stmt = $this->pdo->prepare('DELETE FROM instruments WHERE InstrumentID = :id');
         $stmt->execute(['id' => $instrumentID]);
     }
+
+    public function deleteMultiple(array $ids): int
+    {
+        // Genera un string de placeholders para la consulta SQL
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+
+        $query = "DELETE FROM instruments WHERE InstrumentID IN ($placeholders)";
+        $stmt = $this->pdo->prepare($query);
+
+        // Ejecuta la consulta pasando los IDs como parámetros
+        $stmt->execute($ids);
+
+        return $stmt->rowCount(); // Retorna la cantidad de filas afectadas
+    }
 }

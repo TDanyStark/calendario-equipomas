@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 use App\Application\Middleware\SessionMiddleware;
 use Slim\App;
-use App\Application\Middleware\RoleMiddleware;
+use App\Application\Middleware\CorsMiddleware;
 
 return function (App $app) {
+    // $app->add(CorsMiddleware::class);
     $app->add(SessionMiddleware::class);
 };

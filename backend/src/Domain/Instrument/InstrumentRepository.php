@@ -15,4 +15,6 @@ interface InstrumentRepository
     public function update(string $instrumentID, Instrument $instrument): void;
 
     public function delete(string $instrumentID): void;
+
+    public function deleteMultiple(array $instrumentIDs): int;
 }

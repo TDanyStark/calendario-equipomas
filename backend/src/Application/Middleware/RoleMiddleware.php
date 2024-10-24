@@ -11,6 +11,8 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Psr\Log\LoggerInterface; // Importar LoggerInterface
+
 
 class RoleMiddleware implements MiddlewareInterface
 {
@@ -53,11 +55,11 @@ class RoleMiddleware implements MiddlewareInterface
                 throw new HttpForbiddenException($request, "User does not have the required role");
             }
 
-            // Si el rol es válido, procesar la solicitud
-            return $handler->handle($request);
         } catch (\Exception $e) {
-            throw new HttpForbiddenException($request, "Invalid or expired token");
+            throw new HttpForbiddenException($request, "Invalid or expired token". $e->getMessage());
         }
+
+        return $handler->handle($request);
     }
 
     // Método para establecer dinámicamente el rol
