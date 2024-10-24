@@ -1,5 +1,6 @@
 // components/DataTable.tsx
 
+import React, { useState } from "react";
 import {
   Table,
   Header,
@@ -7,6 +8,7 @@ import {
   Body,
   Row,
   Cell,
+  HeaderCell,
 } from "@table-library/react-table-library/table";
 import { useTheme } from "@table-library/react-table-library/theme";
 import {
@@ -19,9 +21,15 @@ import {
   SelectTypes,
   useRowSelect,
 } from "@table-library/react-table-library/select";
+import { TableNode } from "@table-library/react-table-library/types";
+
 import { usePagination } from "@table-library/react-table-library/pagination";
 import EditItemButton from "../buttons/EditItemButton";
 import DeleteItemButton from "../buttons/DeleteItemButton";
+import NextPaginationBtn from "../buttons/NextPaginationBtn";
+import PreviousPaginationBtn from "../buttons/PreviousPaginationBtn";
+import PageInfo from "../pagination/PageInfo";
+import PrimaryButton from "../buttons/PrimaryButton";
 
 interface Column<T> {
   label: string;
@@ -32,39 +40,51 @@ interface Column<T> {
 interface DataTableProps<T> {
   data: T[];
   columns: Column<T>[];
+  heightRow?: number;
+  onCreate: () => void;
   onEdit: (item: T) => void;
   onDelete: (item: T) => void;
-  selectedIds: React.Key[];
-  onSelectionChange: (ids: React.Key[]) => void;
-  search: string;
-  heightRow?: number;
+  onDeleteSelected: (selectedIds: React.Key[]) => void;
+  searchPlaceholder?: string;
+  TextButtonCreate?: string;
+  gridTemplateColumns: string;
 }
 
-import { TableNode } from "@table-library/react-table-library/types";
 
 function DataTable<T extends TableNode>({
   data,
   columns,
+  heightRow = 52,
+  onCreate,
   onEdit,
   onDelete,
-  selectedIds,
-  onSelectionChange,
-  search,
-  heightRow = 52,
+  onDeleteSelected,
+  searchPlaceholder = "Buscar",
+  TextButtonCreate,
+  gridTemplateColumns,
 }: DataTableProps<T>) {
+
+  const [search, setSearch] = useState("");
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  };
+
   // Filtrar datos basados en la búsqueda
   const filteredData = data.filter((item) =>
-    Object.values(item)
-      .join(" ")
-      .toLowerCase()
-      .includes(search.toLowerCase())
+    columns.some((column) =>
+      String(column.renderCell(item))
+        .toLowerCase()
+        .includes(search.toLowerCase())
+    )
   );
 
   const tableData = { nodes: filteredData };
 
+  // Define tu tema aquí (puedes reutilizar el que ya tienes)
   const THEME = {
     Table: `
-    --data-table-library_grid-template-columns:  100px 100px 1fr 180px;
+      ${gridTemplateColumns ? `--data-table-library_grid-template-columns: ${gridTemplateColumns};` : ""}
       border-spacing: 0;
       border-collapse: collapse;
       width: 100%;
@@ -75,7 +95,7 @@ function DataTable<T extends TableNode>({
     Body: ``,
     BaseRow: `
       background-color: #000000;
-  
+    
       &.row-select-selected, &.row-select-single-selected {
         background-color: var(--theme-ui-colors-background-secondary);
         color: var(--theme-ui-colors-text);
@@ -83,38 +103,33 @@ function DataTable<T extends TableNode>({
     `,
     HeaderRow: `
       font-size: 20px;
-  
+    
       .th {
         border-bottom: 1px solid white;
       }
     `,
     Row: `
       font-size: 16px;
-  
+    
       &:not(:last-of-type) .td {
         border-bottom: 1px solid white;
       }
-
       &:nth-of-type(odd) {
         background-color: #171717;
       }
-
       &:nth-of-type(even) {
         background-color: #000000;
       }
-  
+    
       &:hover {
         background-color: #000275;
       }
     `,
     BaseCell: `
       border-right: 1px solid white;
-  
       padding: 8px;
       height: ${heightRow}px;
-
       text-align: center;
-  
       svg {
         fill: var(--theme-ui-colors-text);
       }
@@ -125,7 +140,6 @@ function DataTable<T extends TableNode>({
         justify-content: center;
         gap: 10px;
       }
-
       div div span svg{
         fill: #cacaca;
       }
@@ -135,34 +149,34 @@ function DataTable<T extends TableNode>({
 
   const theme = useTheme(THEME);
 
-  // Configuración de sort
+  const sortFns: Record<string, (nodes: TableNode[]) => TableNode[]> = columns.reduce((acc: Record<string, (nodes: TableNode[]) => TableNode[]>, column) => {
+    if (column.sortKey) {
+      acc[column.sortKey] = (nodes: TableNode[]) =>
+        nodes.sort((a, b) => {
+          const aValue = column.sortKey ? ((a as T)[column.sortKey as keyof T] as string | number) : '';
+          const bValue = column.sortKey ? ((b as T)[column.sortKey as keyof T] as string | number) : '';
+          if (typeof aValue === "string") {
+            return String(aValue).localeCompare(String(bValue));
+          }
+          return (aValue as number) - (bValue as number);
+        });
+    }
+    return acc;
+  }, {});
+
   const sort = useSort(
     tableData,
     {},
     {
-      sortFns: columns.reduce((acc, column) => {
-        if (column.sortKey) {
-          acc[column.sortKey] = (array) =>
-            array.sort((a, b) => {
-              const aValue = a[column.sortKey];
-              const bValue = b[column.sortKey];
-              if (typeof aValue === "string") {
-                return aValue.localeCompare(bValue);
-              }
-              return aValue - bValue;
-            });
-        }
-        return acc;
-      }, {}),
+      sortFns,
     }
   );
 
-  // Configuración de selección
   const select = useRowSelect(
     tableData,
     {
-      onChange: (action, state) => {
-        onSelectionChange(state.ids);
+      onChange: () => {
+        // Manejar cambios en la selección si es necesario
       },
     },
     {
@@ -171,7 +185,8 @@ function DataTable<T extends TableNode>({
     }
   );
 
-  // Configuración de paginación
+  const selectedIds = select.state.ids;
+
   const pagination = usePagination(tableData, {
     state: {
       page: 0,
@@ -180,56 +195,118 @@ function DataTable<T extends TableNode>({
   });
 
   return (
-    <div
-      style={{
-        minHeight: `${heightRow * 11}px`,
-      }}
-    >
-      <Table
-        data={tableData}
-        theme={theme}
-        layout={{ fixedHeader: true, horizontalScroll: true, custom: true }}
-        sort={sort}
-        select={select}
-        pagination={pagination}
+    <>
+      {/* Búsqueda y acciones */}
+      <div className="pt-6 flex flex-col gap-3 md:flex-row items-center justify-between">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder={searchPlaceholder}
+            value={search}
+            onChange={handleSearch}
+            className="input-primary w-full max-w-60"
+          />
+          {selectedIds.length > 0 ? (
+            <button
+              onClick={() => {
+                onDeleteSelected(selectedIds);
+                select.fns.onRemoveAll();
+              }}
+              className="px-4 py-2 bg-red-600 text-white rounded text-nowrap"
+            >
+              Eliminar {selectedIds.length}
+            </button>
+          ) : null}
+        </div>
+        <PrimaryButton handleClick={onCreate}>Crear nuevo {TextButtonCreate}</PrimaryButton>
+      </div>
+
+      {/* Tabla */}
+      <div
+        style={{
+          minHeight: `${heightRow * 11}px`,
+        }}
       >
-        {(tableList: T[]) => (
-          <>
-            <Header>
-              <HeaderRow>
-                <HeaderCellSelect />
-                {columns.map((column) => (
-                  <HeaderCellSort key={column.label} sortKey={column.sortKey || ''}>
-                    {column.label}
-                  </HeaderCellSort>
-                ))}
-                <HeaderCellSort sortKey="none">Acciones</HeaderCellSort>
-              </HeaderRow>
-            </Header>
-            <Body>
-              {tableList.map((item) => (
-                <Row key={item.id} item={item}>
-                  <CellSelect item={item} />
+        <Table
+          data={tableData}
+          theme={theme}
+          layout={{ fixedHeader: true, horizontalScroll: true, custom: true }}
+          sort={sort}
+          select={select}
+          pagination={pagination}
+        >
+          {(tableList: T) => (
+            <>
+              <Header>
+                <HeaderRow>
+                  <HeaderCellSelect />
                   {columns.map((column) => (
-                    <Cell key={column.label}>{column.renderCell(item)}</Cell>
+                    <HeaderCellSort
+                      key={column.label}
+                      sortKey={column.sortKey || ""}
+                    >
+                      {column.label}
+                    </HeaderCellSort>
                   ))}
-                  <Cell>
-                    <div className="flex gap-1 justify-center">
-                      <EditItemButton
-                        handleClick={() => onEdit(item)}
-                      />
-                      <DeleteItemButton
-                        handleClick={() => onDelete(item)}
-                      />
-                    </div>
-                  </Cell>
-                </Row>
-              ))}
-            </Body>
-          </>
-        )}
-      </Table>
-    </div>
+                  <HeaderCell>Acciones</HeaderCell>
+                </HeaderRow>
+              </Header>
+              <Body>
+                {tableList.length > 0 ? (
+                  tableList.map((item: T) => (
+                    <Row key={item.id} item={item}>
+                      <CellSelect item={item} />
+                      {columns.map((column) => (
+                        <Cell key={column.label} className="text-lg">
+                          {column.renderCell(item)}
+                        </Cell>
+                      ))}
+                      <Cell>
+                        <div className="flex gap-1 justify-center">
+                          <EditItemButton handleClick={() => onEdit(item)} />
+                          <DeleteItemButton
+                            handleClick={() => onDelete(item)}
+                          />
+                        </div>
+                      </Cell>
+                    </Row>
+                  ))
+                ) : (
+                  <Row item={{ id: "" }}>
+                    <Cell colSpan={columns.length + 2}>No hay datos</Cell>
+                  </Row>
+                )}
+              </Body>
+            </>
+          )}
+        </Table>
+      </div>
+
+      {/* Paginación */}
+      <div className="flex justify-between">
+        <PageInfo
+          page={pagination.state.page + 1}
+          totalPage={pagination.state.getTotalPages(tableData.nodes)}
+        />
+        <div className="flex gap-2">
+          <PreviousPaginationBtn
+            notClickable={pagination.state.page === 0}
+            handleClick={() =>
+              pagination.fns.onSetPage(pagination.state.page - 1)
+            }
+          />
+          <NextPaginationBtn
+            notClickable={
+              pagination.state.page + 1 ===
+              pagination.state.getTotalPages(tableData.nodes)
+            }
+            handleClick={() =>
+              pagination.fns.onSetPage(pagination.state.page + 1)
+            }
+          />
+        </div>
+      </div>
+    </>
   );
 }
 
