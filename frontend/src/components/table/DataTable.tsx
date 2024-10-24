@@ -273,7 +273,12 @@ function DataTable<T extends TableNode>({
                   ))
                 ) : (
                   <Row item={{ id: "" }}>
-                    <Cell colSpan={columns.length + 2}>No hay datos</Cell>
+                    <Cell 
+                      gridColumnStart={1}
+                      gridColumnEnd={columns.length + 3}
+                    >
+                      No hay datos
+                      </Cell>
                   </Row>
                 )}
               </Body>
