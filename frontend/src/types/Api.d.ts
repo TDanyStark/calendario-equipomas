@@ -1,7 +1,9 @@
 
-export interface FetchState<T> {
-  data: T | null;
-  loading: boolean;
-  error: string | null;
-  fetchData: (endpoint: string) => Promise<void>;
-}
+export type ResourceType = 'instruments' | 'classrooms' | 'semesters' | 'professors' | 'students';
+
+// Tipo para el instrumento
+type Instrument = {
+  id: string;
+  instrumentName: string;
+};
+
