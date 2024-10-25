@@ -1,39 +1,38 @@
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { Loader } from "../components/Loader/Loader";
-import { Instrument } from "../types/Api";
+import { InstrumentType } from "../types/Api";
 import useItemMutations from "../hooks/useItemsMutation";
 import useFetchItems from "../hooks/useFetchItems";
 import DataTable from "../components/table/DataTable";
 import Primaryh1 from "../components/titles/Primaryh1";
+import CloseModalBtn from "../components/buttons/CloseModalBtn";
+import BackgroundDiv from "../components/modal/BackgroundDiv";
+import CancelModalBtn from "../components/buttons/CancelModalBtn";
+import SubmitModalBtn from "../components/buttons/SubmitModalBtn";
+
+const entity = "instruments";
 
 const Instruments = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [editInstrument, setEditInstrument] = useState<Instrument | null>(null);
+  const [editInstrument, setEditInstrument] = useState<InstrumentType | null>(
+    null
+  );
 
   // Obtener el token desde el store
   const JWT = useSelector((state: RootState) => state.auth.JWT);
 
   // Fetch instruments data
-  const {
-    data: instruments,
-    isLoading,
-    isError,
-  } = useFetchItems("instruments", JWT);
-
-  // Mutaciones
-  const { createItem, updateItem, deleteItem, deleteItems } =
-    useItemMutations<Instrument>("instruments", JWT);
-
+  const { data: instruments, isLoading, isError } = useFetchItems(entity, JWT);
+  const memorizedData = useMemo(() => instruments, [instruments]);
   // Manejo del formulario con react-hook-form
-  const { register, handleSubmit, setValue, reset } = useForm<Instrument>();
-
-  const onSubmit = (data: Instrument) => {
+  const { register, handleSubmit, setValue, reset } = useForm<InstrumentType>();
+  const onSubmit = (data: InstrumentType) => {
     if (editInstrument) {
       updateItem.mutate({
         id: editInstrument.id,
@@ -47,49 +46,73 @@ const Instruments = () => {
     setIsOpen(false);
   };
 
-  const handleCreate = () => {
+  // Mutaciones
+  const { createItem, updateItem, deleteItem, deleteItems } =
+    useItemMutations<InstrumentType>(entity, JWT);
+
+  const handleCreate = useCallback(() => {
     setEditInstrument(null);
     setIsOpen(true);
     reset();
-  };
+  }, [reset]);
 
-  const handleEdit = (item: Instrument) => {
-    setEditInstrument(item);
-    setIsOpen(true);
-    setValue("instrumentName", item.instrumentName);
-  };
-
-  const handleDelete = (item: Instrument) => {
-    deleteItem.mutate(item.id);
-  };
-
-  const handleDeleteSelected = (selectedIds: React.Key[]) => {
-    const stringIds = selectedIds.map(id => id.toString());
-    deleteItems.mutate(stringIds);
-  };
-  const columns = [
-    {
-      label: "ID",
-      sortKey: "id",
-      renderCell: (item: Instrument) => item.id,
+  const handleEdit = useCallback(
+    (item: InstrumentType) => {
+      setEditInstrument(item);
+      setIsOpen(true);
+      setValue("instrumentName", item.instrumentName);
     },
-    {
-      label: "Instrumento",
-      sortKey: "instrumentName",
-      renderCell: (item: Instrument) => item.instrumentName,
-    }
-    // Puedes agregar más columnas si es necesario
-  ];
+    [setValue]
+  );
+
+  const handleDelete = useCallback(
+    (item: InstrumentType) => {
+      deleteItem.mutate((item as InstrumentType).id);
+    },
+    // aqui los desactivamos porque no entiendo porque detecta que deleteItem cambia en cada renderizado, si no cambia
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
+  const handleDeleteSelected = useCallback(
+    (selectedIds: React.Key[]) => {
+      const stringIds = selectedIds.map((id) => id.toString());
+      deleteItems.mutate(stringIds);
+    },
+    // aqui los desactivamos porque no entiendo porque detecta que deleteItems cambia en cada renderizado, si no cambia
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
+  const columns = useMemo(
+    () => [
+      {
+        label: "ID",
+        sortKey: "id",
+        renderCell: (item: unknown) =>
+          (item as InstrumentType).id as string | number,
+      },
+      {
+        label: "Instrumento",
+        sortKey: "instrumentName",
+        renderCell: (item: unknown) =>
+          (item as InstrumentType).instrumentName as string | number,
+      },
+    ],
+    []
+  );
+
   // Si hay error o está cargando
   if (isLoading) return <Loader />;
   if (isError) return <p>Error cargando instrumentos.</p>;
 
   return (
-    <section className="p-4 flex flex-col gap-6">
+    <section className="section_page">
       <Primaryh1>Instrumentos</Primaryh1>
-
-      <DataTable
-        data={instruments || []}
+      {/* esto lo colocamos porque hay como un bug del editor, dice que Datatable no expera ningun tipo, lo cual es un error dado que recibe ,<T */}
+      {/* @ts-expect-error: DataTable is a generic component */}
+      <DataTable<InstrumentType>
+        data={memorizedData || []}
         columns={columns}
         onCreate={handleCreate}
         onEdit={handleEdit}
@@ -107,13 +130,21 @@ const Instruments = () => {
           onClose={() => setIsOpen(false)}
           className="relative z-50"
         >
-          <div className="fixed inset-0 bg-principal-bg bg-opacity-80" />
-          <div className="fixed inset-0 flex items-center justify-center p-4">
-            <DialogPanel className="bg-principal-bg border border-white border-opacity-40 rounded-lg p-6 w-full max-w-md">
-              <DialogTitle className="text-lg font-bold">
-                {editInstrument ? "Editar Instrumento" : "Crear Instrumento"}
-              </DialogTitle>
-              <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
+          <BackgroundDiv />
+          <div className="modal_container">
+            <DialogPanel className="dialog_panel">
+              <div className="modal_header">
+                <DialogTitle className="dialog_title">
+                  {editInstrument ? "Editar Instrumento" : "Crear Instrumento"}
+                </DialogTitle>
+                <CloseModalBtn onClick={() => setIsOpen(false)} />
+              </div>
+
+              <form
+                id={`form-${entity}`}
+                onSubmit={handleSubmit(onSubmit)}
+                className="mt-4"
+              >
                 <div className="mb-4">
                   <label
                     className="block text-sm font-medium mb-1"
@@ -128,19 +159,15 @@ const Instruments = () => {
                     type="text"
                   />
                 </div>
-                <div className="flex justify-end space-x-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsOpen(false)}
-                    className="btn-secondary"
-                  >
-                    Cancelar
-                  </button>
-                  <button type="submit" className="btn-primary">
-                    {editInstrument ? "Actualizar" : "Crear"}
-                  </button>
-                </div>
               </form>
+
+              <div className="modal_footer">
+                <CancelModalBtn onClick={() => setIsOpen(false)} />
+                <SubmitModalBtn
+                  text={editInstrument ? "Actualizar" : "Crear"}
+                  form={`form-${entity}`}
+                />
+              </div>
             </DialogPanel>
           </div>
         </Dialog>

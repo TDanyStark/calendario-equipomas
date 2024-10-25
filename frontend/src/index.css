@@ -41,3 +41,29 @@ table input[type="checkbox"]{
 .input-primary {
   @apply border border-white rounded px-3 py-2;
 }
+
+.section_page{
+  @apply p-4 flex flex-col gap-6;
+}
+
+/* modal */
+
+.modal_container{
+  @apply fixed inset-0 flex items-center justify-center p-4
+}
+
+.dialog_title{
+  @apply text-xl font-semibold text-gray-900 dark:text-white
+}
+
+.dialog_panel{
+  @apply bg-principal-bg border border-white border-opacity-40 rounded-lg p-6 w-full max-w-md
+}
+
+.modal_header{
+  @apply flex items-center justify-between
+}
+
+.modal_footer{
+  @apply flex justify-end gap-4
+}
