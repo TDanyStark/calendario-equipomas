@@ -1,6 +1,6 @@
 // components/DataTable.tsx
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Table,
   Header,
@@ -51,7 +51,6 @@ interface DataTableProps<T> {
   gridTemplateColumns: string;
 }
 
-
 function DataTable<T extends TableNode>({
   data,
   columns,
@@ -64,13 +63,12 @@ function DataTable<T extends TableNode>({
   TextButtonCreate,
   gridTemplateColumns,
 }: DataTableProps<T>) {
-  
   const [search, setSearch] = useState("");
+
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
-
 
   // Filtrar datos basados en la búsqueda
   const filteredData = data.filter((item) =>
@@ -85,7 +83,11 @@ function DataTable<T extends TableNode>({
 
   const THEME = {
     Table: `
-      ${gridTemplateColumns ? `--data-table-library_grid-template-columns: ${gridTemplateColumns};` : ""}
+      ${
+        gridTemplateColumns
+          ? `--data-table-library_grid-template-columns: ${gridTemplateColumns};`
+          : ""
+      }
       border-spacing: 0;
       border-collapse: collapse;
       width: 100%;
@@ -146,20 +148,28 @@ function DataTable<T extends TableNode>({
 
   const theme = useTheme(THEME);
 
-  const sortFns: Record<string, (nodes: TableNode[]) => TableNode[]> = columns.reduce((acc: Record<string, (nodes: TableNode[]) => TableNode[]>, column) => {
-    if (column.sortKey) {
-      acc[column.sortKey] = (nodes: TableNode[]) =>
-        nodes.sort((a, b) => {
-          const aValue = column.sortKey ? ((a as T)[column.sortKey as keyof T] as string | number) : '';
-          const bValue = column.sortKey ? ((b as T)[column.sortKey as keyof T] as string | number) : '';
-          if (typeof aValue === "string") {
-            return String(aValue).localeCompare(String(bValue));
-          }
-          return (aValue as number) - (bValue as number);
-        });
-    }
-    return acc;
-  }, {});
+  const sortFns: Record<string, (nodes: TableNode[]) => TableNode[]> =
+    columns.reduce(
+      (acc: Record<string, (nodes: TableNode[]) => TableNode[]>, column) => {
+        if (column.sortKey) {
+          acc[column.sortKey] = (nodes: TableNode[]) =>
+            nodes.sort((a, b) => {
+              const aValue = column.sortKey
+                ? ((a as T)[column.sortKey as keyof T] as string | number)
+                : "";
+              const bValue = column.sortKey
+                ? ((b as T)[column.sortKey as keyof T] as string | number)
+                : "";
+              if (typeof aValue === "string") {
+                return String(aValue).localeCompare(String(bValue));
+              }
+              return (aValue as number) - (bValue as number);
+            });
+        }
+        return acc;
+      },
+      {}
+    );
 
   const sort = useSort(
     tableData,
@@ -190,14 +200,23 @@ function DataTable<T extends TableNode>({
   const pagination = usePagination(tableData, {
     state: {
       page: 0,
-      size: 10,
+      size: 1,
     },
   });
 
   const handleDeleteItems = () => {
     onDeleteSelected(selectedIds);
     select.fns.onRemoveAll();
-  }
+  };
+
+  const totalPages = Math.max(1, pagination.state.getTotalPages(tableData.nodes));
+
+   // Crear un ref para onSetPage para que no cambie en cada renderizado
+  const onSetPageRef = useRef(pagination.fns.onSetPage);
+
+  useEffect(() => {
+    onSetPageRef.current(0);
+  }, [search]); 
 
   return (
     <>
@@ -212,10 +231,15 @@ function DataTable<T extends TableNode>({
             className="input-primary w-full max-w-60"
           />
           {selectedIds.length > 0 ? (
-            <DeleteItemsBtn countItems={selectedIds.length} handleClick={handleDeleteItems} />
+            <DeleteItemsBtn
+              countItems={selectedIds.length}
+              handleClick={handleDeleteItems}
+            />
           ) : null}
         </div>
-        <PrimaryButton handleClick={onCreate}>Crear nuevo {TextButtonCreate}</PrimaryButton>
+        <PrimaryButton handleClick={onCreate}>
+          Crear nuevo {TextButtonCreate}
+        </PrimaryButton>
       </div>
 
       {/* Tabla */}
@@ -269,8 +293,12 @@ function DataTable<T extends TableNode>({
                     </Row>
                   ))
                 ) : (
-                  <Row key={'notFound'} item={{ id: ""}} className="select-none pointer-events-none">
-                    <Cell 
+                  <Row
+                    key={"notFound"}
+                    item={{ id: "" }}
+                    className="select-none pointer-events-none"
+                  >
+                    <Cell
                       gridColumnStart={1}
                       gridColumnEnd={columns.length + 4}
                     >
@@ -286,10 +314,7 @@ function DataTable<T extends TableNode>({
 
       {/* Paginación */}
       <div className="flex justify-between">
-        <PageInfo
-          page={pagination.state.page + 1}
-          totalPage={pagination.state.getTotalPages(tableData.nodes)}
-        />
+        <PageInfo page={pagination.state.page + 1} totalPage={totalPages} />
         <div className="flex gap-2">
           <PreviousPaginationBtn
             notClickable={pagination.state.page === 0}
@@ -298,10 +323,7 @@ function DataTable<T extends TableNode>({
             }
           />
           <NextPaginationBtn
-            notClickable={
-              pagination.state.page + 1 ===
-              pagination.state.getTotalPages(tableData.nodes)
-            }
+            notClickable={pagination.state.page + 1 === totalPages}
             handleClick={() =>
               pagination.fns.onSetPage(pagination.state.page + 1)
             }
