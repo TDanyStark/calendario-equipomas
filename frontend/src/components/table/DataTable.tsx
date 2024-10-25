@@ -1,6 +1,6 @@
 // components/DataTable.tsx
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Table,
   Header,
@@ -70,48 +70,6 @@ function DataTable<T extends TableNode>({
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
-
-  // crear un useEffect por cada prop recibida con un console.log para ver si se actualiza
-  useEffect(() => {
-    console.log("data", data);
-  }, [data]);
-
-  useEffect(() => {
-    console.log("columns", columns);
-  }, [columns]);
-
-  useEffect(() => {
-    console.log("heightRow", heightRow);
-  }, [heightRow]);
-
-  useEffect(() => {
-    console.log("searchPlaceholder", searchPlaceholder);
-  }, [searchPlaceholder]);
-
-  useEffect(() => {
-    console.log("TextButtonCreate", TextButtonCreate);
-  }, [TextButtonCreate]);
-
-  useEffect(() => {
-    console.log("gridTemplateColumns", gridTemplateColumns);
-  }, [gridTemplateColumns]);
-
-  useEffect(() => {
-    console.log("onCreate");
-  }, [onCreate]);
-
-  useEffect(() => {
-    console.log("onEdit");
-  }, [onEdit]);
-
-  useEffect(() => {
-    console.log("onDelete");
-  }, [onDelete]);
-
-  useEffect(() => {
-    console.log("onDeleteSelected");
-  }, [onDeleteSelected]);
-
 
 
   // Filtrar datos basados en la búsqueda

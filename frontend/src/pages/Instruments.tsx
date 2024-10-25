@@ -29,9 +29,11 @@ const Instruments = () => {
 
   // Fetch instruments data
   const { data: instruments, isLoading, isError } = useFetchItems(entity, JWT);
+
   const memorizedData = useMemo(() => instruments, [instruments]);
   // Manejo del formulario con react-hook-form
   const { register, handleSubmit, setValue, reset } = useForm<InstrumentType>();
+
   const onSubmit = (data: InstrumentType) => {
     if (editInstrument) {
       updateItem.mutate({
@@ -112,6 +114,7 @@ const Instruments = () => {
       {/* esto lo colocamos porque hay como un bug del editor, dice que Datatable no expera ningun tipo, lo cual es un error dado que recibe ,<T */}
       {/* @ts-expect-error: DataTable is a generic component */}
       <DataTable<InstrumentType>
+
         data={memorizedData || []}
         columns={columns}
         onCreate={handleCreate}

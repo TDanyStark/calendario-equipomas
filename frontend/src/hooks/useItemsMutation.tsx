@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 
 
 
-const useItemMutations = <T extends { id?: string }>(resource: ResourceType, JWT: string | null) => {
+const useItemMutations = <T extends { id: string }>(resource: ResourceType, JWT: string | null) => {
   const queryClient = useQueryClient();
   
   const createItem = useMutation(
