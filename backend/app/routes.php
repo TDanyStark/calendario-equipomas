@@ -16,6 +16,11 @@ use App\Application\Actions\Instrument\UpdateInstrumentAction;
 use App\Application\Actions\Instrument\DeleteInstrumentAction;
 use App\Application\Actions\Instrument\DeleteMultipleInstrumentsAction;
 
+use App\Application\Actions\Room\ListRoomsAction;
+use App\Application\Actions\Room\CreateRoomAction;
+use App\Application\Actions\Room\UpdateRoomAction;
+use App\Application\Actions\Room\DeleteRoomAction;
+
 use App\Application\Middleware\RoleMiddleware;
 
 return function (App $app) {
@@ -36,6 +41,15 @@ return function (App $app) {
             $instrumentGroup->delete('/{id}', DeleteInstrumentAction::class);
 
             $instrumentGroup->delete('', DeleteMultipleInstrumentsAction::class);
+        })->add($this->get(RoleMiddleware::class)->withRole('admin'));
+
+        $group->group('/rooms', function (Group $roomGroup) {
+            $roomGroup->get('', ListRoomsAction::class);
+            $roomGroup->post('', CreateRoomAction::class);
+            $roomGroup->put('/{id}', UpdateRoomAction::class);
+            $roomGroup->delete('/{id}', DeleteRoomAction::class);
+
+            $roomGroup->delete('', DeleteMultipleInstrumentsAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
     });
 };

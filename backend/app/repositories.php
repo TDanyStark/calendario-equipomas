@@ -16,7 +16,9 @@ use App\Domain\Admin\AdminRepository;
 use App\Infrastructure\Repository\DatabaseAdminRepository;
 
 use App\Domain\Instrument\InstrumentRepository;
+use App\Domain\Room\RoomRepository;
 use App\Infrastructure\Repository\DatabaseInstrumentRepository;
+use App\Infrastructure\Repository\DatabaseRoomRepository;
 
 return function (ContainerBuilder $containerBuilder) {
     // Here we map our UserRepository interface to its in memory implementation
@@ -52,5 +54,10 @@ return function (ContainerBuilder $containerBuilder) {
             $database = $container->get(Database::class);
             return new DatabaseInstrumentRepository($database);
         },
+
+        RoomRepository::class => function($container){
+            $database = $container->get(Database::class);
+            return new DatabaseRoomRepository($database);
+        }
     ]);
 };
