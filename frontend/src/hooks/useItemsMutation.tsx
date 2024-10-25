@@ -16,6 +16,7 @@ const useItemMutations = <T extends { id: string }>(resource: ResourceType, JWT:
       }),
     {
       onSuccess: () => {
+        // esto invalida la cache de la query que se hizo para obtener los items, y obliga a volver a hacer el get al recurso
         queryClient.invalidateQueries(resource);
         toast.success(`${resource} creado exitosamente`);
         toast.clearWaitingQueue();
@@ -27,7 +28,6 @@ const useItemMutations = <T extends { id: string }>(resource: ResourceType, JWT:
     }
   );
   
-  // Similar para updateItem y deleteItem
   const updateItem = useMutation(
     (updatedItem: T) =>
       axios.put(`${URL_BACKEND}${resource}/${updatedItem.id}`, updatedItem, {

@@ -200,7 +200,7 @@ function DataTable<T extends TableNode>({
   const pagination = usePagination(tableData, {
     state: {
       page: 0,
-      size: 1,
+      size: 10,
     },
   });
 

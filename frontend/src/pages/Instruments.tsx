@@ -15,8 +15,10 @@ import CloseModalBtn from "../components/buttons/CloseModalBtn";
 import BackgroundDiv from "../components/modal/BackgroundDiv";
 import CancelModalBtn from "../components/buttons/CancelModalBtn";
 import SubmitModalBtn from "../components/buttons/SubmitModalBtn";
+import ErrorLoadingResourse from "../components/error/ErrorLoadingResourse";
 
 const entity = "instruments";
+const entityName = "instrumentos"
 
 const Instruments = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,7 +31,7 @@ const Instruments = () => {
 
   // Fetch instruments data
   const { data: instruments, isLoading, isError } = useFetchItems(entity, JWT);
-
+  
   const memorizedData = useMemo(() => instruments, [instruments]);
   // Manejo del formulario con react-hook-form
   const { register, handleSubmit, setValue, reset } = useForm<InstrumentType>();
@@ -106,7 +108,7 @@ const Instruments = () => {
 
   // Si hay error o está cargando
   if (isLoading) return <Loader />;
-  if (isError) return <p>Error cargando instrumentos.</p>;
+  if (isError) return <ErrorLoadingResourse resourse={entityName} />;
 
   return (
     <section className="section_page">
