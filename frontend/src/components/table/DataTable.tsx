@@ -81,7 +81,6 @@ function DataTable<T extends TableNode>({
 
   const tableData = { nodes: filteredData };
 
-  // Define tu tema aquí (puedes reutilizar el que ya tienes)
   const THEME = {
     Table: `
       ${gridTemplateColumns ? `--data-table-library_grid-template-columns: ${gridTemplateColumns};` : ""}
@@ -95,7 +94,6 @@ function DataTable<T extends TableNode>({
     Body: ``,
     BaseRow: `
       background-color: #000000;
-    
       &.row-select-selected, &.row-select-single-selected {
         background-color: var(--theme-ui-colors-background-secondary);
         color: var(--theme-ui-colors-text);
@@ -103,14 +101,12 @@ function DataTable<T extends TableNode>({
     `,
     HeaderRow: `
       font-size: 20px;
-    
       .th {
         border-bottom: 1px solid white;
       }
     `,
     Row: `
       font-size: 16px;
-    
       &:not(:last-of-type) .td {
         border-bottom: 1px solid white;
       }
@@ -120,7 +116,6 @@ function DataTable<T extends TableNode>({
       &:nth-of-type(even) {
         background-color: #000000;
       }
-    
       &:hover {
         background-color: #000275;
       }
@@ -176,7 +171,9 @@ function DataTable<T extends TableNode>({
     tableData,
     {
       onChange: () => {
-        // Manejar cambios en la selección si es necesario
+        if (select.state.ids.includes("")) {
+          select.fns.onRemoveAll();
+        }
       },
     },
     {
@@ -185,7 +182,8 @@ function DataTable<T extends TableNode>({
     }
   );
 
-  const selectedIds = select.state.ids;
+  // quitar los ids vacios ""
+  const selectedIds = select.state.ids.filter((id: string) => id !== "");
 
   const pagination = usePagination(tableData, {
     state: {
@@ -272,13 +270,13 @@ function DataTable<T extends TableNode>({
                     </Row>
                   ))
                 ) : (
-                  <Row item={{ id: "" }}>
+                  <Row key={'notFound'} item={{ id: ""}} className="select-none pointer-events-none">
                     <Cell 
                       gridColumnStart={1}
-                      gridColumnEnd={columns.length + 3}
+                      gridColumnEnd={columns.length + 4}
                     >
                       No hay datos
-                      </Cell>
+                    </Cell>
                   </Row>
                 )}
               </Body>
