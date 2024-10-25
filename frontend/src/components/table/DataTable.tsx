@@ -30,6 +30,7 @@ import NextPaginationBtn from "../buttons/NextPaginationBtn";
 import PreviousPaginationBtn from "../buttons/PreviousPaginationBtn";
 import PageInfo from "../pagination/PageInfo";
 import PrimaryButton from "../buttons/PrimaryButton";
+import DeleteItemsBtn from "../buttons/DeleteItemsBtn";
 
 interface Column<T> {
   label: string;
@@ -192,6 +193,11 @@ function DataTable<T extends TableNode>({
     },
   });
 
+  const handleDeleteItems = () => {
+    onDeleteSelected(selectedIds);
+    select.fns.onRemoveAll();
+  }
+
   return (
     <>
       {/* Búsqueda y acciones */}
@@ -205,15 +211,7 @@ function DataTable<T extends TableNode>({
             className="input-primary w-full max-w-60"
           />
           {selectedIds.length > 0 ? (
-            <button
-              onClick={() => {
-                onDeleteSelected(selectedIds);
-                select.fns.onRemoveAll();
-              }}
-              className="px-4 py-2 bg-red-600 text-white rounded text-nowrap"
-            >
-              Eliminar {selectedIds.length}
-            </button>
+            <DeleteItemsBtn countItems={selectedIds.length} handleClick={handleDeleteItems} />
           ) : null}
         </div>
         <PrimaryButton handleClick={onCreate}>Crear nuevo {TextButtonCreate}</PrimaryButton>

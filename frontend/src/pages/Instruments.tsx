@@ -77,7 +77,7 @@ const Instruments = () => {
       label: "Instrumento",
       sortKey: "instrumentName",
       renderCell: (item: Instrument) => item.instrumentName,
-    },
+    }
     // Puedes agregar más columnas si es necesario
   ];
   // Si hay error o está cargando
