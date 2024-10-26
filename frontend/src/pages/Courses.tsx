@@ -1,5 +1,5 @@
 import { useForm, Controller, useFieldArray } from "react-hook-form";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,7 +16,8 @@ import BackgroundDiv from "../components/modal/BackgroundDiv";
 import CancelModalBtn from "../components/buttons/CancelModalBtn";
 import SubmitModalBtn from "../components/buttons/SubmitModalBtn";
 import ErrorLoadingResourse from "../components/error/ErrorLoadingResourse";
-import { daysOfWeek } from "../data/DaysOfWeek";
+import useFetchDaysOfWeek from "../hooks/useFetchDaysOfWeek";
+
 
 const entity = "courses";
 const entityName = "cursos";
@@ -28,19 +29,23 @@ const Courses = () => {
   // Obtener el token desde el store
   const JWT = useSelector((state: RootState) => state.auth.JWT);
 
-  // Fetch courses data
+   // Fetch courses data
   const { data: courses, isLoading, isError } = useFetchItems(entity, JWT);
-  // @ts-expect-error: This variable is used but you can't see it in the code
+  
+   // @ts-expect-error: This variable is used but you can't see it in the code
   const memorizedData = useMemo(() => courses, [courses]);
+
+  // Fetch días de la semana
+  const {
+    daysOfWeek,
+    isLoading: loadingDays,
+    isError: errorDays,
+  } = useFetchDaysOfWeek();
 
   const { register, handleSubmit, setValue, reset, control } =
     useForm<CourseType>({
       defaultValues: {
-        availability: daysOfWeek.map((day) => ({
-          dayOfWeek: day.name,
-          startTime: null,
-          endTime: null,
-        })),
+        availability: [], // Inicializa vacío, para ser llenado después
       },
     });
 
@@ -49,19 +54,29 @@ const Courses = () => {
     name: "availability",
   });
 
+  // Actualizar valores predeterminados del formulario cuando `daysOfWeek` esté disponible
+  useEffect(() => {
+    if (daysOfWeek.length > 0) {
+      reset({
+        availability: daysOfWeek.map((day) => ({
+          dayOfWeek: day.dayName,
+          startTime: null,
+          endTime: null,
+        })),
+      });
+    }
+  }, [daysOfWeek, reset]);
+
   const onSubmit = (data: CourseType) => {
     const filteredAvailability = data.availability
-      .filter(
-        (day) =>
-          day.startTime !== null &&
-          day.endTime !== null
-      )
-      .map((day) => ({
-        dayOfWeek: day.dayOfWeek,
-        startTime: day.startTime,
-        endTime: day.endTime,
-      }));
-
+    .filter(
+      (day) => day.startTime !== null && day.endTime !== null
+    )
+    .map((day) => ({
+      dayOfWeek: day.dayOfWeek,
+      startTime: day.startTime,
+      endTime: day.endTime,
+    }));
     const cleanedData = {
       ...data,
       availability: filteredAvailability.length > 0 ? filteredAvailability : [],
@@ -221,9 +236,9 @@ const Courses = () => {
                   <label className="block text-sm font-medium mb-1">
                     Disponibilidad
                   </label>
-                  {fields.map((field, index: number) => (
+                  {fields && fields.map((field, index: number) => (
                     <div key={field.id} className="flex items-center mb-2">
-                      <span className="w-24">{daysOfWeek[index].displayName}:</span>
+                      <span className="w-24">{daysOfWeek[index].dayDisplayName}:</span>
                       <Controller
                         control={control}
                         name={`availability.${index}.startTime`}
@@ -252,7 +267,7 @@ const Courses = () => {
                       <input
                         type="hidden"
                         {...register(`availability.${index}.dayOfWeek` as const)}
-                        value={daysOfWeek[index].name}
+                        value={daysOfWeek[index].dayName}
                       />
                     </div>
                   ))}
