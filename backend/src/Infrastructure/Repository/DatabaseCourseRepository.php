@@ -55,10 +55,9 @@ class DatabaseCourseRepository implements CourseRepository
 
   public function create(Course $course): int
   {
-    $stmt = $this->pdo->prepare("INSERT INTO courses (CourseName, CourseDescription, IsOnline) VALUES (:name, :description, :isOnline)");
+    $stmt = $this->pdo->prepare("INSERT INTO courses (CourseName, IsOnline) VALUES (:name, :isOnline)");
     $stmt->execute([
       'name' => $course->getName(),
-      'description' => $course->getDescription(),
       'isOnline' => $course->getIsOnline(),
     ]);
 
@@ -67,11 +66,10 @@ class DatabaseCourseRepository implements CourseRepository
 
   public function update(Course $course): void
   {
-    $stmt = $this->pdo->prepare("UPDATE courses SET CourseName = :name, CourseDescription = :description, IsOnline = :isOnline WHERE CourseID = :id");
+    $stmt = $this->pdo->prepare("UPDATE courses SET CourseName = :name, IsOnline = :isOnline WHERE CourseID = :id");
     $stmt->execute([
       'id' => $course->getId(),
       'name' => $course->getName(),
-      'description' => $course->getDescription(),
       'isOnline' => $course->getIsOnline(),
     ]);
   }
@@ -89,7 +87,6 @@ class DatabaseCourseRepository implements CourseRepository
       return new Course(
           (int)$row['CourseID'],
           $row['CourseName'],
-          $row['CourseDescription'],
           (bool)$row['IsOnline'],
           $row['Created_at'],
           $row['Updated_at'],

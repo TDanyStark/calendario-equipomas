@@ -1,6 +1,6 @@
-import { DayOfWeek } from "../types/Api";
+import { DayOfWeekType } from "../types/Api";
 
-export const DayOfWeeks: DayOfWeek[] = [
+export const daysOfWeek: DayOfWeekType[] = [
   { id: 1, name: "Monday", displayName: "Lunes" },
   { id: 2, name: "Tuesday", displayName: "Martes" },
   { id: 3, name: "Wednesday", displayName: "Miércoles" },

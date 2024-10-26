@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { Loader } from "../components/Loader/Loader";
-import { Room } from "../types/Api";
+import { RoomType } from "../types/Api";
 import useItemMutations from "../hooks/useItemsMutation";
 import useFetchItems from "../hooks/useFetchItems";
 import DataTable from "../components/table/DataTable";
@@ -22,7 +22,7 @@ const entityName = "salones";
 
 const Rooms = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [editRoom, setEditRoom] = useState<Room | null>(null);
+  const [editRoom, setEditRoom] = useState<RoomType | null>(null);
 
   // Obtener el token desde el store
   const JWT = useSelector((state: RootState) => state.auth.JWT);
@@ -32,9 +32,9 @@ const Rooms = () => {
 
   const memorizedData = useMemo(() => rooms, [rooms]);
   // Manejo del formulario con react-hook-form
-  const { register, handleSubmit, setValue, reset } = useForm<Room>();
+  const { register, handleSubmit, setValue, reset } = useForm<RoomType>();
 
-  const onSubmit = (data: Room) => {
+  const onSubmit = (data: RoomType) => {
     if (editRoom) {
       updateItem.mutate({
         id: editRoom.id,
@@ -51,7 +51,7 @@ const Rooms = () => {
 
   // Mutaciones
   const { createItem, updateItem, deleteItem, deleteItems } =
-    useItemMutations<Room>(entity, JWT);
+    useItemMutations<RoomType>(entity, JWT);
 
   const handleCreate = useCallback(() => {
     setEditRoom(null);
@@ -60,7 +60,7 @@ const Rooms = () => {
   }, [reset]);
 
   const handleEdit = useCallback(
-    (item: Room) => {
+    (item: RoomType) => {
       setEditRoom(item);
       setIsOpen(true);
       setValue("name", item.name);
@@ -70,8 +70,8 @@ const Rooms = () => {
   );
 
   const handleDelete = useCallback(
-    (item: Room) => {
-      deleteItem.mutate((item as Room).id);
+    (item: RoomType) => {
+      deleteItem.mutate((item as RoomType).id);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -91,17 +91,17 @@ const Rooms = () => {
       {
         label: "ID",
         sortKey: "id",
-        renderCell: (item: unknown) => (item as Room).id as string | number,
+        renderCell: (item: unknown) => (item as RoomType).id as string | number,
       },
       {
         label: "Nombre del Salón",
         sortKey: "name",
-        renderCell: (item: unknown) => (item as Room).name as string,
+        renderCell: (item: unknown) => (item as RoomType).name as string,
       },
       {
         label: "Capacidad",
         sortKey: "capacity",
-        renderCell: (item: unknown) => (item as Room).capacity as number,
+        renderCell: (item: unknown) => (item as RoomType).capacity as number,
       },
     ],
     []

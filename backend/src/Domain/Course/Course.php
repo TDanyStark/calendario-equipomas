@@ -11,7 +11,6 @@ class Course implements JsonSerializable
 {
     private int $id;
     private string $name;
-    private ?string $description;
     private bool $isOnline;
     private string $createdAt;
     private string $updatedAt;
@@ -21,7 +20,6 @@ class Course implements JsonSerializable
     public function __construct(
         int $id,
         string $name,
-        ?string $description,
         bool $isOnline,
         string $createdAt,
         string $updatedAt,
@@ -29,7 +27,6 @@ class Course implements JsonSerializable
     ) {
         $this->id = $id;
         $this->name = $name;
-        $this->description = $description;
         $this->isOnline = $isOnline;
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
@@ -44,11 +41,6 @@ class Course implements JsonSerializable
     public function getName(): string
     {
         return $this->name;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
     }
 
     public function getIsOnline(): bool
@@ -76,7 +68,6 @@ class Course implements JsonSerializable
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'description' => $this->description,
             'isOnline' => $this->isOnline,
             'availability' => $this->availability,
         ];
