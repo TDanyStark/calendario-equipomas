@@ -1,5 +1,5 @@
 // types/Api.d.ts
-export type ResourceType = 'instruments' | 'classrooms' | 'semesters' | 'professors' | 'students';
+export type ResourceType = 'instruments' | 'rooms' | 'semesters' | 'professors' | 'students';
 
 // Extiende TableNode
 export interface InstrumentType{
@@ -8,7 +8,7 @@ export interface InstrumentType{
 }
 
 type Room = {
-  id: number;
+  id: string;
   name: string;
   capacity: number;
 };
