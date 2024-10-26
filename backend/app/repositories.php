@@ -13,12 +13,16 @@ use App\Infrastructure\Repository\DatabaseUserRepository;
 use App\Domain\Role\RoleRepository;
 use App\Infrastructure\Repository\DatabaseRoleRepository;
 use App\Domain\Admin\AdminRepository;
+use App\Domain\Course\Course;
 use App\Infrastructure\Repository\DatabaseAdminRepository;
 
 use App\Domain\Instrument\InstrumentRepository;
 use App\Domain\Room\RoomRepository;
 use App\Infrastructure\Repository\DatabaseInstrumentRepository;
 use App\Infrastructure\Repository\DatabaseRoomRepository;
+
+use App\Domain\Course\CourseRepository;
+use App\Infrastructure\Repository\DatabaseCourseRepository;
 
 return function (ContainerBuilder $containerBuilder) {
     // Here we map our UserRepository interface to its in memory implementation
@@ -58,6 +62,11 @@ return function (ContainerBuilder $containerBuilder) {
         RoomRepository::class => function($container){
             $database = $container->get(Database::class);
             return new DatabaseRoomRepository($database);
-        }
+        },
+
+        CourseRepository::class => function ($container) {
+            $database = $container->get(Database::class);
+            return new DatabaseCourseRepository($database);
+        },
     ]);
 };

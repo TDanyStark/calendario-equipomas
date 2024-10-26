@@ -21,6 +21,11 @@ use App\Application\Actions\Room\UpdateRoomAction;
 use App\Application\Actions\Room\DeleteRoomAction;
 use App\Application\Actions\Room\DeleteMultipleRoomsAction;
 
+use App\Application\Actions\Course\ListCoursesAction;
+use App\Application\Actions\Course\CreateCourseAction;
+use App\Application\Actions\Course\UpdateCourseAction;
+use App\Application\Actions\Course\DeleteCourseAction;
+
 use App\Application\Middleware\RoleMiddleware;
 
 return function (App $app) {
@@ -47,6 +52,13 @@ return function (App $app) {
             $roomGroup->put('/{id}', UpdateRoomAction::class);
             $roomGroup->delete('/{id}', DeleteRoomAction::class);
             $roomGroup->delete('', DeleteMultipleRoomsAction::class);
+        })->add($this->get(RoleMiddleware::class)->withRole('admin'));
+
+        $group->group('/courses', function (Group $courseGroup) {
+            $courseGroup->get('', ListCoursesAction::class);
+            $courseGroup->post('', CreateCourseAction::class);
+            $courseGroup->put('/{id}', UpdateCourseAction::class);
+            $courseGroup->delete('/{id}', DeleteCourseAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
     });
 };
