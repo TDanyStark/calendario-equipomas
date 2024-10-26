@@ -6,7 +6,6 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
 use Slim\Interfaces\RouteCollectorProxyInterface as Group;
-use App\Application\Actions\Student\ListStudentsAction;
 use App\Application\Actions\Auth\LoginAction;
 use App\Application\Actions\Auth\ValidateJWTAction;
 
@@ -32,14 +31,12 @@ return function (App $app) {
     $app->group('/api', function (Group $group) {
         $group->post('/login', LoginAction::class);
         $group->post('/validateJWT', ValidateJWTAction::class);
-        $group->get('/students', ListStudentsAction::class);
 
         $group->group('/instruments', function (Group $instrumentGroup) {
             $instrumentGroup->get('', ListInstrumentsAction::class);
             $instrumentGroup->post('', CreateInstrumentAction::class);
             $instrumentGroup->put('/{id}', UpdateInstrumentAction::class);
             $instrumentGroup->delete('/{id}', DeleteInstrumentAction::class);
-
             $instrumentGroup->delete('', DeleteMultipleInstrumentsAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
 
@@ -48,7 +45,6 @@ return function (App $app) {
             $roomGroup->post('', CreateRoomAction::class);
             $roomGroup->put('/{id}', UpdateRoomAction::class);
             $roomGroup->delete('/{id}', DeleteRoomAction::class);
-
             $roomGroup->delete('', DeleteMultipleInstrumentsAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
     });
