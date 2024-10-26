@@ -19,6 +19,7 @@ use App\Application\Actions\Room\ListRoomsAction;
 use App\Application\Actions\Room\CreateRoomAction;
 use App\Application\Actions\Room\UpdateRoomAction;
 use App\Application\Actions\Room\DeleteRoomAction;
+use App\Application\Actions\Room\DeleteMultipleRoomsAction;
 
 use App\Application\Middleware\RoleMiddleware;
 
@@ -45,7 +46,7 @@ return function (App $app) {
             $roomGroup->post('', CreateRoomAction::class);
             $roomGroup->put('/{id}', UpdateRoomAction::class);
             $roomGroup->delete('/{id}', DeleteRoomAction::class);
-            $roomGroup->delete('', DeleteMultipleInstrumentsAction::class);
+            $roomGroup->delete('', DeleteMultipleRoomsAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
     });
 };

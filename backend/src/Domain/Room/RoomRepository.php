@@ -11,4 +11,5 @@ interface RoomRepository
     public function create(Room $room): int;
     public function update(Room $room): bool;
     public function delete(int $id): bool;
+    public function deleteMultiple(array $ids): int;
 }

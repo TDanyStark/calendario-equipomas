@@ -63,4 +63,15 @@ class DatabaseRoomRepository implements RoomRepository
     $stmt = $this->pdo->prepare("DELETE FROM rooms WHERE RoomID = :id");
     return $stmt->execute(['id' => $id]);
   }
+
+  public function deleteMultiple(array $ids): int
+  {
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    $query = "DELETE FROM rooms WHERE RoomID IN ($placeholders)";
+    $stmt = $this->pdo->prepare($query);
+
+    $stmt->execute($ids);
+
+    return $stmt->rowCount();
+  }
 }
