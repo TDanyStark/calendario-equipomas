@@ -90,6 +90,7 @@ class DatabaseCourseRepository implements CourseRepository
       (string)$row['CourseID'],
       $row['CourseName'],
       (bool)$row['IsOnline'],
+      (int)$row['CourseDuration'],
       $row['Created_at'],
       $row['Updated_at'],
       $availability

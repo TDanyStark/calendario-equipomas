@@ -32,7 +32,7 @@ const Courses = () => {
    // Fetch courses data
   const { data: courses, isLoading, isError } = useFetchItems(entity, JWT);
   
-   // @ts-expect-error: This variable is used but you can't see it in the code
+  // @ts-expect-error: This variable is used but you can't see it in the code
   const memorizedData = useMemo(() => courses, [courses]);
 
   // Fetch días de la semana
@@ -158,14 +158,9 @@ const Courses = () => {
           (item as CourseType).isOnline ? "Online" : "Presencial",
       },
       {
-        label: "Disponibilidad",
-        renderCell: (item: unknown) =>
-          (item as CourseType).availability
-            .map(
-              (avail) =>
-                `${avail.dayOfWeek} (${avail.startTime} - ${avail.endTime})`
-            )
-            .join(", "),
+        label: "Duración",
+        sortKey: "duration",
+        renderCell: (item: unknown) => (item as CourseType).duration,
       },
     ],
     []

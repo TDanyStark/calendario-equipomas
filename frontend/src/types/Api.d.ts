@@ -33,5 +33,6 @@ type CourseType = {
   id: string;                       // ID del curso
   name: string;                     // Nombre del curso
   isOnline: boolean;                // Indica si el curso es online
+  duration: number;                 // Duración del curso en minutos
   availability: CourseAvailability[]; // Arreglo de disponibilidades del curso
 };
