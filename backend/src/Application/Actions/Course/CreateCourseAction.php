@@ -7,7 +7,7 @@ namespace App\Application\Actions\Course;
 use Psr\Http\Message\ResponseInterface as Response;
 use App\Domain\Course\Course;
 use App\Domain\Course\CourseAvailability;
-use App\Domain\Shared\DayOfWeek;
+use App\Domain\Shared\Days\DayOfWeek;
 use InvalidArgumentException;
 
 class CreateCourseAction extends CourseAction

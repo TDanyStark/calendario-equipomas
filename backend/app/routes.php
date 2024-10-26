@@ -26,6 +26,8 @@ use App\Application\Actions\Course\CreateCourseAction;
 use App\Application\Actions\Course\UpdateCourseAction;
 use App\Application\Actions\Course\DeleteCourseAction;
 
+use App\Application\Actions\Days\ScheduleDaysAction;
+
 use App\Application\Middleware\RoleMiddleware;
 
 return function (App $app) {
@@ -37,6 +39,7 @@ return function (App $app) {
     $app->group('/api', function (Group $group) {
         $group->post('/login', LoginAction::class);
         $group->post('/validateJWT', ValidateJWTAction::class);
+        $group->get('/schedule/days', ScheduleDaysAction::class);
 
         $group->group('/instruments', function (Group $instrumentGroup) {
             $instrumentGroup->get('', ListInstrumentsAction::class);

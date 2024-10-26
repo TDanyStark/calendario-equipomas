@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Shared;
+namespace App\Domain\Shared\Days;
 
 enum DayOfWeek: string
 {

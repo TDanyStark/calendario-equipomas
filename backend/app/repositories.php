@@ -24,6 +24,9 @@ use App\Infrastructure\Repository\DatabaseRoomRepository;
 use App\Domain\Course\CourseRepository;
 use App\Infrastructure\Repository\DatabaseCourseRepository;
 
+use App\Domain\Shared\Days\ScheduleDayRepository;
+use App\Infrastructure\Repository\DbScheduleDayRepository;
+
 return function (ContainerBuilder $containerBuilder) {
     // Here we map our UserRepository interface to its in memory implementation
     $containerBuilder->addDefinitions([
@@ -67,6 +70,11 @@ return function (ContainerBuilder $containerBuilder) {
         CourseRepository::class => function ($container) {
             $database = $container->get(Database::class);
             return new DatabaseCourseRepository($database);
+        },
+
+        ScheduleDayRepository::class => function ($container) {
+            $database = $container->get(Database::class);
+            return new DbScheduleDayRepository($database);
         },
     ]);
 };

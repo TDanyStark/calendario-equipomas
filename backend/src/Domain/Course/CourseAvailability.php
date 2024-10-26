@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Course;
 
-use App\Domain\Shared\DayOfWeek;
+use App\Domain\Shared\Days\DayOfWeek;
 
 use JsonSerializable;
 

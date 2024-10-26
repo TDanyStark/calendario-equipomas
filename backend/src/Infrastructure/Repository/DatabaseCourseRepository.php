@@ -10,7 +10,7 @@ use App\Infrastructure\Database;
 use PDO;
 use App\Domain\Course\CourseAvailability;
 
-use App\Domain\Shared\DayOfWeek;
+use App\Domain\Shared\Days\DayOfWeek;
 
 class DatabaseCourseRepository implements CourseRepository
 {
