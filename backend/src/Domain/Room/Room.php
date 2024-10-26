@@ -48,14 +48,27 @@ class Room implements JsonSerializable
         return $this->updatedAt;
     }
 
-    public function jsonSerialize(): array
+    // Método para serializar la entidad a un array
+    public function toArray(array $options = []): array
     {
-        return [
+        $data = [
             'id' => $this->id,
             'name' => $this->name,
             'capacity' => $this->capacity,
-            'created_at' => $this->createdAt,
-            'updated_at' => $this->updatedAt,
         ];
+
+        return $data;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
+        // return [
+        //     'id' => $this->id,
+        //     'name' => $this->name,
+        //     'capacity' => $this->capacity,
+        //     'created_at' => $this->createdAt,
+        //     'updated_at' => $this->updatedAt,
+        // ];
     }
 }

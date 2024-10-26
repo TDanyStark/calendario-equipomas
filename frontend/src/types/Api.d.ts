@@ -3,6 +3,12 @@ export type ResourceType = 'instruments' | 'classrooms' | 'semesters' | 'profess
 
 // Extiende TableNode
 export interface InstrumentType{
-  id: string; // ya que `TableNode` típicamente requiere `id`
+  id: string;
   instrumentName: string;
 }
+
+type Room = {
+  id: number;
+  name: string;
+  capacity: number;
+};

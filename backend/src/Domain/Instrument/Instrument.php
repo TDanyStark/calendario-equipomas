@@ -51,13 +51,24 @@ class Instrument implements JsonSerializable
         $this->instrumentName = $instrumentName;
     }
 
-    public function jsonSerialize(): array
+    public function toArray(array $options = []): array
     {
-        return [
+        $data = [
             'id' => $this->id,
             'instrumentName' => $this->instrumentName,
-            'createdAt' => $this->createdAt,
-            'updatedAt' => $this->updatedAt,
         ];
+
+        return $data;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
+        // return [
+        //     'id' => $this->id,
+        //     'instrumentName' => $this->instrumentName,
+        //     'createdAt' => $this->createdAt,
+        //     'updatedAt' => $this->updatedAt,
+        // ];
     }
 }
