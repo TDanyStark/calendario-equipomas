@@ -8,29 +8,29 @@ use JsonSerializable;
 
 class ScheduleDay implements JsonSerializable
 {
-    private int $dayId;
+    private string $id;
     private DayOfWeek $dayName;
     private string $dayDisplayName;
     private string $startTime;
     private string $endTime;
 
     public function __construct(
-        int $dayId,
+        string $id,
         DayOfWeek $dayName,
         string $dayDisplayName,
         string $startTime,
         string $endTime
     ) {
-        $this->dayId = $dayId;
+        $this->id = $id;
         $this->dayName = $dayName;
         $this->dayDisplayName = $dayDisplayName;
         $this->startTime = $startTime;
         $this->endTime = $endTime;
     }
 
-    public function getDayId(): int
+    public function getDayId(): string
     {
-        return $this->dayId;
+        return $this->id;
     }
 
     public function getDayName(): DayOfWeek
@@ -56,7 +56,7 @@ class ScheduleDay implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'dayId' => $this->dayId,
+            'id' => $this->id,
             'dayName' => $this->dayName->value,
             'dayDisplayName' => $this->dayDisplayName,
             'startTime' => $this->startTime,

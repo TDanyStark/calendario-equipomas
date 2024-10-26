@@ -9,7 +9,7 @@ use JsonSerializable;
 
 class Course implements JsonSerializable
 {
-    private int $id;
+    private string $id;
     private string $name;
     private bool $isOnline;
     private string $createdAt;
@@ -18,7 +18,7 @@ class Course implements JsonSerializable
     private array $availability;
 
     public function __construct(
-        int $id,
+        string $id,
         string $name,
         bool $isOnline,
         string $createdAt,
@@ -33,7 +33,7 @@ class Course implements JsonSerializable
         $this->availability = $availability;
     }
 
-    public function getId(): int
+    public function getId(): string
     {
         return $this->id;
     }

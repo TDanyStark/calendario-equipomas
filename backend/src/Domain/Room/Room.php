@@ -8,13 +8,13 @@ use JsonSerializable;
 
 class Room implements JsonSerializable
 {
-    private int $id;
+    private string $id;
     private string $name;
     private int $capacity;
     private string $createdAt;
     private string $updatedAt;
 
-    public function __construct(int $id, string $name, int $capacity, string $createdAt, string $updatedAt)
+    public function __construct(string $id, string $name, int $capacity, string $createdAt, string $updatedAt)
     {
         $this->id = $id;
         $this->name = $name;
@@ -23,7 +23,7 @@ class Room implements JsonSerializable
         $this->updatedAt = $updatedAt;
     }
 
-    public function getId(): int
+    public function getId(): string
     {
         return $this->id;
     }

@@ -87,7 +87,7 @@ class DatabaseCourseRepository implements CourseRepository
     $availability = $this->getCourseAvailability((int)$row['CourseID']);
 
     return new Course(
-      (int)$row['CourseID'],
+      (string)$row['CourseID'],
       $row['CourseName'],
       (bool)$row['IsOnline'],
       $row['Created_at'],

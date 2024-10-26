@@ -8,6 +8,15 @@ type DayOfWeekType = {
   displayName: string; // Nombre en español
 };
 
+type ScheduleDay = {
+  id: string;            // ID único para cada día
+  dayName: DayOfWeekNameType;
+  dayDisplayName: string;   // Nombre del día en español para mostrar
+  startTime: string;        // Hora de inicio en formato 'HH:MM'
+  endTime: string;          // Hora de fin en formato 'HH:MM'
+};
+
+
 export interface InstrumentType{
   id: string;
   instrumentName: string;

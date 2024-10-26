@@ -31,7 +31,7 @@ class DbScheduleDayRepository implements ScheduleDayRepository
 
         return array_map(function ($row) {
             return new ScheduleDay(
-                (int)$row['DayID'],
+                (string)$row['DayID'],
                 DayOfWeek::from(strtolower($row['DayName'])), // Convertimos el string a DayOfWeek enum
                 $row['DayDisplayName'],
                 $row['StartTime'],

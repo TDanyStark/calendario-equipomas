@@ -8,13 +8,13 @@ use JsonSerializable;
 
 class Instrument implements JsonSerializable
 {
-    private ?int $id;
+    private ?string $id;
     private string $instrumentName;
     private string $createdAt;
     private string $updatedAt;
 
     public function __construct(
-        ?int $id,
+        ?string $id,
         string $instrumentName,
         string $createdAt,
         string $updatedAt
@@ -25,7 +25,7 @@ class Instrument implements JsonSerializable
         $this->updatedAt = $updatedAt;
     }
 
-    public function getid(): int
+    public function getid(): string
     {
         return $this->id;
     }

@@ -23,7 +23,7 @@ class DatabaseRoomRepository implements RoomRepository
     $stmt = $this->pdo->query("SELECT * FROM rooms");
     $rooms = [];
     while ($row = $stmt->fetch()) {
-      $rooms[] = new Room((int)$row['RoomID'], $row['RoomName'], (int)$row['RoomCapacity'], $row['Created_at'], $row['Updated_at']);
+      $rooms[] = new Room((string)$row['RoomID'], $row['RoomName'], (int)$row['RoomCapacity'], $row['Created_at'], $row['Updated_at']);
     }
     return $rooms;
   }
@@ -34,7 +34,7 @@ class DatabaseRoomRepository implements RoomRepository
     $stmt->execute(['id' => $id]);
     $row = $stmt->fetch();
 
-    return $row ? new Room((int)$row['RoomID'], $row['RoomName'], (int)$row['RoomCapacity'], $row['Created_at'], $row['Updated_at']) : null;
+    return $row ? new Room((string)$row['RoomID'], $row['RoomName'], (int)$row['RoomCapacity'], $row['Created_at'], $row['Updated_at']) : null;
   }
 
   public function create(Room $room): int

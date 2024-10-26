@@ -23,7 +23,7 @@ class DatabaseInstrumentRepository implements InstrumentRepository
         $stmt = $this->pdo->query('SELECT * FROM instruments');
         $instruments = [];
         while ($row = $stmt->fetch()) {
-            $instruments[] = new Instrument($row['InstrumentID'], $row['InstrumentName'], $row['Created_at'], $row['Updated_at']);
+            $instruments[] = new Instrument((string)$row['InstrumentID'], $row['InstrumentName'], $row['Created_at'], $row['Updated_at']);
         }
         return $instruments;
     }
