@@ -10,6 +10,8 @@ use App\Infrastructure\Database;
 use PDO;
 use App\Domain\Course\CourseAvailability;
 
+use App\Domain\Shared\DayOfWeek;
+
 class DatabaseCourseRepository implements CourseRepository
 {
   private PDO $pdo;
@@ -44,7 +46,7 @@ class DatabaseCourseRepository implements CourseRepository
 
     return array_map(
       fn($availability) => new CourseAvailability(
-        $availability['DayOfWeek'],
+        DayOfWeek::from(strtolower($availability['DayOfWeek'])), // Convertimos el valor a enum
         $availability['StartTime'],
         $availability['EndTime']
       ),
@@ -82,15 +84,15 @@ class DatabaseCourseRepository implements CourseRepository
 
   private function mapRowToCourse(array $row): Course
   {
-      $availability = $this->getCourseAvailability((int)$row['CourseID']);
+    $availability = $this->getCourseAvailability((int)$row['CourseID']);
 
-      return new Course(
-          (int)$row['CourseID'],
-          $row['CourseName'],
-          (bool)$row['IsOnline'],
-          $row['Created_at'],
-          $row['Updated_at'],
-          $availability
-      );
+    return new Course(
+      (int)$row['CourseID'],
+      $row['CourseName'],
+      (bool)$row['IsOnline'],
+      $row['Created_at'],
+      $row['Updated_at'],
+      $availability
+    );
   }
 }

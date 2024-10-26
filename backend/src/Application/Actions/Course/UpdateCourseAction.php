@@ -24,7 +24,6 @@ class UpdateCourseAction extends CourseAction
         $course = new Course(
             $id,
             $data['name'] ?? $course->getName(),
-            $data['description'] ?? $course->getDescription(),
             $data['isOnline'] ?? $course->getIsOnline(),
             $course->getCreatedAt(),
             $course->getUpdatedAt(),

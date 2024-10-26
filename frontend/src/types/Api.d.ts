@@ -1,5 +1,5 @@
 // types/Api.d.ts
-export type DayOfWeekNameType = "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
+export type DayOfWeekNameType = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
 export type ResourceType = 'instruments' | 'rooms' | 'courses';
 
 type DayOfWeekType = {
@@ -21,12 +21,12 @@ type RoomType = {
 
 type CourseAvailability = {
   dayOfWeek: DayOfWeekNameType;      // Ej: 'Monday', 'Tuesday', etc.
-  startTime: string | null; // Formato de tiempo o null si no se especifica
-  endTime: string | null;   // Formato de tiempo o null si no se especifica
+  startTime: date | null; // Formato de tiempo o null si no se especifica
+  endTime: date | null;   // Formato de tiempo o null si no se especifica
 };
 
 type CourseType = {
-  id: number;                    // ID del curso
+  id: string;                    // ID del curso
   name: string;                  // Nombre del curso
   isOnline: boolean;             // Indica si el curso es online
   availability: CourseAvailability[]; // Arreglo de disponibilidades del curso

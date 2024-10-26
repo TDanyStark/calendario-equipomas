@@ -7,6 +7,8 @@ namespace App\Application\Actions\Course;
 use Psr\Http\Message\ResponseInterface as Response;
 use App\Domain\Course\Course;
 use App\Domain\Course\CourseAvailability;
+use App\Domain\Shared\DayOfWeek;
+use InvalidArgumentException;
 
 class CreateCourseAction extends CourseAction
 {
@@ -17,18 +19,23 @@ class CreateCourseAction extends CourseAction
         // Validamos y preparamos la disponibilidad
         $availabilityData = $data['availability'] ?? [];
         $availability = array_map(function ($item) {
-            return new CourseAvailability(
-                $item['dayOfWeek'],
-                $item['startTime'] ?? null,
-                $item['endTime'] ?? null
-            );
+            try {
+                // Convertimos dayOfWeek al enum DayOfWeek
+                $dayOfWeek = DayOfWeek::from(strtolower($item['dayOfWeek']));
+                return new CourseAvailability(
+                    $dayOfWeek,
+                    $item['startTime'] ?? null,
+                    $item['endTime'] ?? null
+                );
+            } catch (\ValueError $e) {
+                throw new InvalidArgumentException("Invalid dayOfWeek value: {$item['dayOfWeek']}");
+            }
         }, $availabilityData);
 
         // Creamos la instancia de Course incluyendo la disponibilidad
         $course = new Course(
             0, // El ID se genera automáticamente en la base de datos
             $data['name'],
-            $data['description'] ?? null,
             $data['isOnline'],
             '', // createdAt es manejado por la base de datos
             '', // updatedAt es manejado por la base de datos
