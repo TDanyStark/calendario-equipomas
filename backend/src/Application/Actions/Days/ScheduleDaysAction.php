@@ -8,25 +8,34 @@ use Psr\Http\Message\ResponseInterface as Response;
 use App\Domain\Shared\Days\ScheduleDayRepository;
 use App\Application\Actions\Action;
 use Psr\Log\LoggerInterface;
+use App\Domain\Shared\Settings\SettingRepository;
 
 class ScheduleDaysAction extends Action
 {
     private ScheduleDayRepository $scheduleDayRepository;
+    private SettingRepository $settingRepository;
 
     public function __construct(
         LoggerInterface $logger,
-        ScheduleDayRepository $scheduleDayRepository
+        ScheduleDayRepository $scheduleDayRepository,
+        SettingRepository $settingRepository
     ) {
         parent::__construct($logger);
         $this->scheduleDayRepository = $scheduleDayRepository;
+        $this->settingRepository = $settingRepository;
     }
 
     protected function action(): Response
     {
         // Obtener los horarios de cada día de la semana
         $scheduleDays = $this->scheduleDayRepository->findAll();
+        $recurrence = $this->settingRepository->findSetting('recurrence');
 
-        // Responder con los horarios de los días
-        return $this->respondWithData($scheduleDays);
+        $data = [
+            'scheduleDays' => $scheduleDays,
+            'recurrence' => $recurrence->getValue()
+        ];
+
+        return $this->respondWithData($data);
     }
 }

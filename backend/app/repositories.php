@@ -25,6 +25,8 @@ use App\Domain\Course\CourseRepository;
 use App\Infrastructure\Repository\DatabaseCourseRepository;
 
 use App\Domain\Shared\Days\ScheduleDayRepository;
+use App\Domain\Shared\Settings\SettingRepository;
+use App\Infrastructure\Repository\DbSettingRepository;
 use App\Infrastructure\Repository\DbScheduleDayRepository;
 
 return function (ContainerBuilder $containerBuilder) {
@@ -75,6 +77,11 @@ return function (ContainerBuilder $containerBuilder) {
         ScheduleDayRepository::class => function ($container) {
             $database = $container->get(Database::class);
             return new DbScheduleDayRepository($database);
+        },
+
+        SettingRepository::class => function ($container) {
+            $database = $container->get(Database::class);
+            return new DbSettingRepository($database);
         },
     ]);
 };

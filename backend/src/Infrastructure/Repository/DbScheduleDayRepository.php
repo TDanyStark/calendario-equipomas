@@ -26,14 +26,15 @@ class DbScheduleDayRepository implements ScheduleDayRepository
      */
     public function findAll(): array
     {
-        $stmt = $this->pdo->query("SELECT DayID, DayName, DayDisplayName, StartTime, EndTime FROM schedule_days");
+        $stmt = $this->pdo->query("SELECT DayID, DayName, DayDisplayName, IsActive, StartTime, EndTime FROM schedule_days WHERE IsActive = 1");
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return array_map(function ($row) {
             return new ScheduleDay(
                 (string)$row['DayID'],
-                DayOfWeek::from(strtolower($row['DayName'])), // Convertimos el string a DayOfWeek enum
+                DayOfWeek::from(strtolower($row['DayName'])),
                 $row['DayDisplayName'],
+                (bool)$row['IsActive'],
                 $row['StartTime'],
                 $row['EndTime']
             );

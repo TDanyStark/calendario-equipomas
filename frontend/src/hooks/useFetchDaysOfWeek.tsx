@@ -15,7 +15,7 @@ const useFetchDaysOfWeek = () => {
     const fetchDays = async () => {
       try {
         const response = await axios.get(`${URL_BACKEND}schedule/days`);
-        setDaysOfWeek(response.data.data);
+        setDaysOfWeek(response.data.data.scheduleDays);
         setIsError(false);
       } catch (error) {
         console.error("Error fetching days of the week:", error);
