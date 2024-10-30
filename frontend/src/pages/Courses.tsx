@@ -1,7 +1,7 @@
-import { useForm, Controller, useFieldArray } from "react-hook-form";
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useState, useCallback, useMemo, forwardRef } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { ToastContainer } from "react-toastify";
+import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
@@ -16,7 +16,7 @@ import BackgroundDiv from "../components/modal/BackgroundDiv";
 import CancelModalBtn from "../components/buttons/CancelModalBtn";
 import SubmitModalBtn from "../components/buttons/SubmitModalBtn";
 import ErrorLoadingResourse from "../components/error/ErrorLoadingResourse";
-import useFetchDaysOfWeek from "../hooks/useFetchDaysOfWeek";
+import SelectSchedule from "../components/selectSchedule";
 
 const entity = "courses";
 const entityName = "cursos";
@@ -24,6 +24,7 @@ const entityName = "cursos";
 const Courses = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [editCourse, setEditCourse] = useState<CourseType | null>(null);
+  const [courseSchedule, setCourseSchedule] = useState<SelectSchedule[]>([]);
 
   // Obtener el token desde el store
   const JWT = useSelector((state: RootState) => state.auth.JWT);
@@ -33,22 +34,17 @@ const Courses = () => {
 
   const memorizedData = useMemo(() => courses, [courses]);
 
-  // Fetch días de la semana
-  const {
-    daysOfWeek,
-    isLoading: loadingDays,
-    isError: errorDays,
-  } = useFetchDaysOfWeek();
-
-  console.log(daysOfWeek, loadingDays, errorDays)
-
   const { register, handleSubmit, setValue, reset } =
     useForm<CourseType>();
 
+  const handleScheduleChange = (newSchedule: SelectSchedule[]) => {
+    setCourseSchedule(newSchedule); // Actualizamos el estado local con el nuevo schedule
+  };
 
   const onSubmit = (data: CourseType) => {
     const cleanedData = {
       ...data,
+      availability: courseSchedule,
     };
     console.log(cleanedData);
     setIsOpen(false);
@@ -186,7 +182,7 @@ const Courses = () => {
                   <label className="block text-sm font-medium mb-1">
                     Disponibilidad
                   </label>
-                  
+                  <SelectSchedule<CourseType> onScheduleChange={handleScheduleChange} editItem={editCourse} />
                 </div>
               </form>
 

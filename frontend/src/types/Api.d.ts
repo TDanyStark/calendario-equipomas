@@ -11,6 +11,11 @@ type ScheduleDayType = {
   endTime: string;
 };
 
+interface ScheduleState {
+  scheduleDays: ScheduleDayType[] | null;
+  recurrence: string | null;
+}
+
 
 export interface InstrumentType{
   id: string;
@@ -23,16 +28,18 @@ type RoomType = {
   capacity: number;
 };
 
-type CourseAvailability = {
-  dayOfWeek: DayOfWeekNameType; // Ej: 'Monday', 'Tuesday', etc.
-  startTime: date | null; // Formato de tiempo o null si no se especifica
-  endTime: date | null;   // Formato de tiempo o null si no se especifica
-};
 
 type CourseType = {
   id: string;                       // ID del curso
   name: string;                     // Nombre del curso
   isOnline: boolean;                // Indica si el curso es online
   duration: number;                 // Duración del curso en minutos
-  availability: CourseAvailability[]; // Arreglo de disponibilidades del curso
+  availability: ScheduleDayType[]; // Arreglo de disponibilidades del curso
+};
+
+type TestType = {
+  id: string;
+  name: string; 
+  isOnline: boolean;
+  duration: number;
 };

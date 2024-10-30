@@ -49,7 +49,7 @@ table input[type="checkbox"]{
 /* modal */
 
 .modal_container{
-  @apply fixed inset-0 flex items-center justify-center p-4
+  @apply fixed top-0 left-0 w-full h-full flex justify-center p-4 overflow-y-auto
 }
 
 .dialog_title{
@@ -57,7 +57,7 @@ table input[type="checkbox"]{
 }
 
 .dialog_panel{
-  @apply bg-principal-bg border border-white border-opacity-40 rounded-lg p-6 w-full max-w-lg space-y-8
+  @apply bg-principal-bg border border-white border-opacity-40 rounded-lg p-6 w-full h-fit max-w-lg space-y-8 my-auto
 }
 
 .modal_header{
@@ -66,4 +66,23 @@ table input[type="checkbox"]{
 
 .modal_footer{
   @apply flex justify-end gap-4
+}
+
+/* Estilo para personalizar el scroll */
+.scroll-thin {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #a0a0a0 transparent; /* Color de fondo y de la barra en Firefox */
+}
+
+.scroll-thin::-webkit-scrollbar {
+  width: 6px; /* Ancho del scroll */
+}
+
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent; /* Fondo del track */
+}
+
+.scroll-thin::-webkit-scrollbar-thumb {
+  background-color: #a0a0a0; /* Color de la barra */
+  border-radius: 10px; /* Bordes redondeados */
 }

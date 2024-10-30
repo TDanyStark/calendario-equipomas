@@ -11,14 +11,14 @@ class CourseAvailability implements JsonSerializable
 {
     private string $id;
     private ScheduleDay $scheduleDay;
-    private ?string $startTime;
-    private ?string $endTime;
+    private string $startTime;
+    private string $endTime;
 
     public function __construct(
         string $id,
         ScheduleDay $scheduleDay,
-        ?string $startTime,
-        ?string $endTime
+        string $startTime,
+        string $endTime
     ) {
         $this->id = $id;
         $this->scheduleDay = $scheduleDay;
@@ -46,6 +46,9 @@ class CourseAvailability implements JsonSerializable
         return $this->endTime;
     }
 
+    /**
+     * @return array{id: string, dayName: string, dayDisplayName: string, startTime: string, endTime: string}
+     */
     public function jsonSerialize(): array
     {
         return [

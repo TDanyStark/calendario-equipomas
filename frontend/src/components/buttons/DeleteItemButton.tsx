@@ -6,7 +6,7 @@ const DeleteItemButton = ({ handleClick }: Props) => {
   return (
     <button
       onClick={handleClick}
-      className="p-1"
+      className="p-2 hover:bg-gray-800 rounded-md"
       title="Eliminar"
     >
       <svg

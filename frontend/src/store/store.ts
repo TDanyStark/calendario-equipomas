@@ -1,11 +1,12 @@
 // src/store/store.ts
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './authSlice';
+import scheduleReducer from './scheduleSlice';
 
 const store = configureStore({
   reducer: {
     auth: authReducer,
-    // Añade otros reducers aquí si tienes más slices
+    schedule: scheduleReducer,
   },
 });
 

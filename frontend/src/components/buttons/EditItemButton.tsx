@@ -6,7 +6,7 @@ const EditItemButton = ({handleClick}: Props) => {
   return (
     <button
       onClick={handleClick}
-      className="p-1 text-blue-400"
+      className="p-2 text-blue-400"
       title="Editar"
     >
       <svg

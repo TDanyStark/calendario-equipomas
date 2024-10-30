@@ -1,5 +1,6 @@
 // src/App.js
 import { Routes, Route, Navigate } from "react-router-dom";
+import { setSchedule } from "./store/scheduleSlice";
 import DefaultLayout from "./layout/DefaultLayout";
 import ErrorPage from "./pages/ErrorPage";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -9,9 +10,25 @@ import { Roles } from "./data/Roles";
 import { generateRoutes } from "./utils/getComponentForPath";
 import { rolRedirect } from "./utils/rolRedirect";
 import getUserRole from "./utils/getUserRole";
+import useFetchDaysOfWeek from "./hooks/useFetchDaysOfWeek";
+import { useDispatch } from "react-redux";
+import { ScheduleState } from "./types/Api";
 
 
 function App() {
+  const dispatch = useDispatch();
+
+  const {
+    daysOfWeek,
+  } = useFetchDaysOfWeek<ScheduleState>();
+
+  if (daysOfWeek?.scheduleDays && daysOfWeek?.recurrence) {
+    dispatch(setSchedule({ 
+      scheduleDays: daysOfWeek.scheduleDays,
+      recurrence: daysOfWeek.recurrence 
+    }));
+  }
+
   const userRole = getUserRole();
 
   return (
