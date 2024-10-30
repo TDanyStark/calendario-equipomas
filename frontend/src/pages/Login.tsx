@@ -76,7 +76,8 @@ const Login = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.data.message || "Error al iniciar sesión");
+        console.log("Error al iniciar sesión: " + errorData.data.message);
+        throw new Error("Error al iniciar sesión");
       }
 
       const res = await response.json();

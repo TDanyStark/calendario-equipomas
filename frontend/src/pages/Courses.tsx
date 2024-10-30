@@ -18,7 +18,6 @@ import SubmitModalBtn from "../components/buttons/SubmitModalBtn";
 import ErrorLoadingResourse from "../components/error/ErrorLoadingResourse";
 import useFetchDaysOfWeek from "../hooks/useFetchDaysOfWeek";
 
-
 const entity = "courses";
 const entityName = "cursos";
 
@@ -29,10 +28,9 @@ const Courses = () => {
   // Obtener el token desde el store
   const JWT = useSelector((state: RootState) => state.auth.JWT);
 
-   // Fetch courses data
+  // Fetch courses data
   const { data: courses, isLoading, isError } = useFetchItems(entity, JWT);
-  
-  // @ts-expect-error: This variable is used but you can't see it in the code
+
   const memorizedData = useMemo(() => courses, [courses]);
 
   // Fetch días de la semana
@@ -42,84 +40,40 @@ const Courses = () => {
     isError: errorDays,
   } = useFetchDaysOfWeek();
 
-  const { register, handleSubmit, setValue, reset, control } =
-    useForm<CourseType>({
-      defaultValues: {
-        availability: [], // Inicializa vacío, para ser llenado después
-      },
-    });
+  console.log(daysOfWeek, loadingDays, errorDays)
 
-  const { fields } = useFieldArray({
-    control,
-    name: "availability",
-  });
+  const { register, handleSubmit, setValue, reset } =
+    useForm<CourseType>();
 
-  // Actualizar valores predeterminados del formulario cuando `daysOfWeek` esté disponible
-  useEffect(() => {
-    if (daysOfWeek.length > 0) {
-      reset({
-        availability: daysOfWeek.map((day) => ({
-          dayOfWeek: day.dayName,
-          startTime: null,
-          endTime: null,
-        })),
-      });
-    }
-  }, [daysOfWeek, reset]);
 
   const onSubmit = (data: CourseType) => {
-    const filteredAvailability = data.availability
-    .filter(
-      (day) => day.startTime !== null && day.endTime !== null
-    )
-    .map((day) => ({
-      dayOfWeek: day.dayOfWeek,
-      startTime: day.startTime,
-      endTime: day.endTime,
-    }));
     const cleanedData = {
       ...data,
-      availability: filteredAvailability.length > 0 ? filteredAvailability : [],
     };
     console.log(cleanedData);
-    // if (editCourse) {
-    //   updateItem.mutate({
-    //     id: editCourse.id,
-    //     ...cleanedData,
-    //   });
-    //   reset();
-    // } else {
-    //   createItem.mutate(cleanedData);
-    //   reset();
-    // }
-    // setIsOpen(false);
+    setIsOpen(false);
   };
 
   // Mutaciones
   const { createItem, updateItem, deleteItem, deleteItems } =
     useItemMutations<CourseType>(entity, JWT);
 
-  // @ts-expect-error: This variable is used but you can't see it in the code
   const handleCreate = useCallback(() => {
     setEditCourse(null);
     setIsOpen(true);
     reset();
   }, [reset]);
 
-  // @ts-expect-error: This variable is used but you can't see it in the code
   const handleEdit = useCallback(
     (item: CourseType) => {
       setEditCourse(item);
       setIsOpen(true);
       setValue("name", item.name);
       setValue("isOnline", item.isOnline);
-      setValue("availability", item.availability);
     },
     [setValue]
   );
 
-  // ignorar error de typescript
-  // @ts-expect-error: This variable is used but you can't see it in the code
   const handleDelete = useCallback(
     (item: CourseType) => {
       deleteItem.mutate(item.id);
@@ -128,7 +82,6 @@ const Courses = () => {
     []
   );
 
-  // @ts-expect-error: This variable is used but you can't see it in the code
   const handleDeleteSelected = useCallback(
     (selectedIds: React.Key[]) => {
       const stringIds = selectedIds.map((id) => id.toString());
@@ -138,7 +91,6 @@ const Courses = () => {
     []
   );
 
-  // @ts-expect-error: This variable is used but you can't see it in the code
   const columns = useMemo(
     () => [
       {
@@ -207,7 +159,10 @@ const Courses = () => {
                 className="mt-4"
               >
                 <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1" htmlFor="name">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium mb-1"
+                  >
                     Nombre del Curso
                   </label>
                   <input
@@ -224,48 +179,14 @@ const Courses = () => {
                   <input
                     type="checkbox"
                     {...register("isOnline")}
-                    className="input-checkbox"
+                    className="input-checkbox w-5 h-5"
                   />
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm font-medium mb-1">
                     Disponibilidad
                   </label>
-                  {fields && fields.map((field, index: number) => (
-                    <div key={field.id} className="flex items-center mb-2">
-                      <span className="w-24">{daysOfWeek[index].dayDisplayName}:</span>
-                      <Controller
-                        control={control}
-                        name={`availability.${index}.startTime`}
-                        render={({ field }) => (
-                          <input
-                            {...field}
-                            type="time"
-                            className="input-primary"
-                            placeholder="Hora de inicio"
-                          />
-                        )}
-                      />
-                      <span className="mx-2">-</span>
-                      <Controller
-                        control={control}
-                        name={`availability.${index}.endTime`}
-                        render={({ field }) => (
-                          <input
-                            {...field}
-                            type="time"
-                            className="input-primary"
-                            placeholder="Hora de fin"
-                          />
-                        )}
-                      />
-                      <input
-                        type="hidden"
-                        {...register(`availability.${index}.dayOfWeek` as const)}
-                        value={daysOfWeek[index].dayName}
-                      />
-                    </div>
-                  ))}
+                  
                 </div>
               </form>
 

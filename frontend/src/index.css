@@ -57,7 +57,7 @@ table input[type="checkbox"]{
 }
 
 .dialog_panel{
-  @apply bg-principal-bg border border-white border-opacity-40 rounded-lg p-6 w-full max-w-md space-y-8
+  @apply bg-principal-bg border border-white border-opacity-40 rounded-lg p-6 w-full max-w-lg space-y-8
 }
 
 .modal_header{
