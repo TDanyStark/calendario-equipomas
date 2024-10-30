@@ -77,6 +77,10 @@ const SelectSchedule = <T extends WithAvailability>({
     }
   }, [daysOfWeek, editItem]);
 
+  useEffect(() => {
+    onScheduleChange(selectSchedule);
+  }, [selectSchedule, onScheduleChange]);
+
 
   const handleChange = (id: string) => {
     setSelectSchedule((prev) =>
@@ -91,7 +95,6 @@ const SelectSchedule = <T extends WithAvailability>({
           : day
       )
     );
-    onScheduleChange(selectSchedule);
   };
 
   const handleOpenOptions = (id: string, type: "start" | "end") => {
@@ -102,7 +105,6 @@ const SelectSchedule = <T extends WithAvailability>({
           : { ...d, isOptionsOpen: false, activeTimeType: null }
       )
     );
-    onScheduleChange(selectSchedule);
   };
 
   const createSelectorHours = (id: string, type: "start" | "end") => {
@@ -161,7 +163,6 @@ const SelectSchedule = <T extends WithAvailability>({
           : d
       )
     );
-    onScheduleChange(selectSchedule);
   };
 
   return (
