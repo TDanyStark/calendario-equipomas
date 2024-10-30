@@ -9,7 +9,7 @@ use App\Domain\Course\CourseRepository;
 use App\Infrastructure\Database;
 use PDO;
 use App\Domain\Course\CourseAvailability;
-
+use App\Domain\Shared\Days\ScheduleDay;
 use App\Domain\Shared\Days\DayOfWeek;
 
 class DatabaseCourseRepository implements CourseRepository
@@ -40,19 +40,46 @@ class DatabaseCourseRepository implements CourseRepository
 
   private function getCourseAvailability(int $courseId): array
   {
-    $stmt = $this->pdo->prepare("SELECT DayOfWeek, StartTime, EndTime FROM course_availability WHERE CourseID = :courseId");
-    $stmt->execute(['courseId' => $courseId]);
-    $availabilityData = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    return array_map(
-      fn($availability) => new CourseAvailability(
-        DayOfWeek::from(strtolower($availability['DayOfWeek'])), // Convertimos el valor a enum
-        $availability['StartTime'],
-        $availability['EndTime']
-      ),
-      $availabilityData
-    );
+      // Consulta JOIN entre `course_availability` y `schedule_days` para obtener todos los datos necesarios de cada día
+      $stmt = $this->pdo->prepare("
+          SELECT 
+              ca.DayID,
+              sd.DayName,
+              sd.DayDisplayName,
+              sd.IsActive,
+              sd.StartTime AS ScheduleStartTime,
+              sd.EndTime AS ScheduleEndTime,
+              ca.StartTime,
+              ca.EndTime
+          FROM course_availability ca
+          JOIN schedule_days sd ON ca.DayID = sd.DayID
+          WHERE ca.CourseID = :courseId
+      ");
+      
+      // Ejecuta la consulta con el ID del curso
+      $stmt->execute(['courseId' => $courseId]);
+      $availabilityData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  
+      // Mapeo de los resultados para construir instancias de `CourseAvailability` con un objeto `ScheduleDay`
+      return array_map(
+          fn($availability) => new CourseAvailability(
+              (string)$availability['DayID'],
+              new ScheduleDay(                                         // Creamos una instancia de `ScheduleDay`
+                  (string)$availability['DayID'],
+                  DayOfWeek::from($availability['DayName']),
+                  $availability['DayDisplayName'],
+                  (bool)$availability['IsActive'],
+                  $availability['ScheduleStartTime'],
+                  $availability['ScheduleEndTime']
+              ),
+              $availability['StartTime'],                             // Hora de inicio específica para la disponibilidad del curso
+              $availability['EndTime']                                // Hora de finalización específica para la disponibilidad del curso
+          ),
+          $availabilityData
+      );
   }
+  
+  
 
 
   public function create(Course $course): int
