@@ -150,7 +150,7 @@ const Courses = () => {
         onDeleteSelected={handleDeleteSelected}
         searchPlaceholder="Buscar curso"
         TextButtonCreate="curso"
-        gridTemplateColumns="100px 100px 1fr 180px 100px 180px"
+        gridTemplateColumns="100px 100px 1fr 150px 150px 180px"
       />
 
       {isOpen && (
