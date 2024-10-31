@@ -5,61 +5,21 @@ declare(strict_types=1);
 namespace App\Application\Actions\Course;
 
 use Psr\Http\Message\ResponseInterface as Response;
-use App\Domain\Course\Course;
-use App\Domain\Course\CourseAvailability;
-use App\Domain\Shared\Days\DayOfWeek;
-use InvalidArgumentException;
-use App\Domain\Shared\Days\ScheduleDay;
-use DateTime;
+
 class CreateCourseAction extends CourseAction
 {
     protected function action(): Response
     {
         $data = $this->request->getParsedBody();
 
-        // Validamos y preparamos la disponibilidad
+        // Parsear y validar la disponibilidad
         $availabilityData = $data['availability'] ?? [];
-        $availability = array_map(function ($item) {
-            try {
-                // Parsear y formatear startTime
-                $startDateTime = new DateTime($item['startTime']);
-                $startTime = $startDateTime->format('H:i'); // Formato 'HH:MM'
+        $availability = $this->parseAvailability($availabilityData);
 
-                // Parsear y formatear endTime
-                $endDateTime = new DateTime($item['endTime']);
-                $endTime = $endDateTime->format('H:i'); // Formato 'HH:MM'
+        // Crear una instancia de Course sin ID (se genera en la base de datos)
+        $course = $this->buildCourse("", $data, $availability);
 
-                $scheduleDay = new ScheduleDay(
-                    $item['id'], 
-                    DayOfWeek::from(strtolower($item['dayName'])), 
-                    $item['dayDisplayName'], 
-                    true, // es manejado por la base de datos
-                    $startTime, // es manejado por la base de datos 
-                    $endTime); // es manejado por la base de datos
-
-                return new CourseAvailability(
-                    $item['id'],
-                    $scheduleDay,
-                    $startTime,
-                    $endTime
-                );
-            } catch (\ValueError $e) {
-                throw new InvalidArgumentException("Invalid dayOfWeek value: {$item['dayOfWeek']}");
-            }
-        }, $availabilityData);
-
-        // Creamos la instancia de Course incluyendo la disponibilidad
-        $course = new Course(
-            "", // El ID se genera automáticamente en la base de datos
-            $data['name'],
-            $data['isOnline'],
-            (int)$data['duration'],
-            '', // createdAt es manejado por la base de datos
-            '', // updatedAt es manejado por la base de datos
-            $availability
-        );
-
-        // Guardamos el curso y obtenemos el ID generado
+        // Guardar el curso y obtener el ID generado
         $courseId = $this->courseRepository->create($course);
 
         return $this->respondWithData(['id' => $courseId], 201);

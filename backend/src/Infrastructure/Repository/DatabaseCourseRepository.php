@@ -32,7 +32,7 @@ class DatabaseCourseRepository implements CourseRepository
   public function findById(string $id): ?Course
   {
     $stmt = $this->pdo->prepare("SELECT * FROM courses WHERE CourseID = :id");
-    $stmt->execute(['id' => $id]);
+    $stmt->execute(['id' => (int)$id]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
     return $row ? $this->mapRowToCourse($row) : null;
@@ -56,7 +56,7 @@ class DatabaseCourseRepository implements CourseRepository
           WHERE ca.CourseID = :courseId
       ");
 
-    $stmt->execute(['courseId' => $courseId]);
+    $stmt->execute(['courseId' => (int)$courseId]);
     $availabilityData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Mapeo de los resultados para construir instancias de `CourseAvailability` con un objeto `ScheduleDay`
@@ -111,7 +111,7 @@ class DatabaseCourseRepository implements CourseRepository
     }
   }
 
-  public function createAvailability(CourseAvailability $availability, int $courseId): void
+  private function createAvailability(CourseAvailability $availability, int $courseId): void
   {
     $stmt = $this->pdo->prepare("INSERT INTO course_availability (CourseID, DayID, StartTime, EndTime) VALUES (:courseId, :dayId, :startTime, :endTime)");
     $stmt->execute([
@@ -155,7 +155,7 @@ class DatabaseCourseRepository implements CourseRepository
   }
 
 
-  public function deleteAvailability(string $courseId): void
+  private function deleteAvailability(string $courseId): void
   {
     $stmt = $this->pdo->prepare("DELETE FROM course_availability WHERE CourseID = :courseId");
     $stmt->execute(['courseId' => $courseId]);
