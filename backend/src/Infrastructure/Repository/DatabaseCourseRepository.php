@@ -29,7 +29,7 @@ class DatabaseCourseRepository implements CourseRepository
     return array_map(fn($row) => $this->mapRowToCourse($row), $results);
   }
 
-  public function findById(int $id): ?Course
+  public function findById(string $id): ?Course
   {
     $stmt = $this->pdo->prepare("SELECT * FROM courses WHERE CourseID = :id");
     $stmt->execute(['id' => $id]);
@@ -40,8 +40,8 @@ class DatabaseCourseRepository implements CourseRepository
 
   private function getCourseAvailability(int $courseId): array
   {
-      // Consulta JOIN entre `course_availability` y `schedule_days` para obtener todos los datos necesarios de cada día
-      $stmt = $this->pdo->prepare("
+    // Consulta JOIN entre `course_availability` y `schedule_days` para obtener todos los datos necesarios de cada día
+    $stmt = $this->pdo->prepare("
           SELECT 
               ca.DayID,
               sd.DayName,
@@ -55,48 +55,60 @@ class DatabaseCourseRepository implements CourseRepository
           JOIN schedule_days sd ON ca.DayID = sd.DayID
           WHERE ca.CourseID = :courseId
       ");
-      
-      $stmt->execute(['courseId' => $courseId]);
-      $availabilityData = $stmt->fetchAll(PDO::FETCH_ASSOC);
-  
-      // Mapeo de los resultados para construir instancias de `CourseAvailability` con un objeto `ScheduleDay`
-      return array_map(
-          fn($availability) => new CourseAvailability(
-              (string)$availability['DayID'],
-              new ScheduleDay(                                         // Creamos una instancia de `ScheduleDay`
-                  (string)$availability['DayID'],
-                  DayOfWeek::from($availability['DayName']),
-                  $availability['DayDisplayName'],
-                  (bool)$availability['IsActive'],
-                  $availability['ScheduleStartTime'],
-                  $availability['ScheduleEndTime']
-              ),
-              $availability['StartTime'],                             // Hora de inicio específica para la disponibilidad del curso
-              $availability['EndTime']                                // Hora de finalización específica para la disponibilidad del curso
-          ),
-          $availabilityData
-      );
+
+    $stmt->execute(['courseId' => $courseId]);
+    $availabilityData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Mapeo de los resultados para construir instancias de `CourseAvailability` con un objeto `ScheduleDay`
+    return array_map(
+      fn($availability) => new CourseAvailability(
+        (string)$availability['DayID'],
+        new ScheduleDay(                                         // Creamos una instancia de `ScheduleDay`
+          (string)$availability['DayID'],
+          DayOfWeek::from($availability['DayName']),
+          $availability['DayDisplayName'],
+          (bool)$availability['IsActive'],
+          $availability['ScheduleStartTime'],
+          $availability['ScheduleEndTime']
+        ),
+        $availability['StartTime'],                             // Hora de inicio específica para la disponibilidad del curso
+        $availability['EndTime']                                // Hora de finalización específica para la disponibilidad del curso
+      ),
+      $availabilityData
+    );
   }
-  
-  
 
 
   public function create(Course $course): int
   {
-    $stmt = $this->pdo->prepare("INSERT INTO courses (CourseName, IsOnline, CourseDuration) VALUES (:name, :isOnline, :duration)");
-    $stmt->execute([
-      'name' => $course->getName(),
-      'isOnline' => $course->getIsOnline(),
-      'duration' => $course->getDuration(),
-    ]);
+    try {
+      // Iniciar la transacción
+      $this->pdo->beginTransaction();
 
-    $idInserted = (int)$this->pdo->lastInsertId();
+      // Insertar el curso
+      $stmt = $this->pdo->prepare("INSERT INTO courses (CourseName, IsOnline, CourseDuration) VALUES (:name, :isOnline, :duration)");
+      $stmt->execute([
+        'name' => $course->getName(),
+        'isOnline' => $course->getIsOnline(),
+        'duration' => $course->getDuration(),
+      ]);
 
-    foreach ($course->getAvailability() as $availability) {
-      $this->createAvailability($availability, $idInserted);
+      $idInserted = (int)$this->pdo->lastInsertId();
+
+      // Insertar la disponibilidad
+      foreach ($course->getAvailability() as $availability) {
+        $this->createAvailability($availability, $idInserted);
+      }
+
+      // Confirmar la transacción
+      $this->pdo->commit();
+
+      return $idInserted;
+    } catch (\Exception $e) {
+      // Revertir la transacción en caso de error
+      $this->pdo->rollBack();
+      throw $e; // Opcional: puedes lanzar la excepción para manejarla en otro lugar
     }
-
-    return $idInserted;
   }
 
   public function createAvailability(CourseAvailability $availability, int $courseId): void
@@ -112,16 +124,46 @@ class DatabaseCourseRepository implements CourseRepository
 
   public function update(Course $course): void
   {
-    $stmt = $this->pdo->prepare("UPDATE courses SET CourseName = :name, IsOnline = :isOnline WHERE CourseID = :id");
-    $stmt->execute([
-      'id' => $course->getId(),
-      'name' => $course->getName(),
-      'isOnline' => $course->getIsOnline(),
-    ]);
+    try {
+      // Iniciar la transacción
+      $this->pdo->beginTransaction();
+
+      // Eliminar la disponibilidad existente
+      $this->deleteAvailability($course->getId());
+
+      // Actualizar los datos del curso
+      $stmt = $this->pdo->prepare("UPDATE courses SET CourseName = :name, IsOnline = :isOnline, CourseDuration = :duration WHERE CourseID = :id");
+      $stmt->execute([
+        'id' => $course->getId(),
+        'name' => $course->getName(),
+        'isOnline' => $course->getIsOnline(),
+        'duration' => $course->getDuration(),
+      ]);
+
+      // Insertar la nueva disponibilidad
+      foreach ($course->getAvailability() as $availability) {
+        $this->createAvailability($availability, (int)$course->getId());
+      }
+
+      // Confirmar la transacción
+      $this->pdo->commit();
+    } catch (\Exception $e) {
+      // Revertir la transacción en caso de error
+      $this->pdo->rollBack();
+      throw $e; // Opcional: puedes lanzar la excepción para manejarla en otro lugar
+    }
   }
 
-  public function delete(int $id): void
+
+  public function deleteAvailability(string $courseId): void
   {
+    $stmt = $this->pdo->prepare("DELETE FROM course_availability WHERE CourseID = :courseId");
+    $stmt->execute(['courseId' => $courseId]);
+  }
+
+  public function delete(string $id): void
+  {
+    $this->deleteAvailability($id);
     $stmt = $this->pdo->prepare("DELETE FROM courses WHERE CourseID = :id");
     $stmt->execute(['id' => $id]);
   }

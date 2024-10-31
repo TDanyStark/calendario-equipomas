@@ -10,7 +10,7 @@ class DeleteCourseAction extends CourseAction
 {
     protected function action(): Response
     {
-        $id = (int)$this->resolveArg('id');
+        $id = $this->resolveArg('id');
 
         $course = $this->courseRepository->findById($id);
 
