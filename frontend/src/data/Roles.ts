@@ -42,5 +42,5 @@ export const rolRedirectInfo: TypeRolRedirectInfo = {
   [Roles.admin]: "/dashboard",
   [Roles.student]: "/student-schedule",
   [Roles.professor]: "/my-classes",
-  default: "/error/?code=not-role",
+  default: "/login/?sms=no-role",
 }

@@ -1,9 +1,10 @@
 import {jwtDecode} from "jwt-decode";
 import { RolesExisting } from "../types/Roles";
 
+
 const getUserRole = () => {
   // get JWT localstorage
-  const JWT = localStorage.getItem('JWT');
+  const JWT = localStorage.getItem("JWT");
   // decode JWT
   if (!JWT) {
     return null;

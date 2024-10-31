@@ -11,7 +11,18 @@ type ScheduleDayType = {
   endTime: string;
 };
 
-interface ScheduleState {
+interface SelectScheduleType {
+  id: string;
+  dayName: DayOfWeekNameType;
+  dayDisplayName: string;
+  startTime: string | null;
+  endTime: string | null;
+  isSelected: boolean;
+  isOptionsOpen: boolean;
+  activeTimeType: "start" | "end" | null;
+}
+
+interface ScheduleStateType {
   scheduleDays: ScheduleDayType[] | null;
   recurrence: string | null;
 }

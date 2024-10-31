@@ -56,7 +56,6 @@ class DatabaseCourseRepository implements CourseRepository
           WHERE ca.CourseID = :courseId
       ");
       
-      // Ejecuta la consulta con el ID del curso
       $stmt->execute(['courseId' => $courseId]);
       $availabilityData = $stmt->fetchAll(PDO::FETCH_ASSOC);
   

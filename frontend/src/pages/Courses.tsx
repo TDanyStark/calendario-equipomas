@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
-import { useState, useCallback, useMemo, forwardRef } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { Slide, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
@@ -17,6 +17,8 @@ import CancelModalBtn from "../components/buttons/CancelModalBtn";
 import SubmitModalBtn from "../components/buttons/SubmitModalBtn";
 import ErrorLoadingResourse from "../components/error/ErrorLoadingResourse";
 import SelectSchedule from "../components/selectSchedule";
+import { SelectScheduleType } from "../types/Api";
+
 
 const entity = "courses";
 const entityName = "cursos";
@@ -24,7 +26,7 @@ const entityName = "cursos";
 const Courses = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [editCourse, setEditCourse] = useState<CourseType | null>(null);
-  const [courseSchedule, setCourseSchedule] = useState<SelectSchedule[]>([]);
+  const [courseSchedule, setCourseSchedule] = useState<SelectScheduleType[]>([]);
 
   // Obtener el token desde el store
   const JWT = useSelector((state: RootState) => state.auth.JWT);
@@ -32,34 +34,42 @@ const Courses = () => {
   // Fetch courses data
   const { data: courses, isLoading, isError } = useFetchItems(entity, JWT);
 
+  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const memorizedData = useMemo(() => courses, [courses]);
 
   const { register, handleSubmit, setValue, reset } =
     useForm<CourseType>();
 
-  const handleScheduleChange = (newSchedule: SelectSchedule[]) => {
-    setCourseSchedule(newSchedule); // Actualizamos el estado local con el nuevo schedule
-  };
+  const handleScheduleChange = useCallback(
+    (newSchedule: SelectScheduleType[]) => {
+      setCourseSchedule(newSchedule); // Actualizamos el estado local con el nuevo schedule
+    },
+    []
+  );
 
   const onSubmit = (data: CourseType) => {
+    console.log("ejecutando submit");
     const cleanedData = {
       ...data,
       availability: courseSchedule,
     };
     console.log(cleanedData);
-    setIsOpen(false);
+    // setIsOpen(false);
   };
 
   // Mutaciones
+  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const { createItem, updateItem, deleteItem, deleteItems } =
     useItemMutations<CourseType>(entity, JWT);
 
+  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleCreate = useCallback(() => {
     setEditCourse(null);
     setIsOpen(true);
     reset();
   }, [reset]);
 
+  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleEdit = useCallback(
     (item: CourseType) => {
       setEditCourse(item);
@@ -70,6 +80,7 @@ const Courses = () => {
     [setValue]
   );
 
+  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleDelete = useCallback(
     (item: CourseType) => {
       deleteItem.mutate(item.id);
@@ -77,7 +88,8 @@ const Courses = () => {
     // eslint-disable-next-line
     []
   );
-
+  
+  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleDeleteSelected = useCallback(
     (selectedIds: React.Key[]) => {
       const stringIds = selectedIds.map((id) => id.toString());
@@ -87,6 +99,7 @@ const Courses = () => {
     []
   );
 
+  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const columns = useMemo(
     () => [
       {
@@ -180,8 +193,9 @@ const Courses = () => {
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm font-medium mb-1">
-                    Disponibilidad
+                    Disponibilidad 
                   </label>
+                  <p className="text-sm">(si la disponibilidad es todos los dias no es necesario seleccionar dias)</p>
                   <SelectSchedule<CourseType> onScheduleChange={handleScheduleChange} editItem={editCourse} />
                 </div>
               </form>

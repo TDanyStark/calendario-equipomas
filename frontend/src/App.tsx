@@ -12,7 +12,7 @@ import { rolRedirect } from "./utils/rolRedirect";
 import getUserRole from "./utils/getUserRole";
 import useFetchDaysOfWeek from "./hooks/useFetchDaysOfWeek";
 import { useDispatch } from "react-redux";
-import { ScheduleState } from "./types/Api";
+import { ScheduleStateType } from "./types/Api";
 
 
 function App() {
@@ -20,7 +20,7 @@ function App() {
 
   const {
     daysOfWeek,
-  } = useFetchDaysOfWeek<ScheduleState>();
+  } = useFetchDaysOfWeek<ScheduleStateType>();
 
   if (daysOfWeek?.scheduleDays && daysOfWeek?.recurrence) {
     dispatch(setSchedule({ 
