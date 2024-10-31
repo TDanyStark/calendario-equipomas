@@ -1,8 +1,7 @@
 import { useSelector } from "react-redux";
 import {
-  ScheduleDayType,
-  ScheduleStateType,
   SelectScheduleType,
+  ScheduleStateType,
 } from "../../types/Api";
 import { useEffect, useState } from "react";
 import CheckBoxToggle from "./CheckBoxToggle";
@@ -12,7 +11,7 @@ import createSelectorHours from "../../utils/createSelectorHours";
 
 
 type WithAvailability = {
-  availability: Array<ScheduleDayType>;
+  availability: Array<SelectScheduleType>;
 };
 
 interface Props<T> {

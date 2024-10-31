@@ -51,14 +51,20 @@ const Courses = () => {
     console.log("ejecutando submit");
     const cleanedData = {
       ...data,
+      id: "",
       availability: courseSchedule,
     };
     console.log(cleanedData);
-    // setIsOpen(false);
+    if (editCourse) {
+      cleanedData.id = editCourse.id;
+      updateItem.mutate(cleanedData);
+    } else {
+      createItem.mutate(cleanedData);
+    }
+    setIsOpen(false);
   };
 
   // Mutaciones
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const { createItem, updateItem, deleteItem, deleteItems } =
     useItemMutations<CourseType>(entity, JWT);
 
@@ -76,6 +82,7 @@ const Courses = () => {
       setIsOpen(true);
       setValue("name", item.name);
       setValue("isOnline", item.isOnline);
+      setValue("duration", item.duration);
     },
     [setValue]
   );
@@ -143,7 +150,7 @@ const Courses = () => {
         onDeleteSelected={handleDeleteSelected}
         searchPlaceholder="Buscar curso"
         TextButtonCreate="curso"
-        gridTemplateColumns="100px 100px 1fr 100px 180px 180px"
+        gridTemplateColumns="100px 100px 1fr 180px 100px 180px"
       />
 
       {isOpen && (
@@ -189,6 +196,16 @@ const Courses = () => {
                     type="checkbox"
                     {...register("isOnline")}
                     className="input-checkbox w-5 h-5"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-1">
+                    Duracion en minutos
+                  </label>
+                  <input
+                    type="number"
+                    {...register("duration", { required: true })}
+                    className="input-primary w-28"
                   />
                 </div>
                 <div className="mb-4">

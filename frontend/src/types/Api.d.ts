@@ -15,8 +15,8 @@ interface SelectScheduleType {
   id: string;
   dayName: DayOfWeekNameType;
   dayDisplayName: string;
-  startTime: string | null;
-  endTime: string | null;
+  startTime: string;
+  endTime: string;
   isSelected: boolean;
   isOptionsOpen: boolean;
   activeTimeType: "start" | "end" | null;
@@ -45,7 +45,7 @@ type CourseType = {
   name: string;                     // Nombre del curso
   isOnline: boolean;                // Indica si el curso es online
   duration: number;                 // Duración del curso en minutos
-  availability: ScheduleDayType[]; // Arreglo de disponibilidades del curso
+  availability: SelectScheduleType[]; // Arreglo de disponibilidades del curso
 };
 
 type TestType = {

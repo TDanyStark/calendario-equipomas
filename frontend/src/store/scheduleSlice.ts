@@ -1,8 +1,8 @@
 // src/store/scheduleSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ScheduleDayType, ScheduleState } from '../types/Api';
+import { ScheduleDayType, ScheduleStateType } from '../types/Api';
 
-const initialState: ScheduleState = {
+const initialState: ScheduleStateType = {
   scheduleDays: null,
   recurrence: null,
 };

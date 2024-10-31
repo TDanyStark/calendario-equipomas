@@ -83,13 +83,31 @@ class DatabaseCourseRepository implements CourseRepository
 
   public function create(Course $course): int
   {
-    $stmt = $this->pdo->prepare("INSERT INTO courses (CourseName, IsOnline) VALUES (:name, :isOnline)");
+    $stmt = $this->pdo->prepare("INSERT INTO courses (CourseName, IsOnline, CourseDuration) VALUES (:name, :isOnline, :duration)");
     $stmt->execute([
       'name' => $course->getName(),
       'isOnline' => $course->getIsOnline(),
+      'duration' => $course->getDuration(),
     ]);
 
-    return (int)$this->pdo->lastInsertId();
+    $idInserted = (int)$this->pdo->lastInsertId();
+
+    foreach ($course->getAvailability() as $availability) {
+      $this->createAvailability($availability, $idInserted);
+    }
+
+    return $idInserted;
+  }
+
+  public function createAvailability(CourseAvailability $availability, int $courseId): void
+  {
+    $stmt = $this->pdo->prepare("INSERT INTO course_availability (CourseID, DayID, StartTime, EndTime) VALUES (:courseId, :dayId, :startTime, :endTime)");
+    $stmt->execute([
+      'courseId' => $courseId,
+      'dayId' => $availability->getScheduleDay()->getDayId(),
+      'startTime' => $availability->getStartTime(),
+      'endTime' => $availability->getEndTime(),
+    ]);
   }
 
   public function update(Course $course): void

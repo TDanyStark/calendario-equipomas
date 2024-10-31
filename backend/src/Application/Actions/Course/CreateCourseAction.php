@@ -9,7 +9,8 @@ use App\Domain\Course\Course;
 use App\Domain\Course\CourseAvailability;
 use App\Domain\Shared\Days\DayOfWeek;
 use InvalidArgumentException;
-
+use App\Domain\Shared\Days\ScheduleDay;
+use DateTime;
 class CreateCourseAction extends CourseAction
 {
     protected function action(): Response
@@ -20,12 +21,27 @@ class CreateCourseAction extends CourseAction
         $availabilityData = $data['availability'] ?? [];
         $availability = array_map(function ($item) {
             try {
-                // Convertimos dayOfWeek al enum DayOfWeek
-                $dayOfWeek = DayOfWeek::from(strtolower($item['dayOfWeek']));
+                // Parsear y formatear startTime
+                $startDateTime = new DateTime($item['startTime']);
+                $startTime = $startDateTime->format('H:i'); // Formato 'HH:MM'
+
+                // Parsear y formatear endTime
+                $endDateTime = new DateTime($item['endTime']);
+                $endTime = $endDateTime->format('H:i'); // Formato 'HH:MM'
+
+                $scheduleDay = new ScheduleDay(
+                    $item['id'], 
+                    DayOfWeek::from(strtolower($item['dayName'])), 
+                    $item['dayDisplayName'], 
+                    true, // es manejado por la base de datos
+                    $startTime, // es manejado por la base de datos 
+                    $endTime); // es manejado por la base de datos
+
                 return new CourseAvailability(
-                    $dayOfWeek,
-                    $item['startTime'] ?? null,
-                    $item['endTime'] ?? null
+                    $item['id'],
+                    $scheduleDay,
+                    $startTime,
+                    $endTime
                 );
             } catch (\ValueError $e) {
                 throw new InvalidArgumentException("Invalid dayOfWeek value: {$item['dayOfWeek']}");
@@ -34,9 +50,10 @@ class CreateCourseAction extends CourseAction
 
         // Creamos la instancia de Course incluyendo la disponibilidad
         $course = new Course(
-            0, // El ID se genera automáticamente en la base de datos
+            "", // El ID se genera automáticamente en la base de datos
             $data['name'],
             $data['isOnline'],
+            (int)$data['duration'],
             '', // createdAt es manejado por la base de datos
             '', // updatedAt es manejado por la base de datos
             $availability
