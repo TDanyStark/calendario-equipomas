@@ -216,7 +216,7 @@ function DataTable<T extends TableNode>({
 
   useEffect(() => {
     onSetPageRef.current(0);
-  }, [search]); 
+  }, [search, data]); 
 
   return (
     <>
