@@ -21,7 +21,6 @@ export const SubMenuNav = ({ item }: Props) => {
         onClick={() => toggleSection()}
         className="flex items-center justify-between w-full p-2 rounded-lg text-white hover:bg-gray-700"
       >
-
         <div className="flex gap-2">
           <img
             className="w-7 h-7"
@@ -45,16 +44,19 @@ export const SubMenuNav = ({ item }: Props) => {
       </button>
       <ul className={`${isOpen ? "block" : "hidden"} pl-8 mt-2 space-y-1`}>
         {item.subMenu &&
-          item.subMenu.map((subitem) => (
-            <li key={subitem.id}>
-              <NavLink
-                to={subitem.path}
-                className="flex items-center p-2 rounded-lg font-normal text-white hover:bg-gray-700"
-              >
-                {subitem.name}
-              </NavLink>
-            </li>
-          ))}
+          item.subMenu.map((subitem) => {
+            if (subitem.isHidden) return;
+            return (
+              <li key={subitem.id}>
+                <NavLink
+                  to={subitem.path}
+                  className="flex items-center p-2 rounded-lg font-normal text-white hover:bg-gray-700"
+                >
+                  {subitem.name}
+                </NavLink>
+              </li>
+            );
+          })}
       </ul>
     </li>
   );

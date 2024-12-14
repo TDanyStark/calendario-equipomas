@@ -23,7 +23,7 @@ export const Menus: TypeMenusByRole = {
         { id: 7, name: "Instrumentos", icon: "instruments", path: "/instruments" },
         { id: 8, name: "Salones", icon: "rooms", path: "/rooms" },
         { id: 9, name: "Cursos", icon: "courses", path: "/courses" },
-        { id: 10, name: "Semestres", icon: "semesters", path: "/semesters" },
+        { id: 10, name: "Semestres", icon: "semesters", path: "/semesters", isHidden:true },
         { id: 11, name: "Usuarios", icon: "users", path: "/users" },
         { id: 12, name: "Generales", icon: "general-settings", path: "/general-settings" },
       ],

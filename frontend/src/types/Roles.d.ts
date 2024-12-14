@@ -6,6 +6,7 @@ export type MenuItem = {
   name: string;
   icon: string;
   path: string;
+  isHidden?: boolean;
   subMenu?: MenuItem[]; // Submenú opcional, que es una lista de MenuItem
 };
 
