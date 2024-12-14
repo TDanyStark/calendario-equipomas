@@ -20,7 +20,7 @@ class DatabaseSemesterRepository implements SemesterRepository
 
   public function findAll(): array
   {
-    $stmt = $this->pdo->query("SELECT * FROM semester");
+    $stmt = $this->pdo->query("SELECT * FROM semesters");
     $semesters = [];
     while ($row = $stmt->fetch()) {
       $semesters[] = new Semester((string)$row['SemesterID'], $row['SemesterName'], $row['Created_at'], $row['Updated_at']);
@@ -30,7 +30,7 @@ class DatabaseSemesterRepository implements SemesterRepository
 
   public function findById(int $id): ?Semester
   {
-    $stmt = $this->pdo->prepare("SELECT * FROM semester WHERE SemesterID = :id");
+    $stmt = $this->pdo->prepare("SELECT * FROM semesters WHERE SemesterID = :id");
     $stmt->execute(['id' => $id]);
     $row = $stmt->fetch();
 
@@ -39,7 +39,7 @@ class DatabaseSemesterRepository implements SemesterRepository
 
   public function create(Semester $semester): int
   {
-    $stmt = $this->pdo->prepare("INSERT INTO semester (SemesterName) VALUES (:name)");
+    $stmt = $this->pdo->prepare("INSERT INTO semesters (SemesterName) VALUES (:name)");
     $stmt->execute([
       'name' => $semester->getName(),
     ]);
@@ -49,7 +49,7 @@ class DatabaseSemesterRepository implements SemesterRepository
 
   public function update(Semester $semester): bool
   {
-    $stmt = $this->pdo->prepare("UPDATE semester SET SemesterName = :name WHERE SemesterID = :id");
+    $stmt = $this->pdo->prepare("UPDATE semesters SET SemesterName = :name WHERE SemesterID = :id");
     return $stmt->execute([
       'name' => $semester->getName(),
       'id' => $semester->getId()
@@ -58,14 +58,14 @@ class DatabaseSemesterRepository implements SemesterRepository
 
   public function delete(int $id): bool
   {
-    $stmt = $this->pdo->prepare("DELETE FROM semester WHERE SemesterID = :id");
+    $stmt = $this->pdo->prepare("DELETE FROM semesters WHERE SemesterID = :id");
     return $stmt->execute(['id' => $id]);
   }
 
   public function deleteMultiple(array $ids): int
   {
     $placeholders = implode(',', array_fill(0, count($ids), '?'));
-    $query = "DELETE FROM semester WHERE SemesterID IN ($placeholders)";
+    $query = "DELETE FROM semesters WHERE SemesterID IN ($placeholders)";
     $stmt = $this->pdo->prepare($query);
 
     $stmt->execute($ids);
