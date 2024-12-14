@@ -74,6 +74,7 @@ class LoginAction extends Action
         // Obtener el rol utilizando el RoleRepository
         $role = $this->roleRepository->getRoleById($user->getRoleID());
 
+        // Si se va a implementar un nuevo rol se debe tener en cuenta que el Dominio debe tener el metodo getFirstName y getUser
         switch ($role->getRoleName()) {
             case 'admin':
                 $user = $this->adminRepository->findAdminById($id);

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Domain\Professor;
 
-use JsonSerializable;
+use App\Domain\PersonInterface;
 use App\Domain\User\User; // Importa la clase User
 
-class Professor implements JsonSerializable
+class Professor implements PersonInterface
 {
     private string $professorID;
     private string $firstName;
