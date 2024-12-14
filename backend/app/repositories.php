@@ -17,8 +17,9 @@ use App\Domain\Course\Course;
 use App\Infrastructure\Repository\DatabaseAdminRepository;
 
 use App\Domain\Instrument\InstrumentRepository;
-use App\Domain\Room\RoomRepository;
 use App\Infrastructure\Repository\DatabaseInstrumentRepository;
+
+use App\Domain\Room\RoomRepository;
 use App\Infrastructure\Repository\DatabaseRoomRepository;
 
 use App\Domain\Course\CourseRepository;
@@ -28,6 +29,9 @@ use App\Domain\Shared\Days\ScheduleDayRepository;
 use App\Domain\Shared\Settings\SettingRepository;
 use App\Infrastructure\Repository\DbSettingRepository;
 use App\Infrastructure\Repository\DbScheduleDayRepository;
+
+use App\Domain\Semester\SemesterRepository;
+use App\Infrastructure\Repository\DatabaseSemesterRepository;
 
 return function (ContainerBuilder $containerBuilder) {
     // Here we map our UserRepository interface to its in memory implementation
@@ -83,5 +87,11 @@ return function (ContainerBuilder $containerBuilder) {
             $database = $container->get(Database::class);
             return new DbSettingRepository($database);
         },
+
+        SemesterRepository::class => function($container){
+            $database = $container->get(Database::class);
+            return new DatabaseSemesterRepository($database);
+        },
+        
     ]);
 };
