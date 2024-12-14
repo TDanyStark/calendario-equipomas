@@ -41,6 +41,7 @@ const Sidebar = ({ role }: Props) => {
                 if (item.subMenu) {
                   return <SubMenuNav key={item.id} item={item} />;
                 } else {
+                  if(item.isHidden)return
                   return <RegularNav key={item.id} item={item} />;
                 }
               })}
