@@ -25,6 +25,7 @@ use App\Application\Actions\Course\ListCoursesAction;
 use App\Application\Actions\Course\CreateCourseAction;
 use App\Application\Actions\Course\UpdateCourseAction;
 use App\Application\Actions\Course\DeleteCourseAction;
+use App\Application\Actions\Course\DeleteMultipleCourseAction;
 
 use App\Application\Actions\Days\ScheduleDaysAction;
 
@@ -62,6 +63,11 @@ return function (App $app) {
             $courseGroup->post('', CreateCourseAction::class);
             $courseGroup->put('/{id}', UpdateCourseAction::class);
             $courseGroup->delete('/{id}', DeleteCourseAction::class);
+            $courseGroup->delete('', DeleteMultipleCourseAction::class);
+        })->add($this->get(RoleMiddleware::class)->withRole('admin'));
+
+        $group->group('/semesters', function (Group $courseGroup) {
+            $courseGroup->get('', ListCoursesAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
     });
 };

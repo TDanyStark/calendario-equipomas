@@ -11,7 +11,6 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use Psr\Log\LoggerInterface; // Importar LoggerInterface
 
 
 class RoleMiddleware implements MiddlewareInterface

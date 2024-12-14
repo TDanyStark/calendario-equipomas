@@ -182,4 +182,15 @@ class DatabaseCourseRepository implements CourseRepository
       $availability
     );
   }
+
+  public function deleteMultiple(array $ids): int
+  {
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    $query = "DELETE FROM courses WHERE CourseID IN ($placeholders)";
+    $stmt = $this->pdo->prepare($query);
+
+    $stmt->execute($ids);
+
+    return $stmt->rowCount();
+  }
 }

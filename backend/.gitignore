@@ -2,6 +2,7 @@
 .vscode/
 /coverage/
 /vendor/
+.env
 /logs/*
 !/logs/README.md
 .phpunit.result.cache
