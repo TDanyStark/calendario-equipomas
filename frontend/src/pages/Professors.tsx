@@ -268,6 +268,7 @@ const Professors = () => {
                 
               </form>
 
+
               <div className="modal_footer">
                 <CancelModalBtn onClick={() => setIsOpen(false)} />
                 <SubmitModalBtn
