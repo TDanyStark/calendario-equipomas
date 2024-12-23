@@ -1,6 +1,6 @@
 // types/Api.d.ts
 export type DayOfWeekNameType = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
-export type ResourceType = 'instruments' | 'rooms' | 'courses' | 'semesters';
+export type ResourceType = 'instruments' | 'rooms' | 'courses' | 'semesters' | 'professors';
 
 
 type ScheduleDayType = {
@@ -58,4 +58,17 @@ type TestType = {
 type SemesterType = {
   id: string;
   name: string;
+}
+
+type ProfessorType ={
+  id: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  status: string;
+  user: {
+    email: string;
+    password: string;
+    roleID: string;
+  };
 }

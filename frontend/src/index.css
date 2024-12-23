@@ -38,6 +38,10 @@ table input[type="checkbox"]{
   @apply  text-white border font-semibold py-2 px-4 rounded;
 }
 
+.input-disabled {
+  @apply text-gray-500 cursor-not-allowed px-3 py-2;
+}
+
 .input-primary {
   @apply border border-white rounded px-3 py-2;
 }

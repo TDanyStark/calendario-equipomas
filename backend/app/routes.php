@@ -33,6 +33,11 @@ use App\Application\Actions\Semester\UpdateSemesterAction;
 use App\Application\Actions\Semester\DeleteSemesterAction;
 use App\Application\Actions\Semester\DeleteMultipleSemestersAction;
 
+use App\Application\Actions\Professor\ListProfessorsAction;
+use App\Application\Actions\Professor\CreateProfessorAction;
+use App\Application\Actions\Professor\UpdateProfessorAction;
+use App\Application\Actions\Professor\DeleteProfessorAction;
+use App\Application\Actions\Professor\DeleteMultipleProfessorsAction;
 
 use App\Application\Actions\Days\ScheduleDaysAction;
 
@@ -79,6 +84,14 @@ return function (App $app) {
             $semesterGroup->put('/{id}', UpdateSemesterAction::class);
             $semesterGroup->delete('/{id}', DeleteSemesterAction::class);
             $semesterGroup->delete('', DeleteMultipleSemestersAction::class);
+        })->add($this->get(RoleMiddleware::class)->withRole('admin'));
+        
+        $group->group('/professors', function (Group $professorGroup) {
+            $professorGroup->get('', ListProfessorsAction::class);
+            $professorGroup->post('', CreateProfessorAction::class);
+            $professorGroup->put('/{id}', UpdateProfessorAction::class);
+            $professorGroup->delete('/{id}', DeleteProfessorAction::class);
+            $professorGroup->delete('', DeleteMultipleProfessorsAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
         
     });

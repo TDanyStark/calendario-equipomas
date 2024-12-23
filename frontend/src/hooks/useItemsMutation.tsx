@@ -4,11 +4,14 @@ import { URL_BACKEND } from "../variables";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-
-
-const useItemMutations = <T extends { id: string }>(resource: ResourceType, JWT: string | null) => {
+const useItemMutations = <T extends { id: string }>(
+  resource: ResourceType,
+  JWT: string | null,
+  setIsOpen?: (state: boolean) => void
+) => {
   const queryClient = useQueryClient();
-  
+
+  // Create Mutation
   const createItem = useMutation(
     (newItem: T) =>
       axios.post(`${URL_BACKEND}${resource}`, newItem, {
@@ -16,18 +19,26 @@ const useItemMutations = <T extends { id: string }>(resource: ResourceType, JWT:
       }),
     {
       onSuccess: () => {
-        // esto invalida la cache de la query que se hizo para obtener los items, y obliga a volver a hacer el get al recurso
         queryClient.invalidateQueries(resource);
         toast.success(`${resource} creado exitosamente`);
         toast.clearWaitingQueue();
+        if (setIsOpen) {
+          setIsOpen(false);
+        }
       },
-      onError: () => {
-        toast.error(`Error creando el ${resource}`);
+      onError: (error) => {
+        if (axios.isAxiosError(error) && error.response) {
+          const errorMessage = error.response.data?.data?.error || "Error desconocido";
+          toast.error(`Error creando el ${resource}: ${errorMessage}`);
+        } else {
+          toast.error(`Error creando el ${resource}`);
+        }
         toast.clearWaitingQueue();
       },
     }
   );
-  
+
+  // Update Mutation
   const updateItem = useMutation(
     (updatedItem: T) =>
       axios.put(`${URL_BACKEND}${resource}/${updatedItem.id}`, updatedItem, {
@@ -38,6 +49,9 @@ const useItemMutations = <T extends { id: string }>(resource: ResourceType, JWT:
         queryClient.invalidateQueries(resource);
         toast.success(`${resource} actualizado exitosamente`);
         toast.clearWaitingQueue();
+        if (setIsOpen) {
+          setIsOpen(false);
+        }
       },
       onError: () => {
         toast.error(`Error actualizando el ${resource}`);
@@ -46,6 +60,7 @@ const useItemMutations = <T extends { id: string }>(resource: ResourceType, JWT:
     }
   );
 
+  // Delete Single Item Mutation
   const deleteItem = useMutation(
     (id: string) =>
       axios.delete(`${URL_BACKEND}${resource}/${id}`, {
@@ -64,9 +79,10 @@ const useItemMutations = <T extends { id: string }>(resource: ResourceType, JWT:
     }
   );
 
+  // Delete Multiple Items Mutation
   const deleteItems = useMutation(
     (ids: string[]) =>
-      axios.delete(`${URL_BACKEND}${resource}`,{
+      axios.delete(`${URL_BACKEND}${resource}`, {
         headers: { Authorization: `Bearer ${JWT}` },
         data: { ids },
       }),
@@ -82,8 +98,18 @@ const useItemMutations = <T extends { id: string }>(resource: ResourceType, JWT:
       },
     }
   );
-  
-  return { createItem, updateItem, deleteItem, deleteItems };
+
+  // Retornar el estado de carga junto con las mutaciones
+  return {
+    createItem,
+    isCreateLoading: createItem.isLoading,
+    updateItem,
+    isUpdateLoading: updateItem.isLoading,
+    deleteItem,
+    isDeleteLoading: deleteItem.isLoading,
+    deleteItems,
+    isDeleteItemsLoading: deleteItems.isLoading,
+  };
 };
 
 export default useItemMutations;

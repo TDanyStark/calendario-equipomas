@@ -21,7 +21,14 @@ class DatabaseProfessorRepository implements ProfessorRepository
 
     public function findAll(): array
     {
-        $stmt = $this->pdo->query("SELECT p.*, u.UserID, u.UserEmail, u.UserPassword, u.RoleID FROM professors p INNER JOIN users u ON p.ProfessorID = u.UserID WHERE p.ProfessorIsDelete = 0");
+        $stmt = $this->pdo->query("
+            SELECT p.*, u.UserID, u.UserEmail, u.UserPassword, u.RoleID 
+            FROM professors p 
+            INNER JOIN users u ON p.ProfessorID = u.UserID 
+            WHERE p.ProfessorIsDelete = 0
+            ORDER BY p.Created_at DESC
+        ");
+
         $professors = [];
         while ($row = $stmt->fetch()) {
             $user = new User($row['UserID'], $row['UserEmail'], $row['UserPassword'], (int)$row['RoleID']);
@@ -93,6 +100,12 @@ class DatabaseProfessorRepository implements ProfessorRepository
             return (int)$this->pdo->lastInsertId();
         } catch (\Exception $e) {
             $this->pdo->rollBack();
+            // Verificar si el error es una violación de clave duplicada
+            if ($e->getCode() === '23000') {
+                throw new \DomainException("El ID proporcionado ya existe en la base de datos.");
+            }
+
+            // Re-lanzar la excepción si no es del tipo esperado
             throw $e;
         }
     }
@@ -137,29 +150,43 @@ class DatabaseProfessorRepository implements ProfessorRepository
     public function delete(string $id): bool
     {
         try {
-            $stmtUser = $this->pdo->prepare("DELETE FROM users WHERE UserID = :userID");
-            return $stmtUser->execute(['userID' => $id]);
+            // Actualizar la tabla professors
+            $stmt = $this->pdo->prepare("
+                UPDATE professors 
+                SET ProfessorIsDelete = 1, Deleted_at = NOW() 
+                WHERE ProfessorID = :id
+            ");
+            $stmt->execute(['id' => $id]);
+    
+            return $stmt->rowCount() > 0; // Devuelve true si se afectó al menos una fila
         } catch (\Exception $e) {
             throw $e; // Manejar la excepción si ocurre un error
         }
     }
+    
 
     public function deleteMultiple(array $ids): int
     {
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
         $this->pdo->beginTransaction();
-
+    
         try {
-            // Eliminar de la tabla users (ON DELETE CASCADE se encargará de professors)
-            $queryUser = "DELETE FROM users WHERE UserID IN ($placeholders)";
-            $stmtUser = $this->pdo->prepare($queryUser);
-            $stmtUser->execute($ids);
-
+            // Actualizar la tabla professors
+            $query = "
+                UPDATE professors 
+                SET ProfessorIsDelete = 1, Deleted_at = NOW() 
+                WHERE ProfessorID IN ($placeholders)
+            ";
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute($ids);
+    
             $this->pdo->commit();
-            return $stmtUser->rowCount();
+    
+            return $stmt->rowCount(); // Devuelve el número de filas afectadas
         } catch (\Exception $e) {
             $this->pdo->rollBack();
-            throw $e;
+            throw $e; // Manejar la excepción si ocurre un error
         }
     }
+    
 }

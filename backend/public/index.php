@@ -11,6 +11,7 @@ use Slim\Factory\AppFactory;
 use Slim\Factory\ServerRequestCreatorFactory;
 use Dotenv\Dotenv;
 
+date_default_timezone_set("America/Bogota");
 
 require __DIR__ . '/../vendor/autoload.php';
 
