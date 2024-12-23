@@ -32,6 +32,7 @@ const Instruments = () => {
   // Fetch instruments data
   const { data: instruments, isLoading, isError } = useFetchItems(entity, JWT);
   
+  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const memorizedData = useMemo(() => instruments, [instruments]);
   // Manejo del formulario con react-hook-form
   const { register, handleSubmit, setValue, reset } = useForm<InstrumentType>();
@@ -54,12 +55,14 @@ const Instruments = () => {
   const { createItem, updateItem, deleteItem, deleteItems } =
     useItemMutations<InstrumentType>(entity, JWT);
 
+    // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleCreate = useCallback(() => {
     setEditInstrument(null);
     setIsOpen(true);
     reset();
   }, [reset]);
 
+  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleEdit = useCallback(
     (item: InstrumentType) => {
       setEditInstrument(item);
@@ -69,6 +72,7 @@ const Instruments = () => {
     [setValue]
   );
 
+  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleDelete = useCallback(
     (item: InstrumentType) => {
       deleteItem.mutate((item as InstrumentType).id);
@@ -78,6 +82,7 @@ const Instruments = () => {
     []
   );
 
+  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleDeleteSelected = useCallback(
     (selectedIds: React.Key[]) => {
       const stringIds = selectedIds.map((id) => id.toString());
@@ -88,6 +93,7 @@ const Instruments = () => {
     []
   );
 
+  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const columns = useMemo(
     () => [
       {

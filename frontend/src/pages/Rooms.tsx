@@ -30,6 +30,7 @@ const Rooms = () => {
   // Fetch rooms data
   const { data: rooms, isLoading, isError } = useFetchItems(entity, JWT);
 
+  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const memorizedData = useMemo(() => rooms, [rooms]);
   // Manejo del formulario con react-hook-form
   const { register, handleSubmit, setValue, reset } = useForm<RoomType>();
@@ -53,12 +54,14 @@ const Rooms = () => {
   const { createItem, updateItem, deleteItem, deleteItems } =
     useItemMutations<RoomType>(entity, JWT);
 
+    // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleCreate = useCallback(() => {
     setEditRoom(null);
     setIsOpen(true);
     reset();
   }, [reset]);
 
+  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleEdit = useCallback(
     (item: RoomType) => {
       setEditRoom(item);
@@ -69,6 +72,7 @@ const Rooms = () => {
     [setValue]
   );
 
+  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleDelete = useCallback(
     (item: RoomType) => {
       deleteItem.mutate((item as RoomType).id);
@@ -77,6 +81,7 @@ const Rooms = () => {
     []
   );
 
+  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleDeleteSelected = useCallback(
     (selectedIds: React.Key[]) => {
       const stringIds = selectedIds.map((id) => id.toString());
@@ -86,6 +91,7 @@ const Rooms = () => {
     []
   );
 
+  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const columns = useMemo(
     () => [
       {

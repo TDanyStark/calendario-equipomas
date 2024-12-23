@@ -8,11 +8,11 @@ RewriteCond %{REQUEST_URI} ^/api
 RewriteRule ^api/(.*)$ /backend/public/index.php/$1 [L]
 
 # Si la solicitud es a la raíz, redirigir a index.html en frontend/dist
-RewriteRule ^$ /frontend/dist/index.html [L]
+RewriteRule ^$ /frontend/index.html [L]
 
 # Redirigir al frontend si no es /api y no es un archivo o directorio real
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ /frontend/dist/$1 [L]
+RewriteRule ^(.*)$ /frontend/$1 [L]
 
 
