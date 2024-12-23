@@ -180,7 +180,9 @@ const SelectShedulePro = () => {
         const newStartMin = prevEndMin + 15;
         slot.startHour = formatMinutesToTime(newStartMin);
         // Y revalidamos la relación con endHour
-        if (parseTimeToMinutes(slot.startHour) >= parseTimeToMinutes(slot.endHour)) {
+        if (
+          parseTimeToMinutes(slot.startHour) >= parseTimeToMinutes(slot.endHour)
+        ) {
           const forcedEnd = parseTimeToMinutes(slot.startHour) + 15;
           slot.endHour = formatMinutesToTime(forcedEnd);
         }
@@ -199,7 +201,10 @@ const SelectShedulePro = () => {
         nextStartMin = currentEndMin + 15;
         nextSlot.startHour = formatMinutesToTime(nextStartMin);
         // También habrá que forzar su end si quedó menor
-        if (parseTimeToMinutes(nextSlot.startHour) >= parseTimeToMinutes(nextSlot.endHour)) {
+        if (
+          parseTimeToMinutes(nextSlot.startHour) >=
+          parseTimeToMinutes(nextSlot.endHour)
+        ) {
           const forcedNextEnd = parseTimeToMinutes(nextSlot.startHour) + 15;
           nextSlot.endHour = formatMinutesToTime(forcedNextEnd);
         }
@@ -208,50 +213,49 @@ const SelectShedulePro = () => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div className="flex flex-col gap-4">
       <h2>Horario de Atención</h2>
       {schedule.map((day, dayIndex) => (
-        <div
-          key={day.name}
-          style={{
-            border: "1px solid #ccc",
-            marginBottom: 16,
-            padding: 16,
-            borderRadius: 8,
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <label style={{ marginRight: 8 }}>{day.DisplayName}</label>
-            <label className="switch">
+        <div key={day.name} className="flex gap-4 min-h-16">
+          <div className="min-w-24">
+            <label>
               <input
                 type="checkbox"
                 checked={day.isActive}
                 onChange={() => handleToggleDay(dayIndex)}
+                className="w-5 h-5"
               />
-              <span className="slider round"></span>
+              <span className="ml-2">{day.DisplayName}</span>
             </label>
           </div>
           {day.isActive && (
-            <div>
-              {day.availability.map((av, avIndex) => (
-                <TimeRangeRow
-                  key={avIndex}
-                  startHour={av.startHour}
-                  endHour={av.endHour}
-                  onChangeStart={(val) =>
-                    handleTimeChange(dayIndex, avIndex, "startHour", val)
-                  }
-                  onChangeEnd={(val) =>
-                    handleTimeChange(dayIndex, avIndex, "endHour", val)
-                  }
-                  onRemove={() => handleRemoveAvailability(dayIndex, avIndex)}
-                  canRemove={day.availability.length > 1}
-                />
-              ))}
-              <button onClick={() => handleAddAvailability(dayIndex)}>
-                + Agregar horario
-              </button>
-            </div>
+            <>
+              <div>
+                {day.availability.map((av, avIndex) => (
+                  <TimeRangeRow
+                    key={avIndex}
+                    startHour={av.startHour}
+                    endHour={av.endHour}
+                    onChangeStart={(val: string) =>
+                      handleTimeChange(dayIndex, avIndex, "startHour", val)
+                    }
+                    onChangeEnd={(val: string) =>
+                      handleTimeChange(dayIndex, avIndex, "endHour", val)
+                    }
+                    onRemove={() => handleRemoveAvailability(dayIndex, avIndex)}
+                    canRemove={day.availability.length > 1}
+                  />
+                ))}
+              </div>
+              <div>
+                <button
+                  onClick={() => handleAddAvailability(dayIndex)}
+                  className="bg-blue-500 text-white px-2 py-1 rounded"
+                >
+                  +
+                </button>
+              </div>
+            </>
           )}
         </div>
       ))}
@@ -277,7 +281,9 @@ const TimeRangeRow = ({
   canRemove,
 }) => {
   return (
-    <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
+    <div 
+      className="flex items-center gap-1"
+    >
       <TimePicker value={startHour} onChange={onChangeStart} />
       <span style={{ margin: "0 8px" }}>-</span>
       <TimePicker value={endHour} onChange={onChangeEnd} />
