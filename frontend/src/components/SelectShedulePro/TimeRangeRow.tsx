@@ -4,6 +4,7 @@ import TimePicker from "./TimePicker";
 interface TimeRangeRowProps {
   startTime: string;
   endTime: string;
+  dayIndex: string;
   onChangeStart: (val: string) => void;
   onChangeEnd: (val: string) => void;
   onRemove: () => void;
@@ -12,6 +13,7 @@ interface TimeRangeRowProps {
 const TimeRangeRow = ({
   startTime,
   endTime,
+  dayIndex,
   onChangeStart,
   onChangeEnd,
   onRemove,
@@ -19,9 +21,9 @@ const TimeRangeRow = ({
 }: TimeRangeRowProps) => {
   return (
     <div className="flex items-center gap-1">
-      <TimePicker value={startTime} onChange={onChangeStart} />
+      <TimePicker value={startTime} onChange={onChangeStart} dayIndex={dayIndex} />
       <span className="mx-1">-</span>
-      <TimePicker value={endTime} onChange={onChangeEnd} />
+      <TimePicker value={endTime} onChange={onChangeEnd} dayIndex={dayIndex} />
       {canRemove && (
         <button onClick={onRemove} className="text-white">
           <DeleteSvg />

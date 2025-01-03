@@ -2,7 +2,6 @@
 // UTILIDADES
 // =======================
 
-
 const parseTimeToMinutes = (timeStr: string): number => {
   // timeStr en formato "HH:MM"
   const [h, m] = timeStr.split(":").map(Number);
@@ -22,15 +21,15 @@ const formatMinutesToTime: FormatMinutesToTime = (totalMinutes) => {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 };
 
-const generateTimeOptions = (interval: number) => {
+const generateTimeOptions = (interval: number, startTime: string, endTime: string) => {
   const times = [];
-  for (let h = 0; h < 24; h++) {
-    for (let m = 0; m < 60; m += interval) {
-      const hour = String(h).padStart(2, "0");
-      const minute = String(m).padStart(2, "0");
-      times.push(`${hour}:${minute}`);
-    }
+  const startMinutes = parseTimeToMinutes(startTime);
+  const endMinutes = parseTimeToMinutes(endTime);
+  
+  for (let i = startMinutes; i <= endMinutes; i += interval) {
+    times.push(formatMinutesToTime(i));
   }
+
   return times;
 };
 

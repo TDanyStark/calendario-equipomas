@@ -13,23 +13,18 @@ interface Availability {
   startTime: string;
   endTime: string;
 }
-
-// =======================
-// DATOS INICIALES
-// =======================
-const initialSchedule: {
+interface Schedule {
   isActive: boolean;
   id: string;
   dayName: string;
   dayDisplayName: string;
   availability: Availability[];
-}[] = [];
-
+}
 // =======================
 // COMPONENTE PRINCIPAL
 // =======================
 const SelectShedulePro = () => {
-  const [schedule, setSchedule] = useState(initialSchedule);
+  const [schedule, setSchedule] = useState<Schedule[]>([]);
   const scheduleWeek = useSelector(
     (state: { schedule: ScheduleStateType }) => state.schedule
   );
@@ -60,6 +55,8 @@ const SelectShedulePro = () => {
     return null; // Si no hay datos, no renderiza nada
   }
 
+  const recurrence = scheduleWeek.recurrence;
+
   // Cambia el estado (on/off) de un día
   interface HandleToggleDay {
     (index: number): void;
@@ -72,29 +69,24 @@ const SelectShedulePro = () => {
 
   // Agrega un horario a un día
   interface HandleAddAvailability {
-    (dayIndex: number): void;
+    (dayIndex: number, id: string): void;
   }
-  const handleAddAvailability: HandleAddAvailability = (dayIndex) => {
+  const handleAddAvailability: HandleAddAvailability = (dayIndex, id) => {
     const updated = [...schedule];
     const dayAvailability = updated[dayIndex].availability;
 
-    if (dayAvailability.length === 0) {
-      // Si no hay horarios, iniciamos con 09:00 - 09:15, por ejemplo
-      dayAvailability.push({ startTime: "09:00", endTime: "09:15" });
-    } else {
-      // Tomar la hora de fin del último horario y sumarle 15 minutos
-      const lastEnd = dayAvailability[dayAvailability.length - 1].endTime;
-      const lastEndMin = parseTimeToMinutes(lastEnd);
-      const newStartMin = lastEndMin + 15; // +15 min
-      // Generar start y end por defecto (ejemplo: un bloque de 1 hora)
-      const newStart = formatMinutesToTime(newStartMin);
-      const newEnd = formatMinutesToTime(newStartMin + 60); // 1 hora después
+    const selectDayWeek = scheduleWeek?.scheduleDays?.find((day) => day.id === id);
 
-      dayAvailability.push({
-        startTime: newStart,
-        endTime: newEnd,
-      });
-    }
+    const lastEnd = dayAvailability[dayAvailability.length - 1].endTime;
+    const lastEndMin = parseTimeToMinutes(lastEnd);
+    const newStartMin = lastEndMin + recurrence;
+    const newStart = formatMinutesToTime(newStartMin);
+    const newEnd = formatMinutesToTime(selectDayWeek?.endTime ? parseTimeToMinutes(selectDayWeek.endTime) : newStartMin + recurrence); 
+    
+    dayAvailability.push({
+      startTime: newStart,
+      endTime: newEnd,
+    });
     setSchedule(updated);
   };
 
@@ -234,6 +226,7 @@ const SelectShedulePro = () => {
                     key={avIndex}
                     startTime={av.startTime}
                     endTime={av.endTime}
+                    dayIndex={day.id}
                     onChangeStart={(val: string) =>
                       handleTimeChange(dayIndex, avIndex, "startTime", val)
                     }
@@ -245,11 +238,10 @@ const SelectShedulePro = () => {
                   />
                 ))}
               </div>
-              {
-                scheduleWeek.scheduleDays &&
-                parseTimeToMinutes(
-                  day.availability[day.availability.length - 1].endTime
-                ) >=
+              {scheduleWeek.scheduleDays &&
+              parseTimeToMinutes(
+                day.availability[day.availability.length - 1].endTime
+              ) >=
                 parseTimeToMinutes(
                   formatTimeFrontend(
                     scheduleWeek.scheduleDays[dayIndex].endTime
@@ -257,14 +249,13 @@ const SelectShedulePro = () => {
                 ) ? null : (
                 <div>
                   <button
-                    onClick={() => handleAddAvailability(dayIndex)}
+                    onClick={() => handleAddAvailability(dayIndex, day.id)}
                     className="text-white mt-[5px]"
                   >
                     <PlusSvg />
                   </button>
                 </div>
-                )
-              }
+              )}
             </>
           )}
         </div>

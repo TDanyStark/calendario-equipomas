@@ -6,8 +6,9 @@ import { ScheduleStateType } from "../../types/Api";
 interface TimePickerProps {
   value: string;
   onChange: (val: string) => void;
+  dayIndex: string;
 }
-const TimePicker = ({ value, onChange }: TimePickerProps) => {
+const TimePicker = ({ value, onChange, dayIndex }: TimePickerProps) => {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -34,35 +35,28 @@ const TimePicker = ({ value, onChange }: TimePickerProps) => {
     (state: { schedule: ScheduleStateType }) => state.schedule
   );
 
-  const timeOptions = generateTimeOptions(scheduleWeek.recurrence ?? 0);
+  const selectedDay = scheduleWeek.scheduleDays?.find(
+    (day) => day.id === dayIndex
+  );
+
+  const startTime = selectedDay?.startTime ?? "";
+  const endTime = selectedDay?.endTime ?? "";
+  const interval = scheduleWeek.recurrence ?? 0;
+
+  //TODO: validar que el tiempo se muestre solo en los valores permitidos, como por ejemplo que no se genere valores finales antes que el valor de inicio, que el valor de inicio no sea mayor al valor mayor de la hora anterior, etc.
+  const timeOptions = generateTimeOptions(interval, startTime, endTime);
 
   return (
-    <div style={{ position: "relative" }} ref={ref}>
+    <div className="relative" ref={ref}>
       <div
-        style={{
-          border: "1px solid #aaa",
-          padding: "4px 8px",
-          cursor: "pointer",
-          minWidth: 60,
-          textAlign: "center",
-        }}
+        className="text-center py-1 px-2 cursor-pointer min-w-16 border border-gray-300"
         onClick={() => setOpen(!open)}
       >
         {value}
       </div>
       {open && (
         <div
-          style={{
-            position: "absolute",
-            top: "100%",
-            left: 0,
-            backgroundColor: "#fff",
-            border: "1px solid #ccc",
-            maxHeight: 200,
-            overflowY: "auto",
-            zIndex: 999,
-            width: 80,
-          }}
+          className="absolute top-full left-0 bg-white border border-gray-300 max-h-[200px] overflow-y-auto z-50 w-[80px]"
         >
           {timeOptions.map((option) => (
             <div
