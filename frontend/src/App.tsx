@@ -13,21 +13,23 @@ import getUserRole from "./utils/getUserRole";
 import useFetchDaysOfWeek from "./hooks/useFetchDaysOfWeek";
 import { useDispatch } from "react-redux";
 import { ScheduleStateType } from "./types/Api";
+import { useEffect } from "react";
 
 
 function App() {
   const dispatch = useDispatch();
-
-  const {
-    daysOfWeek,
-  } = useFetchDaysOfWeek<ScheduleStateType>();
-
-  if (daysOfWeek?.scheduleDays && daysOfWeek?.recurrence) {
-    dispatch(setSchedule({ 
-      scheduleDays: daysOfWeek.scheduleDays,
-      recurrence: daysOfWeek.recurrence 
-    }));
-  }
+  
+  const { daysOfWeek } = useFetchDaysOfWeek<ScheduleStateType>();
+  useEffect(() => {
+    if (daysOfWeek?.scheduleDays && daysOfWeek?.recurrence) {
+      dispatch(
+        setSchedule({
+          scheduleDays: daysOfWeek.scheduleDays,
+          recurrence: daysOfWeek.recurrence,
+        })
+      );
+    }
+  }, [daysOfWeek, dispatch]); 
 
   const userRole = getUserRole();
 

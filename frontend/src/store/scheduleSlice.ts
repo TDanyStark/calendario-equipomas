@@ -11,7 +11,7 @@ const scheduleSlice = createSlice({
   name: 'schedule',
   initialState,
   reducers: {
-    setSchedule: (state, action: PayloadAction<{ scheduleDays: ScheduleDayType[]; recurrence: string }>) => {
+    setSchedule: (state, action: PayloadAction<{ scheduleDays: ScheduleDayType[]; recurrence: number }>) => {
       state.scheduleDays = action.payload.scheduleDays;
       state.recurrence = action.payload.recurrence;
     }

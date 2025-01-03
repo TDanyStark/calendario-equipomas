@@ -33,7 +33,7 @@ class ScheduleDaysAction extends Action
 
         $data = [
             'scheduleDays' => $scheduleDays,
-            'recurrence' => $recurrence->getValue()
+            'recurrence' => (int)$recurrence->getValue()
         ];
 
         return $this->respondWithData($data);

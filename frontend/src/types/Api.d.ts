@@ -24,7 +24,7 @@ interface SelectScheduleType {
 
 interface ScheduleStateType {
   scheduleDays: ScheduleDayType[] | null;
-  recurrence: string | null;
+  recurrence: number | null;
 }
 
 
