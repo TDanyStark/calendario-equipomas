@@ -11,9 +11,6 @@ import { ScheduleStateType, ScheduleType } from "@/types/Api";
 import TimeRangeRow from "./TimeRangeRow";
 
 
-// =======================
-// COMPONENTE PRINCIPAL
-// =======================
 const SelectShedulePro = () => {
   const [schedule, setSchedule] = useState<ScheduleType[]>([]);
   const scheduleWeek = useSelector(
@@ -125,8 +122,6 @@ const SelectShedulePro = () => {
     updated[dayIndex].availability = dayAvailability;
     setSchedule(updated);
   };
-
-
 
   return (
     <div className="flex flex-col gap-4">
