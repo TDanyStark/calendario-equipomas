@@ -1,30 +1,21 @@
 import { useState, useEffect } from "react";
-import PlusSvg from "../../icons/PlusSvg";
+import PlusSvg from "@/icons/PlusSvg";
 import {
   formatMinutesToTime,
   parseTimeToMinutes,
   formatTimeFrontend,
+  validateSlot
 } from "../../utils/schedulePro";
 import { useSelector } from "react-redux";
-import { ScheduleStateType } from "../../types/Api";
+import { ScheduleStateType, ScheduleType } from "@/types/Api";
 import TimeRangeRow from "./TimeRangeRow";
 
-interface Availability {
-  startTime: string;
-  endTime: string;
-}
-interface Schedule {
-  isActive: boolean;
-  id: string;
-  dayName: string;
-  dayDisplayName: string;
-  availability: Availability[];
-}
+
 // =======================
 // COMPONENTE PRINCIPAL
 // =======================
 const SelectShedulePro = () => {
-  const [schedule, setSchedule] = useState<Schedule[]>([]);
+  const [schedule, setSchedule] = useState<ScheduleType[]>([]);
   const scheduleWeek = useSelector(
     (state: { schedule: ScheduleStateType }) => state.schedule
   );
@@ -128,86 +119,21 @@ const SelectShedulePro = () => {
     currentSlot[type] = newTime;
 
     // Validaciones
-    validateSlot(dayAvailability, avIndex, type);
-
+    validateSlot(dayAvailability, avIndex, recurrence);
+    
     // Volvemos a dejar el array ya validado
     updated[dayIndex].availability = dayAvailability;
     setSchedule(updated);
   };
 
-  // Función que valida un "slot" (startTime - endTime):
-  // 1) Si start >= end, forzamos end a ser la siguiente opción de start.
-  // 2) Si existe un slot anterior, verificamos que el start actual no sea
-  //    menor o igual al end del slot anterior.
-  // 3) Si existe un slot siguiente, aseguramos que su start sea > a nuestro end.
-  interface ValidateSlot {
-    (
-      availability: Availability[],
-      avIndex: number,
-      changedType: "startTime" | "endTime"
-    ): void;
-  }
 
-  const validateSlot: ValidateSlot = (availability, avIndex) => {
-    const slot = availability[avIndex];
-    const startMin = parseTimeToMinutes(slot.startTime);
-    let endMin = parseTimeToMinutes(slot.endTime);
-
-    // 1) Verificar que start < end (no puede ser igual, debe ser mayor)
-    if (startMin >= endMin) {
-      endMin = startMin + 15; // forzamos 15 min más
-      slot.endTime = formatMinutesToTime(endMin);
-    }
-
-    // 2) Si no es el primer slot, forzar que mi start sea >= end del anterior + 15
-    //    según tu regla, "nunca puede permitir que la hora de inicio sea menor
-    //    que la hora de fin" (y para no chocar, sumamos 15 min).
-    if (avIndex > 0) {
-      const prevSlot = availability[avIndex - 1];
-      const prevEndMin = parseTimeToMinutes(prevSlot.endTime);
-      if (startMin <= prevEndMin) {
-        // Ajustamos start a prevEndMin + 15
-        const newStartMin = prevEndMin + 15;
-        slot.startTime = formatMinutesToTime(newStartMin);
-        // Y revalidamos la relación con endTime
-        if (
-          parseTimeToMinutes(slot.startTime) >= parseTimeToMinutes(slot.endTime)
-        ) {
-          const forcedEnd = parseTimeToMinutes(slot.startTime) + 15;
-          slot.endTime = formatMinutesToTime(forcedEnd);
-        }
-      }
-    }
-
-    // 3) Si no es el último slot, forzar que el siguiente slot comience
-    //    al menos 15 min después del end actual.
-    if (avIndex < availability.length - 1) {
-      const nextSlot = availability[avIndex + 1];
-      const currentEndMin = parseTimeToMinutes(slot.endTime);
-      let nextStartMin = parseTimeToMinutes(nextSlot.startTime);
-
-      if (nextStartMin <= currentEndMin) {
-        // Mover el siguiente start a currentEndMin + 15
-        nextStartMin = currentEndMin + 15;
-        nextSlot.startTime = formatMinutesToTime(nextStartMin);
-        // También habrá que forzar su end si quedó menor
-        if (
-          parseTimeToMinutes(nextSlot.startTime) >=
-          parseTimeToMinutes(nextSlot.endTime)
-        ) {
-          const forcedNextEnd = parseTimeToMinutes(nextSlot.startTime) + 15;
-          nextSlot.endTime = formatMinutesToTime(forcedNextEnd);
-        }
-      }
-    }
-  };
 
   return (
     <div className="flex flex-col gap-4">
-      <h2>Horario de Atención</h2>
+      <h2 className="font-bold">Horario de Atención</h2>
       {schedule.map((day, dayIndex) => (
         <div key={day.dayName} className="flex gap-4 min-h-10">
-          <div className="min-w-24">
+          <div className="min-w-28">
             <label className="flex items-center pt-[5px]">
               <input
                 type="checkbox"
@@ -241,12 +167,13 @@ const SelectShedulePro = () => {
               {scheduleWeek.scheduleDays &&
               parseTimeToMinutes(
                 day.availability[day.availability.length - 1].endTime
-              ) >=
-                parseTimeToMinutes(
-                  formatTimeFrontend(
-                    scheduleWeek.scheduleDays[dayIndex].endTime
-                  )
-                ) ? null : (
+              ) 
+              >=
+              parseTimeToMinutes(
+                formatTimeFrontend(
+                  scheduleWeek.scheduleDays[dayIndex].endTime
+                )
+              ) ? null : (
                 <div>
                   <button
                     onClick={() => handleAddAvailability(dayIndex, day.id)}

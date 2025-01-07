@@ -49,7 +49,7 @@ const TimePicker = ({ value, onChange, dayIndex }: TimePickerProps) => {
   return (
     <div className="relative" ref={ref}>
       <div
-        className="text-center py-1 px-2 cursor-pointer min-w-16 border border-gray-300"
+        className="text-center py-1 px-4 cursor-pointer min-w-16 border border-gray-300 rounded"
         onClick={() => setOpen(!open)}
       >
         {value}

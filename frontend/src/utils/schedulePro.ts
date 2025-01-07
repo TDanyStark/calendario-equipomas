@@ -1,3 +1,5 @@
+import { Availability } from "../types/Api";
+
 // =======================
 // UTILIDADES
 // =======================
@@ -38,7 +40,26 @@ export const formatTimeFrontend = (time: string): string => {
   return `${hours}:${minutes}`;
 };
 
+interface ValidateSlot {
+  (
+    availability: Availability[],
+    avIndex: number,
+    recurrence: number
+  ): void;
+}
+const validateSlot: ValidateSlot = (availability, avIndex, recurrence) => {
+  const slot = availability[avIndex];
+  const startMin = parseTimeToMinutes(slot.startTime);
+  let endMin = parseTimeToMinutes(slot.endTime);
+
+  // 1) Verificar que start < end (no puede ser igual, debe ser mayor)
+  if (startMin >= endMin) {
+    endMin = startMin + recurrence; // forzamos 15 min más
+    slot.endTime = formatMinutesToTime(endMin);
+  }
+};
+
 
 export {
-  parseTimeToMinutes, formatMinutesToTime, generateTimeOptions
+  parseTimeToMinutes, formatMinutesToTime, generateTimeOptions, validateSlot
 }

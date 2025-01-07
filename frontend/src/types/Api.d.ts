@@ -2,6 +2,17 @@
 export type DayOfWeekNameType = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
 export type ResourceType = 'instruments' | 'rooms' | 'courses' | 'semesters' | 'professors';
 
+interface Availability {
+  startTime: string;
+  endTime: string;
+}
+interface ScheduleType {
+  isActive: boolean;
+  id: string;
+  dayName: string;
+  dayDisplayName: string;
+  availability: Availability[];
+}
 
 type ScheduleDayType = {
   id: string;
@@ -41,11 +52,11 @@ type RoomType = {
 
 
 type CourseType = {
-  id: string;                       // ID del curso
-  name: string;                     // Nombre del curso
-  isOnline: boolean;                // Indica si el curso es online
-  duration: number;                 // Duración del curso en minutos
-  availability: SelectScheduleType[]; // Arreglo de disponibilidades del curso
+  id: string;
+  name: string;
+  isOnline: boolean;
+  duration: number;
+  availability: SelectScheduleType[];
 };
 
 type TestType = {
