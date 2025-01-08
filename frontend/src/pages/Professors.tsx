@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,6 +16,8 @@ import BackgroundDiv from "../components/modal/BackgroundDiv";
 import CancelModalBtn from "../components/buttons/CancelModalBtn";
 import SubmitModalBtn from "../components/buttons/SubmitModalBtn";
 import ErrorLoadingResourse from "../components/error/ErrorLoadingResourse";
+import { ScheduleType } from "../types/Api";
+import SelectShedulePro from "../components/SelectShedulePro";
 
 const entity = "professors";
 const entityName = "profesores";
@@ -23,9 +25,24 @@ const entityName = "profesores";
 const Professors = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [editProfessor, setEditProfessor] = useState<ProfessorType | null>(null);
-
-  // Obtener el token desde el store
+  const [schedule, setSchedule] = useState<ScheduleType[]>([]);
+  
   const JWT = useSelector((state: RootState) => state.auth.JWT);
+  const { data: instruments, isLoading: isLoadingInstruments} = useFetchItems("instruments", JWT);
+  const { data: rooms, isLoading: isLoadingRooms} = useFetchItems("rooms", JWT);
+
+  useEffect(() => {
+    console.log(
+      {
+        isLoadingInstruments,
+        isLoadingRooms
+      }
+    );
+  console.log({
+    instruments,
+    rooms
+  });
+  }, [instruments, isLoadingInstruments, isLoadingRooms, rooms]);
 
   // Fetch professors data
   // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
@@ -36,7 +53,11 @@ const Professors = () => {
   const onSubmit = (data: ProfessorType) => {
     const cleanedData = {
       ...data,
+      availability: {...schedule},
     };
+
+    console.log(cleanedData);
+    return;
 
     if (editProfessor) {
       updateItem.mutate(cleanedData);
@@ -267,7 +288,7 @@ const Professors = () => {
                 </div>
                 
               </form>
-
+              <SelectShedulePro schedule={schedule} setSchedule={setSchedule} canBeAdded={true} />
 
               <div className="modal_footer">
                 <CancelModalBtn onClick={() => setIsOpen(false)} />

@@ -82,4 +82,5 @@ type ProfessorType ={
     password: string;
     roleID: string;
   };
+  availability: ScheduleType[];
 }

@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import PlusSvg from "@/icons/PlusSvg";
+import { useEffect } from "react";
+import PlusSvg from "../../icons/PlusSvg";
 import {
   formatMinutesToTime,
   parseTimeToMinutes,
@@ -7,12 +7,22 @@ import {
   validateSlot
 } from "../../utils/schedulePro";
 import { useSelector } from "react-redux";
-import { ScheduleStateType, ScheduleType } from "@/types/Api";
+import { 
+  ScheduleStateType, 
+  ScheduleType, 
+  ScheduleDayType, 
+  Availability 
+} from "../../types/Api";
 import TimeRangeRow from "./TimeRangeRow";
+import CheckBoxToggle from "../selectSchedule/CheckBoxToggle";
 
+interface Props{
+  schedule: ScheduleType[];
+  setSchedule: (schedule: ScheduleType[]) => void;
+  canBeAdded: boolean;
+}
 
-const SelectShedulePro = () => {
-  const [schedule, setSchedule] = useState<ScheduleType[]>([]);
+const SelectShedulePro = ({schedule, setSchedule, canBeAdded = true}: Props) => {
   const scheduleWeek = useSelector(
     (state: { schedule: ScheduleStateType }) => state.schedule
   );
@@ -20,7 +30,7 @@ const SelectShedulePro = () => {
   // Actualiza el estado local `schedule` cuando `scheduleWeek` cambie
   useEffect(() => {
     if (scheduleWeek && scheduleWeek.scheduleDays) {
-      const updatedSchedule = scheduleWeek.scheduleDays.map((day) => {
+      const updatedSchedule = scheduleWeek.scheduleDays.map((day: ScheduleDayType) => {
         return {
           isActive: true,
           id: day.id,
@@ -37,7 +47,7 @@ const SelectShedulePro = () => {
 
       setSchedule(updatedSchedule);
     }
-  }, [scheduleWeek]);
+  }, [scheduleWeek, setSchedule]);
 
   if (!scheduleWeek?.scheduleDays || !scheduleWeek?.recurrence) {
     return null; // Si no hay datos, no renderiza nada
@@ -63,7 +73,7 @@ const SelectShedulePro = () => {
     const updated = [...schedule];
     const dayAvailability = updated[dayIndex].availability;
 
-    const selectDayWeek = scheduleWeek?.scheduleDays?.find((day) => day.id === id);
+    const selectDayWeek = scheduleWeek?.scheduleDays?.find((day: ScheduleDayType) => day.id === id);
 
     const lastEnd = dayAvailability[dayAvailability.length - 1].endTime;
     const lastEndMin = parseTimeToMinutes(lastEnd);
@@ -125,24 +135,21 @@ const SelectShedulePro = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="font-bold">Horario de Atención</h2>
+      <h2 className="font-bold">Horario de Disponibilidad</h2>
       {schedule.map((day, dayIndex) => (
         <div key={day.dayName} className="flex gap-4 min-h-10">
-          <div className="min-w-28">
-            <label className="flex items-center pt-[5px]">
-              <input
-                type="checkbox"
-                checked={day.isActive}
-                onChange={() => handleToggleDay(dayIndex)}
-                className="w-5 h-5"
-              />
-              <span className="ml-2">{day.dayDisplayName}</span>
-            </label>
+          <div className="min-w-24 pt-1">
+            <CheckBoxToggle
+              id={day.id}
+              dayDisplayName={day.dayDisplayName}
+              isSelected={day.isActive}
+              onChange={() => handleToggleDay(dayIndex)}
+            />
           </div>
           {day.isActive && (
             <>
               <div className="space-y-2 min-w-[178px]">
-                {day.availability.map((av, avIndex) => (
+                {day.availability.map((av: Availability, avIndex: number) => (
                   <TimeRangeRow
                     key={avIndex}
                     startTime={av.startTime}
@@ -159,7 +166,7 @@ const SelectShedulePro = () => {
                   />
                 ))}
               </div>
-              {scheduleWeek.scheduleDays &&
+              {scheduleWeek.scheduleDays && canBeAdded &&
               parseTimeToMinutes(
                 day.availability[day.availability.length - 1].endTime
               ) 

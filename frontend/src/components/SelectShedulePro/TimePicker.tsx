@@ -49,19 +49,19 @@ const TimePicker = ({ value, onChange, dayIndex }: TimePickerProps) => {
   return (
     <div className="relative" ref={ref}>
       <div
-        className="text-center py-1 px-4 cursor-pointer min-w-16 border border-gray-300 rounded"
+        className="text-center  w-24 h-10 cursor-pointer border border-gray-300 rounded flex items-center justify-center"
         onClick={() => setOpen(!open)}
       >
         {value}
       </div>
       {open && (
         <div
-          className="absolute top-full left-0 bg-white border border-gray-300 max-h-[200px] overflow-y-auto z-50 w-[80px]"
+          className="absolute top-full left-0 bg-white border border-gray-300 max-h-[200px] overflow-y-auto z-50 w-[96px]"
         >
           {timeOptions.map((option) => (
             <div
               key={option}
-              className="p-1 cursor-pointer bg-black hover:bg-gray-900"
+              className="p-1 cursor-pointer bg-black hover:bg-gray-900 flex justify-center"
               onClick={() => handleOptionClick(option)}
             >
               {option}

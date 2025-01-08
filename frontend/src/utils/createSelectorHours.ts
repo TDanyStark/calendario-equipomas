@@ -1,6 +1,6 @@
 import { ScheduleDayType, SelectScheduleType } from "../types/Api";
 
-const createSelectorHours = (id: string, type: "start" | "end", daysOfWeek: ScheduleDayType[] | null, selectSchedule: SelectScheduleType[] | null, recurrence: string | null) => {
+const createSelectorHours = (id: string, type: "start" | "end", daysOfWeek: ScheduleDayType[] | null, selectSchedule: SelectScheduleType[] | null, recurrence: number | null) => {
   const hours = [];
   // traer el dia que tenga isOptionsOpen true
   const daySelected = daysOfWeek?.find((d) => d.id === id);
@@ -18,7 +18,7 @@ const createSelectorHours = (id: string, type: "start" | "end", daysOfWeek: Sche
     while (startDate <= endDate) {
       hours.push(startDate.toTimeString().slice(0, 5));
       startDate.setMinutes(
-        startDate.getMinutes() + (recurrence ? parseInt(recurrence) : 60)
+        startDate.getMinutes() + (recurrence ? Number(recurrence) : 60)
       );
     }
   }
