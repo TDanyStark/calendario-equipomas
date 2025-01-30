@@ -122,9 +122,6 @@ const Professors = () => {
       timeContract: hasContract ? Number(data.timeContract) : 0,
     };
 
-    console.log(cleanedData);
-    // return
-
     if (editProfessor) {
       updateItem.mutate(cleanedData);
     } else {
@@ -159,6 +156,8 @@ const Professors = () => {
       setValue("id", item.id);
       setValue("phone", item.phone);
       setValue("status", item.status);
+      setValue("hasContract", item.hasContract);
+      setValue("timeContract", item.timeContract);
       setValue("user.email", item.user.email);
       setValue("user.roleID", item.user.roleID);
       fillDefaultValues();
@@ -303,7 +302,6 @@ const Professors = () => {
                     type="text"
                   />
                 </div>
-
                 <div className="mb-4">
                   <label
                     htmlFor="phone"
@@ -394,7 +392,6 @@ const Professors = () => {
                 setSchedule={setSchedule}
                 canBeAdded={true}
               />
-
               <div className="modal_footer">
                 <CancelModalBtn onClick={() => setIsOpen(false)} />
                 <SubmitModalBtn
@@ -408,7 +405,7 @@ const Professors = () => {
         </Dialog>
       )}
 
-      <ToastContainer theme="dark" limit={1} />
+      <ToastContainer theme="dark" limit={2} />
     </section>
   );
 };

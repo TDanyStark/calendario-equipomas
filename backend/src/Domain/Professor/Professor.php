@@ -30,9 +30,9 @@ class Professor implements PersonInterface
         User $user, // Pasar el objeto User
         int $hasContract,
         int $timeContract,
-        ?array $instruments = null,
-        ?array $rooms = null,
-        ?array $availability = null
+        ?array $instruments = [],
+        ?array $rooms = [],
+        ?array $availability = []
     ) {
         $this->professorID = $professorID;
         $this->firstName = ucfirst($firstName);
