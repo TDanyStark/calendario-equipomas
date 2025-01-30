@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
@@ -83,7 +83,10 @@ const Professors = () => {
   // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const { data: professors, isLoading, isError } = useFetchItems(entity, JWT);
 
-  const { register, handleSubmit, setValue, reset } = useForm<ProfessorType>();
+  const { register, handleSubmit, watch, setValue, reset } =
+    useForm<ProfessorType>();
+  // Observamos el valor del checkbox
+  const hasContract = watch("hasContract");
 
   const onSubmit = (data: ProfessorType) => {
     const instrumentProfessorSelecteds = instrumentProfessor.filter(
@@ -92,15 +95,35 @@ const Professors = () => {
     const roomsProfessorSelecteds = roomsProfessor.filter(
       (room) => room.selected
     );
+
+    // validar que se seleccionen al menos un instrumento y un salon
+    if (instrumentProfessorSelecteds.length === 0) {
+      toast.error("Debe seleccionar al menos un instrumento");
+      return;
+    }
+
+    if (roomsProfessorSelecteds.length === 0) {
+      toast.error("Debe seleccionar al menos un salón");
+      return;
+    }
+
+    // validar que existe aunque sea un dia activo en el horario
+    const hasActiveDay = schedule.some((day) => day.isActive);
+    if (!hasActiveDay) {
+      toast.error("Debe seleccionar al menos un día activo en el horario");
+      return;
+    }
+
     const cleanedData = {
       ...data,
       availability: { ...schedule },
       instruments: instrumentProfessorSelecteds,
       rooms: roomsProfessorSelecteds,
+      timeContract: hasContract ? Number(data.timeContract) : 0,
     };
 
     console.log(cleanedData);
-    return;
+    // return
 
     if (editProfessor) {
       updateItem.mutate(cleanedData);
@@ -137,7 +160,6 @@ const Professors = () => {
       setValue("phone", item.phone);
       setValue("status", item.status);
       setValue("user.email", item.user.email);
-      setValue("user.password", ""); // La contraseña no se muestra
       setValue("user.roleID", item.user.roleID);
       fillDefaultValues();
     },
@@ -327,19 +349,27 @@ const Professors = () => {
                   />
                 </div>
                 <div className="mb-4">
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium mb-1"
-                  >
-                    Contraseña
+                  <label>
+                    <input type="checkbox" {...register("hasContract")} />
+                    <span className="ml-2 text-sm font-medium">Con contrato</span>
                   </label>
-                  <input
-                    id="password"
-                    {...register("user.password")}
-                    className="input-primary w-full"
-                    type="text"
-                  />
                 </div>
+                {hasContract && (
+                  <div className="mb-4">
+                    <label
+                      htmlFor="timeContract"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Tiempo de contrato (Horas)
+                    </label>
+                    <input
+                      id="timeContract"
+                      {...register("timeContract", { required: true})}
+                      className="input-primary w-full"
+                      type="number"
+                    />
+                  </div>
+                )}
               </form>
               <div className="flex gap-6">
                 <div className="flex-1">

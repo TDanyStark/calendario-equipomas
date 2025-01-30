@@ -36,7 +36,7 @@ const SelectShedulePro = ({schedule, setSchedule, canBeAdded = true}: Props) => 
           id: day.id,
           dayName: day.dayName,
           dayDisplayName: day.dayDisplayName,
-          availability: [
+          hours: [
             {
               startTime: formatTimeFrontend(day.startTime),
               endTime: formatTimeFrontend(day.endTime),
@@ -71,7 +71,7 @@ const SelectShedulePro = ({schedule, setSchedule, canBeAdded = true}: Props) => 
   }
   const handleAddAvailability: HandleAddAvailability = (dayIndex, id) => {
     const updated = [...schedule];
-    const dayAvailability = updated[dayIndex].availability;
+    const dayAvailability = updated[dayIndex].hours;
 
     const selectDayWeek = scheduleWeek?.scheduleDays?.find((day: ScheduleDayType) => day.id === id);
 
@@ -97,8 +97,8 @@ const SelectShedulePro = ({schedule, setSchedule, canBeAdded = true}: Props) => 
     avIndex
   ) => {
     const updated = [...schedule];
-    if (updated[dayIndex].availability.length > 1) {
-      updated[dayIndex].availability.splice(avIndex, 1);
+    if (updated[dayIndex].hours.length > 1) {
+      updated[dayIndex].hours.splice(avIndex, 1);
       setSchedule(updated);
     }
   };
@@ -119,7 +119,7 @@ const SelectShedulePro = ({schedule, setSchedule, canBeAdded = true}: Props) => 
     newTime
   ) => {
     const updated = [...schedule];
-    const dayAvailability = updated[dayIndex].availability;
+    const dayAvailability = updated[dayIndex].hours;
     const currentSlot = dayAvailability[avIndex];
 
     // Seteamos temporalmente la hora elegida
@@ -129,7 +129,7 @@ const SelectShedulePro = ({schedule, setSchedule, canBeAdded = true}: Props) => 
     validateSlot(dayAvailability, avIndex, recurrence);
     
     // Volvemos a dejar el array ya validado
-    updated[dayIndex].availability = dayAvailability;
+    updated[dayIndex].hours = dayAvailability;
     setSchedule(updated);
   };
 
@@ -149,7 +149,7 @@ const SelectShedulePro = ({schedule, setSchedule, canBeAdded = true}: Props) => 
           {day.isActive && (
             <>
               <div className="space-y-2 min-w-[178px]">
-                {day.availability.map((av: Availability, avIndex: number) => (
+                {day.hours.map((av: Availability, avIndex: number) => (
                   <TimeRangeRow
                     key={avIndex}
                     startTime={av.startTime}
@@ -162,13 +162,13 @@ const SelectShedulePro = ({schedule, setSchedule, canBeAdded = true}: Props) => 
                       handleTimeChange(dayIndex, avIndex, "endTime", val)
                     }
                     onRemove={() => handleRemoveAvailability(dayIndex, avIndex)}
-                    canRemove={day.availability.length > 1}
+                    canRemove={day.hours.length > 1}
                   />
                 ))}
               </div>
               {scheduleWeek.scheduleDays && canBeAdded &&
               parseTimeToMinutes(
-                day.availability[day.availability.length - 1].endTime
+                day.hours[day.hours.length - 1].endTime
               ) 
               >=
               parseTimeToMinutes(

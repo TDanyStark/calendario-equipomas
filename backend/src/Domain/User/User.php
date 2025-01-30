@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\User;
 
 use JsonSerializable;
+use App\Domain\Services\PasswordService;
 
 class User implements JsonSerializable
 {
@@ -16,13 +17,12 @@ class User implements JsonSerializable
     public function __construct(
         string $userID,
         string $email,
-        string $password,
+        ?string $password,
         int $roleID
     ) {
         $this->userID = $userID;
         $this->email = $email;
-        // Encriptar la contraseña usando password_hash
-        $this->password = $password;
+        $this->password = $password ? PasswordService::hash($password) : PasswordService::hash(PasswordService::generate());
         $this->roleID = $roleID;
     }
 
@@ -58,6 +58,6 @@ class User implements JsonSerializable
     // Método para verificar la contraseña
     public function verifyPassword(string $password): bool
     {
-        return password_verify($password, $this->password);
+        return PasswordService::verify($password, $this->password);
     }
 }

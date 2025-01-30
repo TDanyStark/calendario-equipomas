@@ -11,7 +11,7 @@ interface ScheduleType {
   id: string;
   dayName: string;
   dayDisplayName: string;
-  availability: Availability[];
+  hours: Availability[];
 }
 
 type ScheduleDayType = {
@@ -85,9 +85,10 @@ type ProfessorType ={
   lastName: string;
   phone: string;
   status: string;
+  hasContract: boolean;
+  timeContract: number;
   user: {
     email: string;
-    password: string;
     roleID: string;
   };
   availability: ScheduleType[];

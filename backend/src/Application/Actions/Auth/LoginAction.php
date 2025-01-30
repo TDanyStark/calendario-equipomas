@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Application\Actions\Auth;
 
 use App\Application\Actions\Action;
-use App\Domain\Admin\Admin;
 use App\Domain\Student\StudentRepository;
 use App\Domain\Professor\ProfessorRepository;
 use Firebase\JWT\JWT;
@@ -13,12 +12,8 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Exception\HttpBadRequestException;
 use Psr\Log\LoggerInterface;
 use App\Domain\Admin\AdminRepository;
-use App\Domain\Professor\Professor;
-use App\Domain\Role\Role;
-use App\Domain\User\User;
 use App\Domain\User\UserRepository;
 use App\Domain\Role\RoleRepository;
-use App\Domain\Student\Student;
 
 class LoginAction extends Action
 {
@@ -74,6 +69,10 @@ class LoginAction extends Action
         // Obtener el rol utilizando el RoleRepository
         $role = $this->roleRepository->getRoleById($user->getRoleID());
 
+        if ($role === null) {
+            return $this->respondWithError('Role not found', 401);
+        }
+
         // Si se va a implementar un nuevo rol se debe tener en cuenta que el Dominio debe tener el metodo getFirstName y getUser
         switch ($role->getRoleName()) {
             case 'admin':
@@ -98,11 +97,7 @@ class LoginAction extends Action
                 return $this->respondWithError('Error al obtener el Rol, consulte al administrador', 401);
         }
 
-        if ($role === null) {
-            return $this->respondWithError('Role not found', 401);
-        }
-
-        // Generar el token JWT
+        // Generar el token JWT, teniendo en cuenta que el Dominio debe tener el metodo getFirstName, getUser.
         $token = $this->generateJWT($user->getFirstName(), $user->getUser()->getEmail(), $role->getRoleName());
 
         // Responder con el token
