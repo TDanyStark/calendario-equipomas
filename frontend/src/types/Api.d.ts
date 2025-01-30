@@ -38,17 +38,25 @@ interface ScheduleStateType {
   recurrence: number | null;
 }
 
+export interface Selectable {
+  selected: boolean;
+  [key: string]: unknown;
+}
 
-export interface InstrumentType{
+
+export interface InstrumentType {
   id: string;
   instrumentName: string;
 }
 
-type RoomType = {
+export interface RoomType {
   id: string;
   name: string;
   capacity: number;
 };
+
+type SelectableInstrument = InstrumentType & Selectable;
+type SelectableRoom = RoomType & Selectable;
 
 
 type CourseType = {

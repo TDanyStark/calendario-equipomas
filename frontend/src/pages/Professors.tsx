@@ -6,7 +6,13 @@ import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { Loader } from "../components/Loader/Loader";
-import { ProfessorType } from "../types/Api";
+import {
+  InstrumentType,
+  ProfessorType,
+  RoomType,
+  SelectableInstrument,
+  SelectableRoom,
+} from "../types/Api";
 import useItemMutations from "../hooks/useItemsMutation";
 import useFetchItems from "../hooks/useFetchItems";
 import DataTable from "../components/table/DataTable";
@@ -18,31 +24,60 @@ import SubmitModalBtn from "../components/buttons/SubmitModalBtn";
 import ErrorLoadingResourse from "../components/error/ErrorLoadingResourse";
 import { ScheduleType } from "../types/Api";
 import SelectShedulePro from "../components/SelectShedulePro";
+import SelectMultiple from "../components/SelectMultiple";
 
 const entity = "professors";
 const entityName = "profesores";
 
 const Professors = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [editProfessor, setEditProfessor] = useState<ProfessorType | null>(null);
+  const [editProfessor, setEditProfessor] = useState<ProfessorType | null>(
+    null
+  );
   const [schedule, setSchedule] = useState<ScheduleType[]>([]);
-  
+
   const JWT = useSelector((state: RootState) => state.auth.JWT);
-  const { data: instruments, isLoading: isLoadingInstruments} = useFetchItems("instruments", JWT);
-  const { data: rooms, isLoading: isLoadingRooms} = useFetchItems("rooms", JWT);
+  const { data: instruments, isLoading: isLoadingInstruments } = useFetchItems(
+    "instruments",
+    JWT
+  );
+  const { data: rooms, isLoading: isLoadingRooms } = useFetchItems(
+    "rooms",
+    JWT
+  );
+
+  const [instrumentProfessor, setInstrumentProfessor] = useState<
+    SelectableInstrument[]
+  >([]);
+  const [roomsProfessor, setRoomsProfessor] = useState<SelectableRoom[]>([]);
+
+  const fillDefaultValues = useCallback(() => {
+    const instrumentsData = instruments as InstrumentType[];
+    const roomsData = rooms as RoomType[];
+
+    const instrumentsProfessor = instrumentsData.map((instrument) => {
+      return {
+        ...instrument,
+        selected: false,
+      };
+    });
+
+    const roomsProfessor = roomsData.map((room) => {
+      return {
+        ...room,
+        selected: false,
+      };
+    });
+
+    setInstrumentProfessor(instrumentsProfessor);
+    setRoomsProfessor(roomsProfessor);
+  }, [instruments, rooms]);
 
   useEffect(() => {
-    console.log(
-      {
-        isLoadingInstruments,
-        isLoadingRooms
-      }
-    );
-  console.log({
-    instruments,
-    rooms
-  });
-  }, [instruments, isLoadingInstruments, isLoadingRooms, rooms]);
+    if (!isLoadingInstruments && !isLoadingRooms) {
+      fillDefaultValues();
+    }
+  }, [fillDefaultValues, isLoadingInstruments, isLoadingRooms]);
 
   // Fetch professors data
   // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
@@ -51,9 +86,17 @@ const Professors = () => {
   const { register, handleSubmit, setValue, reset } = useForm<ProfessorType>();
 
   const onSubmit = (data: ProfessorType) => {
+    const instrumentProfessorSelecteds = instrumentProfessor.filter(
+      (instrument) => instrument.selected
+    );
+    const roomsProfessorSelecteds = roomsProfessor.filter(
+      (room) => room.selected
+    );
     const cleanedData = {
       ...data,
-      availability: {...schedule},
+      availability: { ...schedule },
+      instruments: instrumentProfessorSelecteds,
+      rooms: roomsProfessorSelecteds,
     };
 
     console.log(cleanedData);
@@ -67,14 +110,21 @@ const Professors = () => {
   };
 
   // Mutaciones
-  const { createItem, isCreateLoading, updateItem, isUpdateLoading, deleteItem, deleteItems } =
-    useItemMutations<ProfessorType>(entity, JWT, setIsOpen);
-    // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
+  const {
+    createItem,
+    isCreateLoading,
+    updateItem,
+    isUpdateLoading,
+    deleteItem,
+    deleteItems,
+  } = useItemMutations<ProfessorType>(entity, JWT, setIsOpen);
+  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleCreate = useCallback(() => {
     setEditProfessor(null);
     setIsOpen(true);
+    fillDefaultValues();
     reset();
-  }, [reset]);
+  }, [fillDefaultValues, reset]);
 
   // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleEdit = useCallback(
@@ -89,8 +139,9 @@ const Professors = () => {
       setValue("user.email", item.user.email);
       setValue("user.password", ""); // La contraseña no se muestra
       setValue("user.roleID", item.user.roleID);
+      fillDefaultValues();
     },
-    [setValue]
+    [fillDefaultValues, setValue]
   );
 
   // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
@@ -133,7 +184,8 @@ const Professors = () => {
       {
         label: "Teléfono",
         sortKey: "phone",
-        renderCell: (item: unknown) => (item as ProfessorType).phone || "No disponible",
+        renderCell: (item: unknown) =>
+          (item as ProfessorType).phone || "No disponible",
       },
       {
         label: "Estado",
@@ -194,7 +246,9 @@ const Professors = () => {
                   <input
                     id="id"
                     {...register("id", { required: true })}
-                    className={`w-full ${editProfessor ? 'input-disabled' : 'input-primary'}`}
+                    className={`w-full ${
+                      editProfessor ? "input-disabled" : "input-primary"
+                    }`}
                     type="text"
                     disabled={editProfessor ? true : false}
                   />
@@ -227,7 +281,7 @@ const Professors = () => {
                     type="text"
                   />
                 </div>
-                
+
                 <div className="mb-4">
                   <label
                     htmlFor="phone"
@@ -286,9 +340,30 @@ const Professors = () => {
                     type="text"
                   />
                 </div>
-                
               </form>
-              <SelectShedulePro schedule={schedule} setSchedule={setSchedule} canBeAdded={true} />
+              <div className="flex gap-6">
+                <div className="flex-1">
+                  <SelectMultiple<SelectableInstrument>
+                    items={instrumentProfessor}
+                    propName="instrumentName"
+                    setItems={setInstrumentProfessor}
+                    title="Instrumentos"
+                  />
+                </div>
+                <div className="flex-1">
+                  <SelectMultiple<SelectableRoom>
+                    items={roomsProfessor}
+                    propName="name"
+                    setItems={setRoomsProfessor}
+                    title="Salones"
+                  />
+                </div>
+              </div>
+              <SelectShedulePro
+                schedule={schedule}
+                setSchedule={setSchedule}
+                canBeAdded={true}
+              />
 
               <div className="modal_footer">
                 <CancelModalBtn onClick={() => setIsOpen(false)} />
