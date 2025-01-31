@@ -41,8 +41,7 @@ class ProfessorRooms implements JsonSerializable
     {
         return [
             'ProfessorRoomID' => $this->ProfessorRoomID,
-            'ProfessorID' => $this->ProfessorID,
-            'RoomID' => $this->RoomID,
+            'id' => (string)$this->RoomID,
         ];
     }
 }

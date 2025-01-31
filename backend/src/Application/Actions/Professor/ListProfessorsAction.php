@@ -14,3 +14,4 @@ class ListProfessorsAction extends ProfessorAction
         return $this->respondWithData($professors);
     }
 }
+

@@ -25,6 +25,7 @@ import ErrorLoadingResourse from "../components/error/ErrorLoadingResourse";
 import { ScheduleType } from "../types/Api";
 import SelectShedulePro from "../components/SelectShedulePro";
 import SelectMultiple from "../components/SelectMultiple";
+import fetchItemByID from "../utils/fetchItemByID";
 
 const entity = "professors";
 const entityName = "profesores";
@@ -35,6 +36,7 @@ const Professors = () => {
     null
   );
   const [schedule, setSchedule] = useState<ScheduleType[]>([]);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
 
   const JWT = useSelector((state: RootState) => state.auth.JWT);
   const { data: instruments, isLoading: isLoadingInstruments } = useFetchItems(
@@ -148,21 +150,66 @@ const Professors = () => {
 
   // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleEdit = useCallback(
-    (item: ProfessorType) => {
-      setEditProfessor(item);
-      setIsOpen(true);
-      setValue("firstName", item.firstName);
-      setValue("lastName", item.lastName);
-      setValue("id", item.id);
-      setValue("phone", item.phone);
-      setValue("status", item.status);
-      setValue("hasContract", item.hasContract);
-      setValue("timeContract", item.timeContract);
-      setValue("user.email", item.user.email);
-      setValue("user.roleID", item.user.roleID);
-      fillDefaultValues();
+    async (item: ProfessorType) => {
+      setIsLoadingDetails(true); // Activar el estado de carga
+      setIsOpen(true); // Abrir el modal
+
+      try {
+        // Obtener los detalles completos del profesor usando fetchItemByID
+        const professorDetails = await fetchItemByID<ProfessorType>(
+          entity,
+          item.id,
+          JWT
+        );
+
+        if (professorDetails.data) {
+          const professor = professorDetails.data; // Tomar el primer elemento del array
+          console.log(professor);
+          console.log(instrumentProfessor);
+
+          // Establecer los valores del formulario
+          setValue("firstName", professor.firstName);
+          setValue("lastName", professor.lastName);
+          setValue("id", professor.id);
+          setValue("phone", professor.phone);
+          setValue("status", professor.status);
+          setValue("hasContract", professor.hasContract);
+          setValue("timeContract", professor.timeContract);
+          setValue("user.email", professor.user.email);
+          setValue("user.roleID", professor.user.roleID);
+
+          // Actualizar los instrumentos seleccionados
+          const updatedInstruments = instrumentProfessor.map((instrument) => ({
+            ...instrument,
+            selected: professor.instruments.some(
+              (profInstrument) => profInstrument.id === instrument.id
+            ),
+          }));
+          console.log(updatedInstruments);
+          setInstrumentProfessor(updatedInstruments);
+
+          // Actualizar los salones seleccionados
+          const updatedRooms = roomsProfessor.map((room) => ({
+            ...room,
+            selected: professor.rooms.some(
+              (profRoom) => profRoom.id === room.id
+            ),
+          }));
+          setRoomsProfessor(updatedRooms);
+
+          // Establecer el profesor en edición
+          setEditProfessor(professor);
+        } else {
+          toast.error("No se encontraron detalles del profesor.");
+        }
+      } catch (error) {
+        toast.error("Error al cargar los detalles del profesor.");
+        console.error(error);
+      } finally {
+        setIsLoadingDetails(false); // Desactivar el estado de carga
+      }
     },
-    [fillDefaultValues, setValue]
+    [JWT, instrumentProfessor, roomsProfessor, setValue]
   );
 
   // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
@@ -252,146 +299,154 @@ const Professors = () => {
                 <CloseModalBtn onClick={() => setIsOpen(false)} />
               </div>
 
-              <form
-                id={`form-${entity}`}
-                onSubmit={handleSubmit(onSubmit)}
-                className="mt-4"
-              >
-                <div className="mb-4">
-                  <label
-                    htmlFor="id"
-                    className="block text-sm font-medium mb-1"
+              {isLoadingDetails ? (
+                <p>loading ...</p>
+              ) : (
+                <>
+                  <form
+                    id={`form-${entity}`}
+                    onSubmit={handleSubmit(onSubmit)}
+                    className="mt-4"
                   >
-                    Cédula
-                  </label>
-                  <input
-                    id="id"
-                    {...register("id", { required: true })}
-                    className={`w-full ${
-                      editProfessor ? "input-disabled" : "input-primary"
-                    }`}
-                    type="text"
-                    disabled={editProfessor ? true : false}
-                  />
-                </div>
-                <div className="mb-4">
-                  <label
-                    htmlFor="firstName"
-                    className="block text-sm font-medium mb-1"
-                  >
-                    Nombre
-                  </label>
-                  <input
-                    id="firstName"
-                    {...register("firstName", { required: true })}
-                    className="input-primary w-full"
-                    type="text"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label
-                    htmlFor="lastName"
-                    className="block text-sm font-medium mb-1"
-                  >
-                    Apellido
-                  </label>
-                  <input
-                    id="lastName"
-                    {...register("lastName", { required: true })}
-                    className="input-primary w-full"
-                    type="text"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label
-                    htmlFor="phone"
-                    className="block text-sm font-medium mb-1"
-                  >
-                    Teléfono
-                  </label>
-                  <input
-                    id="phone"
-                    {...register("phone")}
-                    className="input-primary w-full"
-                    type="text"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label
-                    htmlFor="status"
-                    className="block text-sm font-medium mb-1"
-                  >
-                    Estado
-                  </label>
-                  <select
-                    id="status"
-                    {...register("status", { required: true })}
-                    className="input-primary w-full"
-                  >
-                    <option value="active">Activo</option>
-                    <option value="inactive">Inactivo</option>
-                  </select>
-                </div>
-                <div className="mb-4">
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium mb-1"
-                  >
-                    Correo Electrónico
-                  </label>
-                  <input
-                    id="email"
-                    {...register("user.email", { required: true })}
-                    className="input-primary w-full"
-                    type="email"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label>
-                    <input type="checkbox" {...register("hasContract")} />
-                    <span className="ml-2 text-sm font-medium">Con contrato</span>
-                  </label>
-                </div>
-                {hasContract && (
-                  <div className="mb-4">
-                    <label
-                      htmlFor="timeContract"
-                      className="block text-sm font-medium mb-1"
-                    >
-                      Tiempo de contrato (Horas)
-                    </label>
-                    <input
-                      id="timeContract"
-                      {...register("timeContract", { required: true})}
-                      className="input-primary w-full"
-                      type="number"
-                    />
+                    <div className="mb-4">
+                      <label
+                        htmlFor="id"
+                        className="block text-sm font-medium mb-1"
+                      >
+                        Cédula
+                      </label>
+                      <input
+                        id="id"
+                        {...register("id", { required: true })}
+                        className={`w-full ${
+                          editProfessor ? "input-disabled" : "input-primary"
+                        }`}
+                        type="text"
+                        disabled={editProfessor ? true : false}
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label
+                        htmlFor="firstName"
+                        className="block text-sm font-medium mb-1"
+                      >
+                        Nombre
+                      </label>
+                      <input
+                        id="firstName"
+                        {...register("firstName", { required: true })}
+                        className="input-primary w-full"
+                        type="text"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label
+                        htmlFor="lastName"
+                        className="block text-sm font-medium mb-1"
+                      >
+                        Apellido
+                      </label>
+                      <input
+                        id="lastName"
+                        {...register("lastName", { required: true })}
+                        className="input-primary w-full"
+                        type="text"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label
+                        htmlFor="phone"
+                        className="block text-sm font-medium mb-1"
+                      >
+                        Teléfono
+                      </label>
+                      <input
+                        id="phone"
+                        {...register("phone")}
+                        className="input-primary w-full"
+                        type="text"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label
+                        htmlFor="status"
+                        className="block text-sm font-medium mb-1"
+                      >
+                        Estado
+                      </label>
+                      <select
+                        id="status"
+                        {...register("status", { required: true })}
+                        className="input-primary w-full"
+                      >
+                        <option value="active">Activo</option>
+                        <option value="inactive">Inactivo</option>
+                      </select>
+                    </div>
+                    <div className="mb-4">
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-medium mb-1"
+                      >
+                        Correo Electrónico
+                      </label>
+                      <input
+                        id="email"
+                        {...register("user.email", { required: true })}
+                        className="input-primary w-full"
+                        type="email"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label>
+                        <input type="checkbox" {...register("hasContract")} />
+                        <span className="ml-2 text-sm font-medium">
+                          Con contrato
+                        </span>
+                      </label>
+                    </div>
+                    {hasContract && (
+                      <div className="mb-4">
+                        <label
+                          htmlFor="timeContract"
+                          className="block text-sm font-medium mb-1"
+                        >
+                          Tiempo de contrato (Horas)
+                        </label>
+                        <input
+                          id="timeContract"
+                          {...register("timeContract", { required: true })}
+                          className="input-primary w-full"
+                          type="number"
+                        />
+                      </div>
+                    )}
+                  </form>
+                  <div className="flex gap-6">
+                    <div className="flex-1">
+                      <SelectMultiple<SelectableInstrument>
+                        items={instrumentProfessor}
+                        propName="instrumentName"
+                        setItems={setInstrumentProfessor}
+                        title="Instrumentos"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <SelectMultiple<SelectableRoom>
+                        items={roomsProfessor}
+                        propName="name"
+                        setItems={setRoomsProfessor}
+                        title="Salones"
+                      />
+                    </div>
                   </div>
-                )}
-              </form>
-              <div className="flex gap-6">
-                <div className="flex-1">
-                  <SelectMultiple<SelectableInstrument>
-                    items={instrumentProfessor}
-                    propName="instrumentName"
-                    setItems={setInstrumentProfessor}
-                    title="Instrumentos"
+                  <SelectShedulePro
+                    schedule={schedule}
+                    setSchedule={setSchedule}
+                    canBeAdded={true}
                   />
-                </div>
-                <div className="flex-1">
-                  <SelectMultiple<SelectableRoom>
-                    items={roomsProfessor}
-                    propName="name"
-                    setItems={setRoomsProfessor}
-                    title="Salones"
-                  />
-                </div>
-              </div>
-              <SelectShedulePro
-                schedule={schedule}
-                setSchedule={setSchedule}
-                canBeAdded={true}
-              />
+                </>
+              )}
               <div className="modal_footer">
                 <CancelModalBtn onClick={() => setIsOpen(false)} />
                 <SubmitModalBtn

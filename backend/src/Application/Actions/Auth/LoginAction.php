@@ -62,7 +62,7 @@ class LoginAction extends Action
             return $this->respondWithError('Invalid email or password', 401);
         }
 
-        if ($user->getPassword() !== $password) {
+        if ($user->verifyPassword($password) === false) {
             return $this->respondWithError('Invalid email or password', 401);
         }
 
@@ -97,7 +97,7 @@ class LoginAction extends Action
                 return $this->respondWithError('Error al obtener el Rol, consulte al administrador', 401);
         }
 
-        // Generar el token JWT, teniendo en cuenta que el Dominio debe tener el metodo getFirstName, getUser.
+        // Generar el token JWT, teniendo en cuenta que la entidad debe tener el metodo getFirstName, getUser.
         $token = $this->generateJWT($user->getFirstName(), $user->getUser()->getEmail(), $role->getRoleName());
 
         // Responder con el token

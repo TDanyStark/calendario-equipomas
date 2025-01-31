@@ -41,8 +41,7 @@ class ProfessorInstruments implements JsonSerializable
     {
         return [
             'ProfessorInstrumentID' => $this->ProfessorInstrumentID,
-            'ProfessorID' => $this->ProfessorID,
-            'InstrumentID' => $this->InstrumentID,
+            'id' => (string)$this->InstrumentID,
         ];
     }
 }

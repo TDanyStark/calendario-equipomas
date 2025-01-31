@@ -13,11 +13,11 @@ const fetchItems = async (resource: ResourceType, JWT: string | null) => {
   return Array.isArray(response.data.data) ? response.data.data : [];
 };
 
-const useFetchItems = (resource: ResourceType, JWT: string | null) => {
+const FetchItems = (resource: ResourceType, JWT: string | null) => {
   return useQuery([resource], () => fetchItems(resource, JWT), {
     enabled: !!JWT,
     // refetchOnWindowFocus: false, // Desactiva la refetch al reenfocar la ventana
   });
 };
 
-export default useFetchItems;
+export default FetchItems;

@@ -22,7 +22,7 @@ class User implements JsonSerializable
     ) {
         $this->userID = $userID;
         $this->email = $email;
-        $this->password = $password ? PasswordService::hash($password) : PasswordService::hash(PasswordService::generate());
+        $this->password = $password ? $password : PasswordService::hash(PasswordService::generate());
         $this->roleID = $roleID;
     }
 

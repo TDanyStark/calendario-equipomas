@@ -52,7 +52,7 @@ export interface InstrumentType {
 export interface RoomType {
   id: string;
   name: string;
-  capacity: number;
+  capacity: ?number;
 };
 
 type SelectableInstrument = InstrumentType & Selectable;
@@ -92,4 +92,6 @@ type ProfessorType ={
     roleID: string;
   };
   availability: ScheduleType[];
+  instruments: InstrumentType[];
+  rooms: RoomType[];
 }
