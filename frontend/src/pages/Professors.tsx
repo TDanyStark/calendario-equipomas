@@ -121,7 +121,7 @@ const Professors = () => {
       availability: { ...schedule },
       instruments: instrumentProfessorSelecteds,
       rooms: roomsProfessorSelecteds,
-      timeContract: hasContract ? Number(data.timeContract) : 0,
+      timeContract: hasContract ? String(data.timeContract) : "0",
     };
 
     if (editProfessor) {
@@ -172,7 +172,7 @@ const Professors = () => {
           setValue("phone", professor.phone);
           setValue("status", professor.status);
           setValue("hasContract", professor.hasContract);
-          setValue("timeContract", professor.timeContract);
+          setValue("timeContract", professor.timeContract === "0" ? "" : professor.timeContract);
           setValue("user.email", professor.user.email);
 
           // Actualizar los instrumentos seleccionados
@@ -403,7 +403,7 @@ const Professors = () => {
                         </span>
                       </label>
                     </div>
-                    {hasContract && (
+                    {hasContract === true && (
                       <div className="mb-4">
                         <label
                           htmlFor="timeContract"
@@ -412,6 +412,7 @@ const Professors = () => {
                           Tiempo de contrato (Horas)
                         </label>
                         <input
+                          autoFocus
                           id="timeContract"
                           {...register("timeContract", { required: true })}
                           className="input-primary w-full"

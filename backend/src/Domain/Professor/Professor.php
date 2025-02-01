@@ -112,7 +112,7 @@ class Professor implements PersonInterface
             'status' => $this->status,
             'user' => $this->user, // Incluir información del usuario
             'hasContract' => $this->hasContract,
-            'timeContract' => $this->timeContract,
+            'timeContract' => (string)$this->timeContract,
             'instruments' => $this->instruments,
             'rooms' => $this->rooms,
             'availability' => $this->availability

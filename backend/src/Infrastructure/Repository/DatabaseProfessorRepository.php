@@ -360,7 +360,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
     private function getProfessorAvailability(string $professorId): array
     {
         $stmt = $this->pdo->prepare(
-            "SELECT * FROM professor_availability WHERE ProfessorID = :id"
+            "SELECT * FROM professor_availability WHERE ProfessorID = :id ORDER BY DayID, StartTime, EndTime;"
         );
         $stmt->execute(['id' => $professorId]);
 

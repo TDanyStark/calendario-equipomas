@@ -71,7 +71,7 @@ const SelectShedulePro = <T,>({schedule, setSchedule, canBeAdded = true, editPro
           }
         });
       }
-
+      console.log(updatedSchedule);
       setSchedule(updatedSchedule);
     }
   }, [editProfessor, scheduleWeek, setSchedule]);

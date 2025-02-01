@@ -104,7 +104,7 @@ type ProfessorType ={
   phone: string;
   status: string;
   hasContract: boolean;
-  timeContract: number;
+  timeContract: string;
   user: {
     email: string;
     roleID: string;
