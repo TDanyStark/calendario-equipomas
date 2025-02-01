@@ -11,18 +11,21 @@ import {
   ScheduleStateType, 
   ScheduleType, 
   ScheduleDayType, 
-  Availability 
+  Availability, 
+  ProfessorAvailabilityType,
+  ProfessorType
 } from "../../types/Api";
 import TimeRangeRow from "./TimeRangeRow";
 import CheckBoxToggle from "../selectSchedule/CheckBoxToggle";
 
-interface Props{
+interface Props<T,>{
   schedule: ScheduleType[];
   setSchedule: (schedule: ScheduleType[]) => void;
   canBeAdded: boolean;
+  editProfessor: T | null;
 }
 
-const SelectShedulePro = ({schedule, setSchedule, canBeAdded = true}: Props) => {
+const SelectShedulePro = <T,>({schedule, setSchedule, canBeAdded = true, editProfessor}: Props<T>) => {
   const scheduleWeek = useSelector(
     (state: { schedule: ScheduleStateType }) => state.schedule
   );
@@ -31,8 +34,14 @@ const SelectShedulePro = ({schedule, setSchedule, canBeAdded = true}: Props) => 
   useEffect(() => {
     if (scheduleWeek && scheduleWeek.scheduleDays) {
       const updatedSchedule = scheduleWeek.scheduleDays.map((day: ScheduleDayType) => {
+
+        let willActive = true;
+        if (editProfessor && isProfessorType(editProfessor)) {
+          willActive = ((editProfessor as { availability: ProfessorAvailabilityType[] }).availability.some((d: ProfessorAvailabilityType) => d.dayID === day.id));
+        }
+        
         return {
-          isActive: true,
+          isActive: willActive,
           id: day.id,
           dayName: day.dayName,
           dayDisplayName: day.dayDisplayName,
@@ -45,9 +54,28 @@ const SelectShedulePro = ({schedule, setSchedule, canBeAdded = true}: Props) => 
         };
       });
 
+      if (editProfessor && isProfessorType(editProfessor)) {
+        // esto para saber que dias ha encontrado y guardarlos aqui, para solo borr
+        const daysFound = new Set();;
+        (editProfessor as { availability: ProfessorAvailabilityType[] }).availability.forEach((day: ProfessorAvailabilityType) => {
+          const dayIndex = updatedSchedule.findIndex((d) => d.id === day.dayID);
+          if (dayIndex !== -1) {
+            if (!daysFound.has(dayIndex)){
+              daysFound.add(dayIndex);
+              updatedSchedule[dayIndex].hours = [];
+            }
+            updatedSchedule[dayIndex].hours.push({
+              startTime: formatTimeFrontend(day.startTime),
+              endTime: formatTimeFrontend(day.endTime),
+            });
+          }
+        });
+      }
+
       setSchedule(updatedSchedule);
     }
-  }, [scheduleWeek, setSchedule]);
+  }, [editProfessor, scheduleWeek, setSchedule]);
+
 
   if (!scheduleWeek?.scheduleDays || !scheduleWeek?.recurrence) {
     return null; // Si no hay datos, no renderiza nada
@@ -192,5 +220,10 @@ const SelectShedulePro = ({schedule, setSchedule, canBeAdded = true}: Props) => 
     </div>
   );
 };
+
+// Type guard para ProfessorType
+function  isProfessorType<T>(obj: T): obj is T & ProfessorType {
+  return !!obj && typeof obj === 'object' && 'availability' in obj;
+}
 
 export default SelectShedulePro;

@@ -164,8 +164,6 @@ const Professors = () => {
 
         if (professorDetails.data) {
           const professor = professorDetails.data; // Tomar el primer elemento del array
-          console.log(professor);
-          console.log(instrumentProfessor);
 
           // Establecer los valores del formulario
           setValue("firstName", professor.firstName);
@@ -176,7 +174,6 @@ const Professors = () => {
           setValue("hasContract", professor.hasContract);
           setValue("timeContract", professor.timeContract);
           setValue("user.email", professor.user.email);
-          setValue("user.roleID", professor.user.roleID);
 
           // Actualizar los instrumentos seleccionados
           const updatedInstruments = instrumentProfessor.map((instrument) => ({
@@ -185,7 +182,6 @@ const Professors = () => {
               (profInstrument) => profInstrument.id === instrument.id
             ),
           }));
-          console.log(updatedInstruments);
           setInstrumentProfessor(updatedInstruments);
 
           // Actualizar los salones seleccionados
@@ -201,9 +197,11 @@ const Professors = () => {
           setEditProfessor(professor);
         } else {
           toast.error("No se encontraron detalles del profesor.");
+          setIsOpen(false); // Cerrar el modal
         }
       } catch (error) {
         toast.error("Error al cargar los detalles del profesor.");
+        setIsOpen(false); // Cerrar el modal
         console.error(error);
       } finally {
         setIsLoadingDetails(false); // Desactivar el estado de carga
@@ -440,10 +438,11 @@ const Professors = () => {
                       />
                     </div>
                   </div>
-                  <SelectShedulePro
+                  <SelectShedulePro<ProfessorType>
                     schedule={schedule}
                     setSchedule={setSchedule}
                     canBeAdded={true}
+                    editProfessor={editProfessor}
                   />
                 </>
               )}

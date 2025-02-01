@@ -79,6 +79,24 @@ type SemesterType = {
   name: string;
 }
 
+type ProfessorAvailabilityType = {
+  availabilityID: number;
+  professorID: string;
+  dayID: string;
+  startTime: string;
+  endTime: string;
+}
+
+type ProfessorInstrumentType = {
+  ProfessorInstrumentID: number;
+  id: string;
+}
+
+type ProfessorRoomType = {
+  ProfessorRoomID: number;
+  id: string;
+}
+
 type ProfessorType ={
   id: string;
   firstName: string;
@@ -91,7 +109,7 @@ type ProfessorType ={
     email: string;
     roleID: string;
   };
-  availability: ScheduleType[];
-  instruments: InstrumentType[];
-  rooms: RoomType[];
+  availability: ProfessorAvailabilityType[] | ScheduleType[];
+  instruments: ProfessorInstrumentType[] | SelectableInstrument[];
+  rooms: ProfessorRoomType[] | SelectableRoom[];
 }

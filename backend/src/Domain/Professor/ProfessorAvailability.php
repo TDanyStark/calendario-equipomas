@@ -55,11 +55,11 @@ class ProfessorAvailability implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'AvailabilityID' => $this->AvailabilityID,
-            'ProfessorID' => $this->ProfessorID,
-            'DayID' => $this->DayID,
-            'StartTime' => $this->StartTime,
-            'EndTime' => $this->EndTime
+            'availabilityID' => $this->AvailabilityID,
+            'professorID' => $this->ProfessorID,
+            'dayID' => (string)$this->DayID,
+            'startTime' => $this->StartTime,
+            'endTime' => $this->EndTime
         ];
     }
 }
