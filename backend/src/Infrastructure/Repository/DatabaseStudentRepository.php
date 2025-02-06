@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Repository;
 
+use App\Domain\Services\PasswordService;
 use App\Domain\Student\Student;
 use App\Domain\Student\StudentNotFoundException;
 use App\Domain\Student\StudentRepository;
@@ -21,7 +22,7 @@ class DatabaseStudentRepository implements StudentRepository
         $this->pdo = $database->getConnection();
     }
 
-    public function findStudentOfId(string $id): Student
+    public function findStudentById(string $id): Student
     {
         $stmt = $this->pdo->prepare('
         SELECT s.StudentID, s.StudentFirstName, s.StudentLastName, s.StudentPhone, s.StudentStatus,
@@ -52,6 +53,7 @@ class DatabaseStudentRepository implements StudentRepository
                u.UserID, u.UserEmail, u.UserPassword, u.RoleID 
         FROM students s
         JOIN users u ON s.StudentID = u.UserID
+        ORDER BY s.Update_at DESC
     ');
 
         $students = [];
@@ -63,5 +65,85 @@ class DatabaseStudentRepository implements StudentRepository
         }
 
         return $students;
+    }
+
+    public function create(Student $student): int
+    {
+        // crear user con una transacción
+        $this->pdo->beginTransaction();
+        try {
+            $stmt = $this->pdo->prepare('
+                INSERT INTO users (UserID, UserEmail, UserPassword, RoleID)
+                VALUES (:id, :email, :password, :roleID)
+            ');
+            $stmt->execute([
+                'id' => $student->getStudentID(),
+                'email' => $student->getUser()->getEmail(),
+                'password' => PasswordService::hash($student->getUser()->getPassword()),
+                'roleID' => $student->getUser()->getRoleID()
+            ]);
+
+            $stmt = $this->pdo->prepare('
+                INSERT INTO students (StudentID, StudentFirstName, StudentLastName, StudentPhone, StudentStatus)
+                VALUES (:id, :firstName, :lastName, :phone, :status)
+            ');
+            $stmt->execute([
+                'id' => $student->getStudentID(),
+                'firstName' => $student->getFirstName(),
+                'lastName' => $student->getLastName(),
+                'phone' => $student->getPhone(),
+                'status' => $student->getStatus()
+            ]);
+
+            $this->pdo->commit();
+            return (int)$this->pdo->lastInsertId();
+        } catch (\Exception $e) {
+            $this->pdo->rollBack();
+            // Verificar si el error es una violación de clave duplicada
+            if ($e->getCode() === '23000') {
+                throw new \DomainException("El ID proporcionado ya existe en la base de datos.");
+            }
+
+            // Re-lanzar la excepción si no es del tipo esperado
+            throw $e;
+        }
+    }
+
+    public function update(Student $student): bool
+    {
+        $stmt = $this->pdo->prepare('
+            UPDATE students
+            SET StudentFirstName = :firstName, StudentLastName = :lastName, StudentPhone = :phone, StudentStatus = :status
+            WHERE StudentID = :id
+        ');
+        $stmt->execute([
+            'id' => $student->getStudentID(),
+            'firstName' => $student->getFirstName(),
+            'lastName' => $student->getLastName(),
+            'phone' => $student->getPhone(),
+            'status' => $student->getStatus()
+        ]);
+
+        return $stmt->rowCount() > 0;
+    }
+
+    public function delete(string $id): bool
+    {
+        $stmt = $this->pdo->prepare('
+            DELETE FROM users WHERE UserID = :id
+        ');
+        $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return $stmt->rowCount() > 0;
+    }
+
+    public function deleteMultiple(array $ids): int
+    {
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = $this->pdo->prepare("DELETE FROM users WHERE UserID IN ($placeholders)");
+        $stmt->execute($ids);
+
+        return $stmt->rowCount();
     }
 }

@@ -108,10 +108,10 @@ return function (App $app) {
         $group->group('/students', function (Group $studentGroup) {
             $studentGroup->get('', ListStudentsAction::class);
             // $studentGroup->get('/{id}', GetStudentAction::class);
-            // $studentGroup->post('', CreateStudentAction::class);
-            // $studentGroup->put('/{id}', UpdateStudentAction::class);
-            // $studentGroup->delete('/{id}', DeleteStudentAction::class);
-            // $studentGroup->delete('', DeleteMultipleStudentsAction::class);
+            $studentGroup->post('', CreateStudentAction::class);
+            $studentGroup->put('/{id}', UpdateStudentAction::class);
+            $studentGroup->delete('/{id}', DeleteStudentAction::class);
+            $studentGroup->delete('', DeleteMultipleStudentsAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
     });
 };

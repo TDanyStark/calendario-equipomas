@@ -30,7 +30,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
             FROM professors p 
             INNER JOIN users u ON p.ProfessorID = u.UserID 
             WHERE p.ProfessorIsDelete = 0
-            ORDER BY p.Created_at DESC
+            ORDER BY p.Update_at DESC
         ");
 
         $professors = [];

@@ -13,7 +13,7 @@ interface StudentRepository
      * @return Student
      * @throws StudentNotFoundException
      */
-    public function findStudentOfId(string $id): Student;
+    public function findStudentById(string $id): Student;
 
     /**
      * Devuelve todos los estudiantes.
@@ -21,5 +21,8 @@ interface StudentRepository
      * @return array
      */
     public function findAll(): array;
-
+    public function create(Student $student): int;
+    public function update(Student $student): bool;
+    public function delete(string $id): bool;
+    public function deleteMultiple(array $ids): int;
 }
