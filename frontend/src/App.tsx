@@ -14,6 +14,7 @@ import useFetchDaysOfWeek from "./hooks/useFetchDaysOfWeek";
 import { useDispatch } from "react-redux";
 import { ScheduleStateType } from "./types/Api";
 import { useEffect } from "react";
+import { ReactQueryDevtools } from "react-query/devtools";
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
   const userRole = getUserRole();
 
   return (
+    <>
     <Routes>
       {/* Rutas publicas */}
       <Route path="/login" element={<Login />} />
@@ -84,6 +86,8 @@ function App() {
       {/* Ruta comodín para manejar errores */}
       <Route path="*" element={<ErrorPage />} />
     </Routes>
+    <ReactQueryDevtools initialIsOpen={false} />
+    </>
   );
 }
 

@@ -10,7 +10,11 @@ const fetchItems = async (resource: ResourceType, JWT: string | null) => {
       Authorization: `Bearer ${JWT}`,
     },
   });
-  return Array.isArray(response.data.data) ? response.data.data : [];
+  const { data } = response.data;
+  if (Array.isArray(data) || data?.data) {
+    return data;
+  }
+  return [];
 };
 
 const FetchItems = (resource: ResourceType, JWT: string | null) => {

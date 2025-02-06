@@ -5,17 +5,14 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
-import { Loader } from "../components/Loader/Loader";
 import { StudentType } from "../types/Api";
 import useItemMutations from "../hooks/useItemsMutation";
-import useFetchItems from "../hooks/useFetchItems";
-import DataTable from "../components/table/DataTable";
+import DataTablePagination from "../components/TablePagination";
 import Primaryh1 from "../components/titles/Primaryh1";
 import CloseModalBtn from "../components/buttons/CloseModalBtn";
 import BackgroundDiv from "../components/modal/BackgroundDiv";
 import CancelModalBtn from "../components/buttons/CancelModalBtn";
 import SubmitModalBtn from "../components/buttons/SubmitModalBtn";
-import ErrorLoadingResourse from "../components/error/ErrorLoadingResourse";
 
 const entity = "students";
 const entityName = "estudiantes";
@@ -26,7 +23,6 @@ const Students = () => {
 
   const JWT = useSelector((state: RootState) => state.auth.JWT);
 
-  const { data: students, isLoading, isError } = useFetchItems(entity, JWT);
   const { register, handleSubmit, setValue, reset } = useForm<StudentType>();
 
   const onSubmit = (data: StudentType) => {
@@ -117,24 +113,23 @@ const Students = () => {
     []
   );
 
-  if (isLoading) return <Loader />;
-  if (isError) return <ErrorLoadingResourse resourse={entityName} />;
-
   return (
     <section className="section_page">
       <Primaryh1>Estudiantes</Primaryh1>
-      {/* @ts-expect-error: DataTable is a generic component */}
-      <DataTable<StudentType>
-        data={students || []}
-        columns={columns}
-        onCreate={handleCreate}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onDeleteSelected={handleDeleteSelected}
-        searchPlaceholder="Buscar estudiante"
-        TextButtonCreate="estudiante"
-        gridTemplateColumns="50px 180px 1fr 1fr 1fr 180px 150px"
+      <DataTablePagination<StudentType>
+          entity={entity}
+          entityName={entityName}
+          JWT={JWT}
+          columns={columns}
+          onCreate={handleCreate}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onDeleteSelected={handleDeleteSelected}
+          searchPlaceholder="Buscar estudiante"
+          TextButtonCreate="estudiante"
+          gridTemplateColumns="50px 180px 1fr 1fr 1fr 180px 150px"
       />
+
 
       {isOpen && (
         <Dialog

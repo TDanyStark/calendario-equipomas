@@ -46,26 +46,57 @@ class DatabaseStudentRepository implements StudentRepository
         return new Student($data['StudentID'], $data['StudentFirstName'], $data['StudentLastName'], $data['StudentPhone'], $data['StudentStatus'], $user);
     }
 
-    public function findAll(): array
+    public function findAll(int $limit, int $offset, string $query): array
     {
-        $stmt = $this->pdo->query('
-        SELECT s.StudentID, s.StudentFirstName, s.StudentLastName, s.StudentPhone, s.StudentStatus,
-               u.UserID, u.UserEmail, u.UserPassword, u.RoleID 
-        FROM students s
-        JOIN users u ON s.StudentID = u.UserID
-        ORDER BY s.Update_at DESC
-    ');
+        $searchQuery = "%$query%";
+
+        // Condición WHERE reutilizable
+        $whereClause = '(:query = "" OR s.StudentID LIKE :query 
+        OR s.StudentFirstName LIKE :query 
+        OR s.StudentLastName LIKE :query 
+        OR s.StudentPhone LIKE :query 
+        OR s.StudentStatus LIKE :query 
+        OR u.UserEmail LIKE :query)';
+
+        // Obtener cantidad total de registros
+        $countStmt = $this->pdo->prepare("SELECT COUNT(*) as total FROM students s 
+        JOIN users u ON s.StudentID = u.UserID WHERE $whereClause");
+        $countStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
+        $countStmt->execute();
+        $totalRecords = (int) $countStmt->fetchColumn();
+
+        // Calcular número de páginas
+        $totalPages = $limit > 0 ? ceil($totalRecords / $limit) : 1;
+
+        // Obtener datos paginados
+        $dataStmt = $this->pdo->prepare("SELECT s.StudentID, s.StudentFirstName, s.StudentLastName, 
+        s.StudentPhone, s.StudentStatus, u.UserID, u.UserEmail, u.UserPassword, u.RoleID 
+        FROM students s 
+        JOIN users u ON s.StudentID = u.UserID 
+        WHERE $whereClause 
+        LIMIT :limit OFFSET :offset");
+
+        $dataStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
+        $dataStmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $dataStmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $dataStmt->execute();
 
         $students = [];
-        while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            // Crear el objeto User usando los datos obtenidos
-            $user = new User($data['UserID'], $data['UserEmail'], $data['UserPassword'], $data['RoleID']);
-
-            $students[] = new Student($data['StudentID'], $data['StudentFirstName'], $data['StudentLastName'], $data['StudentPhone'], $data['StudentStatus'], $user);
+        while ($row = $dataStmt->fetch(PDO::FETCH_ASSOC)) {
+            $user = new User($row['UserID'], $row['UserEmail'], $row['UserPassword'], $row['RoleID']);
+            $students[] = new Student(
+                $row['StudentID'],
+                $row['StudentFirstName'],
+                $row['StudentLastName'],
+                $row['StudentPhone'],
+                $row['StudentStatus'],
+                $user
+            );
         }
 
-        return $students;
+        return ['data' => $students, 'pages' => $totalPages];
     }
+
 
     public function create(Student $student): int
     {

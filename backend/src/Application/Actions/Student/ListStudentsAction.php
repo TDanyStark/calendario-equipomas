@@ -13,8 +13,16 @@ class ListStudentsAction extends StudentAction
      */
     protected function action(): Response
     {
+        // Obtiene los parámetros de la URL
+        $page = (int) ($this->request->getQueryParams()['page'] ?? 1);
+        $query = $this->request->getQueryParams()['query'] ?? '';
+
+        // Calcula el offset y el límite
+        $limit = 10;
+        $offset = ($page - 1) * $limit;
+
         // Obtiene todos los estudiantes desde el repositorio
-        $students = $this->studentRepository->findAll();
+        $students = $this->studentRepository->findAll($limit, $offset, $query);
 
         // Devuelve los estudiantes en formato JSON
         return $this->respondWithData($students);
