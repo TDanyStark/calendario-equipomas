@@ -11,16 +11,20 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Psr\Log\LoggerInterface;
 
 
 class RoleMiddleware implements MiddlewareInterface
 {
     private string $jwtSecret;
     private ?string $requiredRole = null;
+    private LoggerInterface $logger;
 
-    public function __construct(string $jwtSecret)
+
+    public function __construct(string $jwtSecret, LoggerInterface $logger)
     {
         $this->jwtSecret = $jwtSecret;
+        $this->logger = $logger;
     }
 
     // Implementar el método process para cumplir con la interfaz
@@ -63,7 +67,7 @@ class RoleMiddleware implements MiddlewareInterface
 
     // Método para establecer dinámicamente el rol
     public function withRole(string $role): RoleMiddleware
-    {
+    {   
         $clone = clone $this;  // Clonar la instancia actual del middleware
         $clone->requiredRole = $role;
         return $clone;

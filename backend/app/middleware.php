@@ -7,6 +7,6 @@ use Slim\App;
 use App\Application\Middleware\CorsMiddleware;
 
 return function (App $app) {
-    // $app->add(CorsMiddleware::class);
     $app->add(SessionMiddleware::class);
+    $app->add(CorsMiddleware::class);
 };

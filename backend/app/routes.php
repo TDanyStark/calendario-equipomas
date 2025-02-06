@@ -40,6 +40,14 @@ use App\Application\Actions\Professor\UpdateProfessorAction;
 use App\Application\Actions\Professor\DeleteProfessorAction;
 use App\Application\Actions\Professor\DeleteMultipleProfessorsAction;
 
+use App\Application\Actions\Student\ListStudentsAction;
+use App\Application\Actions\Student\GetStudentAction;
+use App\Application\Actions\Student\CreateStudentAction;
+use App\Application\Actions\Student\UpdateStudentAction;
+use App\Application\Actions\Student\DeleteStudentAction;
+use App\Application\Actions\Student\DeleteMultipleStudentsAction;
+
+
 use App\Application\Actions\Days\ScheduleDaysAction;
 
 use App\Application\Middleware\RoleMiddleware;
@@ -49,6 +57,7 @@ return function (App $app) {
         // CORS Pre-Flight OPTIONS Request Handler
         return $response;
     });
+
 
     $app->group('/api', function (Group $group) {
         $group->post('/login', LoginAction::class);
@@ -86,7 +95,7 @@ return function (App $app) {
             $semesterGroup->delete('/{id}', DeleteSemesterAction::class);
             $semesterGroup->delete('', DeleteMultipleSemestersAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
-        
+
         $group->group('/professors', function (Group $professorGroup) {
             $professorGroup->get('', ListProfessorsAction::class);
             $professorGroup->get('/{id}', GetProfessorAction::class);
@@ -95,6 +104,14 @@ return function (App $app) {
             $professorGroup->delete('/{id}', DeleteProfessorAction::class);
             $professorGroup->delete('', DeleteMultipleProfessorsAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
-        
+
+        $group->group('/students', function (Group $studentGroup) {
+            $studentGroup->get('', ListStudentsAction::class);
+            // $studentGroup->get('/{id}', GetStudentAction::class);
+            // $studentGroup->post('', CreateStudentAction::class);
+            // $studentGroup->put('/{id}', UpdateStudentAction::class);
+            // $studentGroup->delete('/{id}', DeleteStudentAction::class);
+            // $studentGroup->delete('', DeleteMultipleStudentsAction::class);
+        })->add($this->get(RoleMiddleware::class)->withRole('admin'));
     });
 };

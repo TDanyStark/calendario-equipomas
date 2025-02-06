@@ -65,7 +65,7 @@ class Student implements PersonInterface
     public function jsonSerialize(): array
     {
         return [
-            'studentID' => $this->studentID,
+            'id' => $this->studentID,
             'firstName' => $this->firstName,
             'lastName' => $this->lastName,
             'phone' => $this->phone,

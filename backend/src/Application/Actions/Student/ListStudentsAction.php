@@ -16,9 +16,6 @@ class ListStudentsAction extends StudentAction
         // Obtiene todos los estudiantes desde el repositorio
         $students = $this->studentRepository->findAll();
 
-        // Registra una entrada en el log
-        $this->logger->info("Students list was viewed.");
-
         // Devuelve los estudiantes en formato JSON
         return $this->respondWithData($students);
     }
