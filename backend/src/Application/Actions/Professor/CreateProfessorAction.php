@@ -51,8 +51,6 @@ class CreateProfessorAction extends ProfessorAction
 
         $professor = new Professor($ID, $data['firstName'], $data['lastName'],  $data['phone'], $data['status'], $user, (int)$data['hasContract'], (int)$data['timeContract'], $professorInstrumentsArray, $professorRoomsArray, $professorAvailabilityArray);
 
-        $this->logger->info("Creando un nuevo profesor", $professor->jsonSerialize());
-
         try {
             $id = $this->professorRepository->create($professor);
             return $this->respondWithData(['id' => $id], 201);

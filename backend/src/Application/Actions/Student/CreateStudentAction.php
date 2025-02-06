@@ -22,8 +22,6 @@ class CreateStudentAction extends StudentAction
 
     $student = new Student($ID, $data['firstName'], $data['lastName'],  $data['phone'], $data['status'], $user);
 
-    $this->logger->info("Creando un nuevo estudiante", $student->jsonSerialize());
-
     try {
       $id = $this->studentRepository->create($student);
       return $this->respondWithData(['id' => $id], 201);
