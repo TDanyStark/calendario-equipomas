@@ -20,7 +20,8 @@ class CreateProfessorAction extends ProfessorAction
         if ($ID == null) {
             return $this->respondWithData(['error' => 'ID is required'], 400);
         }
-        $user = new User($ID, $data['user']['email'], null, 2); // se pasa null como contraseña para que se genere una aleatoria
+        // el id del rol de profesor es 2
+        $user = new User($ID, $data['user']['email'], $ID, 2); // se pasa el id del profesor como contraseña, ya luego el decide cambiarla
         
         
         $professorInstrumentsArray = [];

@@ -12,6 +12,7 @@ use App\Infrastructure\Database;
 use App\Domain\Professor\ProfessorInstruments;
 use App\Domain\Professor\ProfessorRooms;
 use App\Domain\Professor\ProfessorAvailability;
+use App\Domain\Services\PasswordService;
 
 class DatabaseProfessorRepository implements ProfessorRepository
 {
@@ -97,7 +98,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
             $stmtUser->execute([
                 'userID' => $professor->getProfessorID(), // Usar ProfessorID como UserID
                 'email' => $professor->getUser()->getEmail(),
-                'password' => $professor->getUser()->getPassword(),
+                'password' => PasswordService::hash($professor->getUser()->getPassword()), // Usar ID como contraseña
                 'roleID' => $professor->getUser()->getRoleID()
             ]);
 

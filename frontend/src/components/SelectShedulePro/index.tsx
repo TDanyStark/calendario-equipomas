@@ -55,8 +55,8 @@ const SelectShedulePro = <T,>({schedule, setSchedule, canBeAdded = true, editPro
       });
 
       if (editProfessor && isProfessorType(editProfessor)) {
-        // esto para saber que dias ha encontrado y guardarlos aqui, para solo borr
-        const daysFound = new Set();;
+        // borrar el horario que se coloco por el estado global y colocar los guardados en la base de datos solo de los dias que se encuentran en la informacion del profesor
+        const daysFound = new Set();
         (editProfessor as { availability: ProfessorAvailabilityType[] }).availability.forEach((day: ProfessorAvailabilityType) => {
           const dayIndex = updatedSchedule.findIndex((d) => d.id === day.dayID);
           if (dayIndex !== -1) {
@@ -71,7 +71,6 @@ const SelectShedulePro = <T,>({schedule, setSchedule, canBeAdded = true, editPro
           }
         });
       }
-      console.log(updatedSchedule);
       setSchedule(updatedSchedule);
     }
   }, [editProfessor, scheduleWeek, setSchedule]);
