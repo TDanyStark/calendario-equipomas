@@ -74,6 +74,7 @@ class DatabaseStudentRepository implements StudentRepository
         FROM students s 
         JOIN users u ON s.StudentID = u.UserID 
         WHERE $whereClause 
+        ORDER BY s.Update_at DESC
         LIMIT :limit OFFSET :offset");
 
         $dataStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);

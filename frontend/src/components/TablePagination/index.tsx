@@ -12,10 +12,6 @@ import {
 } from "@table-library/react-table-library/table";
 import { useTheme } from "@table-library/react-table-library/theme";
 import {
-  useSort,
-  HeaderCellSort,
-} from "@table-library/react-table-library/sort";
-import {
   HeaderCellSelect,
   CellSelect,
   SelectTypes,
@@ -38,7 +34,6 @@ import { useSearchParams } from "react-router-dom";
 
 interface Column<T> {
   label: string;
-  sortKey?: string;
   renderCell: (item: T) => string | number;
 }
 
@@ -113,11 +108,10 @@ function DataTablePagination<T extends TableNode>({
 
   const THEME = {
     Table: `
-          ${
-            gridTemplateColumns
-              ? `--data-table-library_grid-template-columns: ${gridTemplateColumns};`
-              : ""
-          }
+          ${gridTemplateColumns
+        ? `--data-table-library_grid-template-columns: ${gridTemplateColumns};`
+        : ""
+      }
           border-spacing: 0;
           border-collapse: collapse;
           width: 100%;
@@ -177,37 +171,6 @@ function DataTablePagination<T extends TableNode>({
   };
 
   const theme = useTheme(THEME);
-
-  const sortFns: Record<string, (nodes: TableNode[]) => TableNode[]> =
-    columns.reduce(
-      (acc: Record<string, (nodes: TableNode[]) => TableNode[]>, column) => {
-        if (column.sortKey) {
-          acc[column.sortKey] = (nodes: TableNode[]) =>
-            nodes.sort((a, b) => {
-              const aValue = column.sortKey
-                ? ((a as T)[column.sortKey as keyof T] as string | number)
-                : "";
-              const bValue = column.sortKey
-                ? ((b as T)[column.sortKey as keyof T] as string | number)
-                : "";
-              if (typeof aValue === "string") {
-                return String(aValue).localeCompare(String(bValue));
-              }
-              return (aValue as number) - (bValue as number);
-            });
-        }
-        return acc;
-      },
-      {}
-    );
-
-  const sort = useSort(
-    tableData,
-    {},
-    {
-      sortFns,
-    }
-  );
 
   const select = useRowSelect(
     tableData,
@@ -271,7 +234,6 @@ function DataTablePagination<T extends TableNode>({
           data={tableData}
           theme={theme}
           layout={{ fixedHeader: true, horizontalScroll: true, custom: true }}
-          sort={sort}
           select={select}
         >
           {(tableList: T) => (
@@ -280,12 +242,9 @@ function DataTablePagination<T extends TableNode>({
                 <HeaderRow>
                   <HeaderCellSelect />
                   {columns.map((column) => (
-                    <HeaderCellSort
-                      key={column.label}
-                      sortKey={column.sortKey || ""}
-                    >
+                    <HeaderCell key={column.label}>
                       {column.label}
-                    </HeaderCellSort>
+                    </HeaderCell>
                   ))}
                   <HeaderCell>Acciones</HeaderCell>
                 </HeaderRow>
@@ -297,7 +256,11 @@ function DataTablePagination<T extends TableNode>({
                       <CellSelect item={item} />
                       {columns.map((column) => (
                         <Cell key={column.label} className="text-lg">
-                          {column.renderCell(item)}
+                          <span className={`
+                            ${column.renderCell(item) === 'inactive' ? 'bg-red-200 text-red-900 font-medium px-3 py-1 rounded-full' : ''}
+                            ${column.renderCell(item) === 'active' ? 'bg-green-200 text-green-900 font-medium px-3 py-1 rounded-full' : ''}`}>
+                            {column.renderCell(item)}
+                          </span>
                         </Cell>
                       ))}
                       <Cell>

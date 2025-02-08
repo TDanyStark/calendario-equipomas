@@ -85,28 +85,23 @@ const Students = () => {
     () => [
       {
         label: "ID",
-        sortKey: "id",
         renderCell: (item: unknown) => (item as StudentType).id,
       },
       {
         label: "Nombre",
-        sortKey: "StudentFirstName",
         renderCell: (item: unknown) => (item as StudentType).firstName,
       },
       {
         label: "Apellido",
-        sortKey: "StudentLastName",
         renderCell: (item: unknown) => (item as StudentType).lastName,
       },
       {
         label: "Teléfono",
-        sortKey: "StudentPhone",
         renderCell: (item: unknown) =>
           (item as StudentType).phone || "No disponible",
       },
       {
         label: "Estado",
-        sortKey: "StudentStatus",
         renderCell: (item: unknown) => (item as StudentType).status,
       },
     ],
@@ -127,7 +122,7 @@ const Students = () => {
           onDeleteSelected={handleDeleteSelected}
           searchPlaceholder="Buscar estudiante"
           TextButtonCreate="estudiante"
-          gridTemplateColumns="50px 180px 1fr 1fr 1fr 180px 150px"
+          gridTemplateColumns="50px 140px 1fr 1fr 1fr 130px 130px"
       />
 
 
