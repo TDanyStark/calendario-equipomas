@@ -30,7 +30,7 @@ class DatabaseStudentRepository implements StudentRepository
         FROM students s
         JOIN users u ON s.StudentID = u.UserID
         WHERE s.StudentID = :id
-    ');
+        ');
         $stmt->bindParam(':id', $id, PDO::PARAM_STR);
         $stmt->execute();
 
@@ -177,5 +177,36 @@ class DatabaseStudentRepository implements StudentRepository
         $stmt->execute($ids);
 
         return $stmt->rowCount();
+    }
+
+    public function findStudentsByQuery(string $query): array
+    {
+        $searchQuery = "%$query%";
+
+        $stmt = $this->pdo->prepare('
+            SELECT s.StudentID, s.StudentFirstName, s.StudentLastName
+            FROM students s
+            JOIN users u ON s.StudentID = u.UserID
+            WHERE s.StudentID LIKE :query
+            OR CONCAT(s.StudentFirstName, " ", s.StudentLastName) LIKE :query
+            OR s.StudentFirstName LIKE :query
+            OR s.StudentLastName LIKE :query
+            OR s.StudentPhone LIKE :query
+            OR s.StudentStatus LIKE :query
+            OR u.UserEmail LIKE :query
+            ORDER BY s.StudentFirstName ASC
+            LIMIT 5
+        ');
+        $stmt->bindParam(':query', $searchQuery, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $students = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $students[] = Array(
+                'id' => $row['StudentID'],
+                'name' => $row['StudentFirstName'] . ' ' . $row['StudentLastName']
+            );
+        }
+        return $students;
     }
 }

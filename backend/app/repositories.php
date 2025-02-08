@@ -33,9 +33,18 @@ use App\Infrastructure\Repository\DbScheduleDayRepository;
 use App\Domain\Semester\SemesterRepository;
 use App\Infrastructure\Repository\DatabaseSemesterRepository;
 
+use App\Domain\Enrollments\EnrollmentsRepository;
+use App\Infrastructure\Repository\DatabaseEnrollmentsRepository;
+
 return function (ContainerBuilder $containerBuilder) {
     // Here we map our UserRepository interface to its in memory implementation
     $containerBuilder->addDefinitions([
+
+        EnrollmentsRepository::class => function ($container) {
+            $database = $container->get(Database::class);
+            return new DatabaseEnrollmentsRepository($database);
+        },
+
         // Registra el repositorio de estudiantes con la inyección de Database
         StudentRepository::class => function ($container) {
             $database = $container->get(Database::class);

@@ -25,4 +25,5 @@ interface StudentRepository
     public function update(Student $student): bool;
     public function delete(string $id): bool;
     public function deleteMultiple(array $ids): int;
+    public function findStudentsByQuery(string $query): array;
 }

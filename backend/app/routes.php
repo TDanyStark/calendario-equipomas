@@ -46,11 +46,14 @@ use App\Application\Actions\Student\CreateStudentAction;
 use App\Application\Actions\Student\UpdateStudentAction;
 use App\Application\Actions\Student\DeleteStudentAction;
 use App\Application\Actions\Student\DeleteMultipleStudentsAction;
+use App\Application\Actions\Student\GetStudentsQueryAction;
 
 
 use App\Application\Actions\Days\ScheduleDaysAction;
 
 use App\Application\Middleware\RoleMiddleware;
+
+use App\Application\Actions\Enrollments\ListEnrollmentsAction;
 
 return function (App $app) {
     $app->options('/{routes:.*}', function (Request $request, Response $response) {
@@ -107,11 +110,15 @@ return function (App $app) {
 
         $group->group('/students', function (Group $studentGroup) {
             $studentGroup->get('', ListStudentsAction::class);
-            // $studentGroup->get('/{id}', GetStudentAction::class);
+            $studentGroup->get('/query', GetStudentsQueryAction::class);
             $studentGroup->post('', CreateStudentAction::class);
             $studentGroup->put('/{id}', UpdateStudentAction::class);
             $studentGroup->delete('/{id}', DeleteStudentAction::class);
             $studentGroup->delete('', DeleteMultipleStudentsAction::class);
+        })->add($this->get(RoleMiddleware::class)->withRole('admin'));
+
+        $group->group('/enrolls', function (Group $enrollsGroup) {
+            $enrollsGroup->get('', ListEnrollmentsAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
     });
 };

@@ -21,7 +21,7 @@ const ErrorLoadingResourse = ({ resourse }: Props) => {
         <span className="sr-only">Info</span>
         <div>
           <span className="font-medium">Hubo un error</span> mientras se
-          intentaba cargar los {resourse}
+          intentaba cargar {resourse}
         </div>
       </div>
     </section>
