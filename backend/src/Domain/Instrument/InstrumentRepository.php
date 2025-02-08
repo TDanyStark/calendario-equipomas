@@ -17,4 +17,6 @@ interface InstrumentRepository
     public function delete(string $instrumentID): void;
 
     public function deleteMultiple(array $instrumentIDs): int;
+
+    public function findInstrumentByQuery(string $query): array;
 }

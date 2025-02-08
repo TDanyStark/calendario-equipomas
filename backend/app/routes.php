@@ -10,6 +10,7 @@ use App\Application\Actions\Auth\LoginAction;
 use App\Application\Actions\Auth\ValidateJWTAction;
 
 use App\Application\Actions\Instrument\ListInstrumentsAction;
+use App\Application\Actions\Instrument\GetInstrumentsQueryAction;
 use App\Application\Actions\Instrument\CreateInstrumentAction;
 use App\Application\Actions\Instrument\UpdateInstrumentAction;
 use App\Application\Actions\Instrument\DeleteInstrumentAction;
@@ -70,6 +71,7 @@ return function (App $app) {
 
         $group->group('/instruments', function (Group $instrumentGroup) {
             $instrumentGroup->get('', ListInstrumentsAction::class);
+            $instrumentGroup->get('/query', GetInstrumentsQueryAction::class);
             $instrumentGroup->post('', CreateInstrumentAction::class);
             $instrumentGroup->put('/{id}', UpdateInstrumentAction::class);
             $instrumentGroup->delete('/{id}', DeleteInstrumentAction::class);

@@ -75,4 +75,29 @@ class DatabaseInstrumentRepository implements InstrumentRepository
 
         return $stmt->rowCount(); // Retorna la cantidad de filas afectadas
     }
+
+    public function findInstrumentByQuery(string $query): array
+    {
+        $searchQuery = "%$query%";
+
+        $stmt = $this->pdo->prepare('
+            SELECT i.InstrumentID, i.InstrumentName
+            FROM instruments i
+            WHERE i.InstrumentName LIKE :query
+            ORDER BY i.InstrumentName ASC
+            LIMIT 5
+        ');
+        $stmt->bindParam(':query', $searchQuery, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $instruments = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $instruments[] = Array(
+                'id' => $row['InstrumentID'],
+                'name' => $row['InstrumentName']
+            );
+        }
+
+        return $instruments;
+    }
 }

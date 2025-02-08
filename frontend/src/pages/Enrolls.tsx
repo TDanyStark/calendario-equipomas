@@ -123,17 +123,17 @@ const Enrolls = () => {
     <section className="section_page">
       <Primaryh1>Matriculas</Primaryh1>
       <DataTablePagination<EnrollType>
-          entity={entity}
-          entityName={entityName}
-          JWT={JWT}
-          columns={columns}
-          onCreate={handleCreate}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onDeleteSelected={handleDeleteSelected}
-          searchPlaceholder="Buscar matriculas"
-          TextButtonCreate="matriculas"
-          gridTemplateColumns="50px 140px 1fr 1fr 1fr 130px 130px"
+        entity={entity}
+        entityName={entityName}
+        JWT={JWT}
+        columns={columns}
+        onCreate={handleCreate}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onDeleteSelected={handleDeleteSelected}
+        searchPlaceholder="Buscar matriculas"
+        TextButtonCreate="matriculas"
+        gridTemplateColumns="50px 140px 1fr 1fr 1fr 130px 130px"
       />
 
       {isOpen && (
@@ -187,6 +187,22 @@ const Enrolls = () => {
                   <SearchSelect entity="instruments" onSelect={(id, name) => {
                     setSelectedInstrument({ instrumentID: id, instrumentName: name });
                   }} />
+                </div>
+                <div className="mb-4">
+                  <label
+                    className="block text-sm font-medium mb-1"
+                    htmlFor="name"
+                  >
+                    Estatus
+                  </label>
+                  <select
+                    id="status"
+                    {...register("status", { required: true })}
+                    className="input-primary w-full"
+                  >
+                    <option value="activo">Activo</option>
+                    <option value="inactivo">Inactivo</option>
+                  </select>
                 </div>
               </form>
               <div className="modal_footer">
