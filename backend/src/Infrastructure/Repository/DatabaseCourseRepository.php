@@ -193,4 +193,28 @@ class DatabaseCourseRepository implements CourseRepository
 
     return $stmt->rowCount();
   }
+
+  public function findCoursesByQuery(string $query): array
+    {
+        $searchQuery = "%$query%";
+
+        $stmt = $this->pdo->prepare('
+            SELECT c.CourseID, c.CourseName
+            FROM courses c
+            WHERE c.CourseName LIKE :query
+            ORDER BY c.CourseName ASC
+            LIMIT 5
+        ');
+        $stmt->bindParam(':query', $searchQuery, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $courses = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $courses[] = Array(
+                'id' => $row['CourseID'],
+                'name' => $row['CourseName']
+            );
+        }
+        return $courses;
+    }
 }

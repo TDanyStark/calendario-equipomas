@@ -2,7 +2,6 @@ import { useState } from "react";
 import useGetSelect from "../../hooks/useGetSelect";
 import { ResourceType } from "../../types/Api";
 import { useSelector } from "react-redux";
-import { set } from "react-hook-form";
 
 type ItemType = {
   id: string;
@@ -21,7 +20,7 @@ const SearchSelect = ({ onSelect, entity }: Props) => {
   const JWT = useSelector((state: { auth: { JWT: string } }) => state.auth.JWT);
 
   const { data, isLoading } = useGetSelect<ItemType>(entity, JWT, search);
-  console.log(viewResults);
+
   function getSearchMessage() {
     if (search.length <= 3) return 'Debes ingresar más de 3 dígitos';
     if (isLoading && selected === null) return 'Cargando...';
@@ -44,7 +43,7 @@ const SearchSelect = ({ onSelect, entity }: Props) => {
 
       {
         selected === null && viewResults && (
-          <div className="rounded-b p-2 bg-gray-900 shadow-md max-h-48 overflow-auto absolute w-full">
+          <div className="rounded-b p-2 bg-gray-900 shadow-md max-h-56 overflow-auto absolute w-full z-10">
             {data && data.length > 0 ? (
               data?.map((item: ItemType) => (
                 <div

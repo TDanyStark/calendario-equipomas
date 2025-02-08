@@ -8,6 +8,7 @@ use App\Domain\Semester\Semester;
 use App\Domain\Semester\SemesterRepository;
 use PDO;
 use App\Infrastructure\Database;
+use StellarWP\Learndash\StellarWP\Arrays\Arr;
 
 class DatabaseSemesterRepository implements SemesterRepository
 {
@@ -71,5 +72,27 @@ class DatabaseSemesterRepository implements SemesterRepository
     $stmt->execute($ids);
 
     return $stmt->rowCount();
+  }
+
+  public function findSemesterByQuery(string $query): array
+  {
+    $searchQuery = "%$query%";
+    $stmt = $this->pdo->prepare('
+            SELECT * FROM semesters 
+            WHERE SemesterName LIKE :query
+            ORDER BY SemesterName ASC
+        ');
+    $stmt->bindParam(':query', $searchQuery, PDO::PARAM_STR);
+    $stmt->execute();
+
+    $semesters = [];
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+      $semesters[] = Array(
+        'id' => $row['SemesterID'],
+        'name' => $row['SemesterName'],
+      );
+    }
+
+    return $semesters;
   }
 }

@@ -22,12 +22,14 @@ use App\Application\Actions\Room\DeleteRoomAction;
 use App\Application\Actions\Room\DeleteMultipleRoomsAction;
 
 use App\Application\Actions\Course\ListCoursesAction;
+use App\Application\Actions\Course\GetCoursesQueryAction;
 use App\Application\Actions\Course\CreateCourseAction;
 use App\Application\Actions\Course\UpdateCourseAction;
 use App\Application\Actions\Course\DeleteCourseAction;
 use App\Application\Actions\Course\DeleteMultipleCourseAction;
 
 use App\Application\Actions\Semester\ListSemestersAction;
+use App\Application\Actions\Semester\GetSemestersQueryAction;
 use App\Application\Actions\Semester\CreateSemesterAction;
 use App\Application\Actions\Semester\UpdateSemesterAction;
 use App\Application\Actions\Semester\DeleteSemesterAction;
@@ -41,7 +43,6 @@ use App\Application\Actions\Professor\DeleteProfessorAction;
 use App\Application\Actions\Professor\DeleteMultipleProfessorsAction;
 
 use App\Application\Actions\Student\ListStudentsAction;
-use App\Application\Actions\Student\GetStudentAction;
 use App\Application\Actions\Student\CreateStudentAction;
 use App\Application\Actions\Student\UpdateStudentAction;
 use App\Application\Actions\Student\DeleteStudentAction;
@@ -85,6 +86,7 @@ return function (App $app) {
 
         $group->group('/courses', function (Group $courseGroup) {
             $courseGroup->get('', ListCoursesAction::class);
+            $courseGroup->get('/query', GetCoursesQueryAction::class);
             $courseGroup->post('', CreateCourseAction::class);
             $courseGroup->put('/{id}', UpdateCourseAction::class);
             $courseGroup->delete('/{id}', DeleteCourseAction::class);
@@ -93,6 +95,7 @@ return function (App $app) {
 
         $group->group('/semesters', function (Group $semesterGroup) {
             $semesterGroup->get('', ListSemestersAction::class);
+            $semesterGroup->get('/query', GetSemestersQueryAction::class);
             $semesterGroup->post('', CreateSemesterAction::class);
             $semesterGroup->put('/{id}', UpdateSemesterAction::class);
             $semesterGroup->delete('/{id}', DeleteSemesterAction::class);

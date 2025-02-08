@@ -12,4 +12,5 @@ interface CourseRepository
     public function update(Course $course): void;
     public function delete(string $id): void;
     public function deleteMultiple(array $ids): int;
+    public function findCoursesByQuery(string $query): array;
 }

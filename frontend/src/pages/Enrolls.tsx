@@ -147,7 +147,7 @@ const Enrolls = () => {
             <DialogPanel className="dialog_panel">
               <div className="modal_header">
                 <DialogTitle className="dialog_title">
-                  {editEnroll ? "Editar Matriculación" : "Crear Matriculación"}
+                  {editEnroll ? "Editar Matricula" : "Crear Matricula"}
                 </DialogTitle>
                 <CloseModalBtn onClick={() => setIsOpen(false)} />
               </div>
@@ -156,23 +156,6 @@ const Enrolls = () => {
                 onSubmit={handleSubmit(onSubmit)}
                 className="mt-4"
               >
-                <div className="mb-4">
-                  <label
-                    htmlFor="id"
-                    className="block text-sm font-medium mb-1"
-                  >
-                    ID
-                  </label>
-                  <input
-                    id="id"
-                    {...register("id", { required: true })}
-                    className={`w-full ${
-                      editEnroll ? "input-disabled" : "input-primary"
-                    }`}
-                    type="text"
-                    disabled={!!editEnroll}
-                  />
-                </div>
                 <div className="mb-4">
                   <span className="block text-sm font-medium mb-1">
                     Estudiante
@@ -186,10 +169,25 @@ const Enrolls = () => {
                     Curso
                   </span>
                   <SearchSelect entity="courses" onSelect={(id, name) => {
-                    setSelectedStudent({ courseID: id, courseName: name });
+                    setSelectedCourse({ courseID: id, courseName: name });
                   }} />
                 </div>
-
+                <div className="mb-4">
+                  <span className="block text-sm font-medium mb-1">
+                    Semestre
+                  </span>
+                  <SearchSelect entity="semesters" onSelect={(id, name) => {
+                    setSelectedSemester({ semesterID: id, semesterName: name });
+                  }} />
+                </div>
+                <div className="mb-4">
+                  <span className="block text-sm font-medium mb-1">
+                    Instrumento
+                  </span>
+                  <SearchSelect entity="instruments" onSelect={(id, name) => {
+                    setSelectedInstrument({ instrumentID: id, instrumentName: name });
+                  }} />
+                </div>
               </form>
               <div className="modal_footer">
                 <CancelModalBtn onClick={() => setIsOpen(false)} />

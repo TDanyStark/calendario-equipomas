@@ -12,4 +12,5 @@ interface SemesterRepository
     public function update(Semester $semester): bool;
     public function delete(int $id): bool;
     public function deleteMultiple(array $ids): int;
+    public function findSemesterByQuery(string $query): array;
 }
