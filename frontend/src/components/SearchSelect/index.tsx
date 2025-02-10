@@ -10,22 +10,23 @@ type ItemType = {
 
 interface Props {
   entity: ResourceType;
+  defaultValue?: string;
   onSelect: (id: string, name: string) => void;
   isActive: boolean;         // Nueva prop
   onFocus: () => void;       // Nueva prop
   onClose: () => void;       // Nueva prop
 }
 
-const SearchSelect = ({ onSelect, entity, isActive, onFocus, onClose }: Props) => {
-  const [search, setSearch] = useState("");
+const SearchSelect = ({ onSelect, entity, defaultValue, isActive, onFocus, onClose }: Props) => {
+  const [search, setSearch] = useState(defaultValue || "");
   const [selected, setSelected] = useState<string | null>(null);
   const JWT = useSelector((state: { auth: { JWT: string } }) => state.auth.JWT);
 
   const { data, isLoading } = useGetSelect<ItemType>(entity, JWT, search);
 
   useEffect(() => {
-    if (!isActive) setSearch("");
-  }, [isActive]);
+    if (!isActive && !defaultValue) setSearch("");
+  }, [defaultValue, isActive]);
 
   function getSearchMessage() {
     if (search.length <= 3) return 'Debes ingresar más de 3 dígitos';
@@ -44,6 +45,12 @@ const SearchSelect = ({ onSelect, entity, isActive, onFocus, onClose }: Props) =
           setSearch(e.target.value);
           setSelected(null);
         }}
+        onKeyDown={(e) => {
+          e.stopPropagation();
+          if (e.key === "Escape") {
+            onClose();  // Cierra al presionar Escape
+          }}  
+        }
         onFocus={onFocus}  // Usamos la prop del padre
       />
 

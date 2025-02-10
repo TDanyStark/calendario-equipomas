@@ -91,14 +91,19 @@ const Enrolls = () => {
     setEditEnroll(null);
     setIsOpen(true);
     reset();
+    setActiveSearchSelect(null);
     cleanData();
   }, [reset]);
 
   const handleEdit = useCallback(
     async (item: EnrollType) => {
       setEditEnroll(item);
-      
+      setSelectedStudent({ studentID: item.studentID, studentName: item.studentName });
+      setSelectedCourse({ courseID: item.courseID, courseName: item.courseName });
+      setSelectedSemester({ semesterID: item.semesterID, semesterName: item.semesterName });
+      setSelectedInstrument({ instrumentID: item.instrumentID, instrumentName: item.instrumentName });
       setValue("status", item.status);
+      setActiveSearchSelect(null);
       setIsOpen(true);
     },
     [setValue]
@@ -190,20 +195,30 @@ const Enrolls = () => {
                   <span className="block text-sm font-medium mb-1">
                     Estudiante
                   </span>
-                  <SearchSelect
-                    entity="students"
-                    onSelect={(id, name) => {
-                      setSelectedStudent({ studentID: id, studentName: name });
-                    }}
-                    isActive={activeSearchSelect === "students"}
-                    onFocus={() => setActiveSearchSelect("students")}
-                    onClose={() => setActiveSearchSelect(null)}
-                  />
+                  {
+                    editEnroll ? (
+                      <p>
+                        {editEnroll.studentName}
+                      </p>
+                    ) : (
+                      <SearchSelect
+                        entity="students"
+                        defaultValue={selectedStudent.studentName}
+                        onSelect={(id, name) => {
+                          setSelectedStudent({ studentID: id, studentName: name });
+                        }}
+                        isActive={activeSearchSelect === "students"}
+                        onFocus={() => setActiveSearchSelect("students")}
+                        onClose={() => setActiveSearchSelect(null)}
+                      />
+                    )
+                  }
                 </div>
                 <div className="mb-4">
                   <span className="block text-sm font-medium mb-1">Curso</span>
                   <SearchSelect
                     entity="courses"
+                    defaultValue={editEnroll ? editEnroll.courseName : ''}
                     onSelect={(id, name) => {
                       setSelectedCourse({ courseID: id, courseName: name });
                     }}
@@ -218,6 +233,7 @@ const Enrolls = () => {
                   </span>
                   <SearchSelect
                     entity="semesters"
+                    defaultValue={editEnroll ? editEnroll.semesterName : ''}
                     onSelect={(id, name) => {
                       setSelectedSemester({
                         semesterID: id,
@@ -235,6 +251,7 @@ const Enrolls = () => {
                   </span>
                   <SearchSelect
                     entity="instruments"
+                    defaultValue={editEnroll ? editEnroll.instrumentName : ''}
                     onSelect={(id, name) => {
                       setSelectedInstrument({
                         instrumentID: id,
