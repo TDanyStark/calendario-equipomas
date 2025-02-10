@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Actions\Enrollments;
+namespace App\Application\Actions\Enrollment;
 
 use Psr\Http\Message\ResponseInterface as Response;
 
-class ListEnrollmentsAction extends EnrollmentsAction
+class ListEnrollmentAction extends EnrollmentAction
 {
     protected function action(): Response
     {

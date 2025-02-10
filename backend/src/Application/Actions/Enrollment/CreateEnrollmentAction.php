@@ -2,32 +2,39 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Actions\Enrollments;
+namespace App\Application\Actions\Enrollment;
 
-use App\Domain\Enrollments\Enrollment;
+use App\Domain\Enrollment\Enrollment;
 
 use Psr\Http\Message\ResponseInterface as Response;
 
-class CreateEnrollAction extends EnrollmentsAction
+class CreateEnrollmentAction extends EnrollmentAction
 {
     protected function action(): Response
     {
         $data = $this->request->getParsedBody();
 
-        if (!isset($data['studentID']) || !isset($data['courseID']) || !isset($data['instrumentID']) || !isset($data['status'])) {
+        $this->logger->info("sadsdasdas a new enrollment", $data);
+
+        if (!isset($data['studentID']) || !isset($data['courseID']) || !isset($data['instrumentID']) || !isset($data['status']) || !isset($data['semesterID'])) {
             return $this->respondWithData(['error' => 'Missing required fields'], 400);
         }
+
+        $this->logger->info("Creating sssa new enrollment", $data);
 
         $enrollment = new Enrollment(
             "",
             $data['studentID'],
             $data['courseID'],
+            $data['semesterID'],
             $data['instrumentID'],
             $data['status'],
             $data['studentName'] ?? null,
             $data['courseName'] ?? null,
             $data['instrumentName'] ?? null
         );
+
+        $this->logger->info("Creating a new enrollment", $enrollment->jsonSerialize());
 
         try {
             $id = $this->enrollmentRepository->create($enrollment);

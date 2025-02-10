@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Enrollments;
+namespace App\Domain\Enrollment;
 
-interface EnrollmentsRepository
+interface EnrollmentRepository
 {
     /**
      * Obtiene todas las inscripciones con paginación y búsqueda.

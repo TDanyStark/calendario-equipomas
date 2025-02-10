@@ -63,7 +63,6 @@ const Enrolls = () => {
     }
 
     console.log(cleanedData);
-    return;
 
     if (editEnroll) {
       updateItem.mutate(cleanedData);

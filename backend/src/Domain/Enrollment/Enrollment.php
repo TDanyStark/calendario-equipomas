@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Enrollments;
+namespace App\Domain\Enrollment;
 
 use JsonSerializable;
 
@@ -12,6 +12,7 @@ class Enrollment implements JsonSerializable
 
     private string $studentID;
     private string $courseID;
+    private string $semesterID;
     private string $instrumentID;
     private string $status;
     private ?string $studentName;
@@ -22,6 +23,7 @@ class Enrollment implements JsonSerializable
         string $enrollmentID,
         string $studentID,
         string $courseID,
+        string $semesterID,
         string $instrumentID,
         string $status,
         ?string $studentName,
@@ -31,6 +33,7 @@ class Enrollment implements JsonSerializable
         $this->enrollmentID = $enrollmentID;
         $this->studentID = $studentID;
         $this->courseID = $courseID;
+        $this->semesterID = $semesterID;
         $this->instrumentID = $instrumentID;
         $this->status = $status;
         $this->studentName = $studentName;
@@ -71,6 +74,11 @@ class Enrollment implements JsonSerializable
     public function getInstrumentName(): string
     {
         return $this->instrumentName;
+    }
+
+    public function getSemesterID(): string
+    {
+        return $this->semesterID;
     }
 
     public function getStatus(): string
