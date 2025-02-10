@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useGetSelect from "../../hooks/useGetSelect";
 import { ResourceType } from "../../types/Api";
 import { useSelector } from "react-redux";
@@ -11,15 +11,21 @@ type ItemType = {
 interface Props {
   entity: ResourceType;
   onSelect: (id: string, name: string) => void;
+  isActive: boolean;         // Nueva prop
+  onFocus: () => void;       // Nueva prop
+  onClose: () => void;       // Nueva prop
 }
 
-const SearchSelect = ({ onSelect, entity }: Props) => {
+const SearchSelect = ({ onSelect, entity, isActive, onFocus, onClose }: Props) => {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
-  const [viewResults, setViewResults] = useState(false);
   const JWT = useSelector((state: { auth: { JWT: string } }) => state.auth.JWT);
 
   const { data, isLoading } = useGetSelect<ItemType>(entity, JWT, search);
+
+  useEffect(() => {
+    if (!isActive) setSearch("");
+  }, [isActive]);
 
   function getSearchMessage() {
     if (search.length <= 3) return 'Debes ingresar más de 3 dígitos';
@@ -33,16 +39,16 @@ const SearchSelect = ({ onSelect, entity }: Props) => {
         type="text"
         placeholder="Buscar estudiante..."
         className="w-full px-3 py-2 border rounded-t"
-        value={search}
+        value={selected || search}
         onChange={(e) => {
           setSearch(e.target.value);
           setSelected(null);
         }}
-        onFocus={() => setViewResults(true)}
+        onFocus={onFocus}  // Usamos la prop del padre
       />
 
       {
-        selected === null && viewResults && (
+        selected === null && isActive && (
           <div className="rounded-b p-2 bg-gray-900 shadow-md max-h-56 overflow-auto absolute w-full z-10">
             {data && data.length > 0 ? (
               data?.map((item: ItemType) => (
@@ -52,8 +58,7 @@ const SearchSelect = ({ onSelect, entity }: Props) => {
                   onClick={() => {
                     onSelect(item.id, item.name);
                     setSelected(item.name);
-                    setSearch(item.name);
-                    setViewResults(false);
+                    onClose();  // Cierra al seleccionar
                   }}
                 >
                   {item.name}

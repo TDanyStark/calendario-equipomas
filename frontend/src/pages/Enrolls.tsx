@@ -21,12 +21,13 @@ const entityName = "matriculas";
 const Enrolls = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [editEnroll, setEditEnroll] = useState<EnrollType | null>(null);
-  const [selectedStudent, setSelectedStudent] = useState<object>({});
-  const [selectedCourse, setSelectedCourse] = useState<object>({});
-  const [selectedSemester, setSelectedSemester] = useState<object>({});
-  const [selectedInstrument, setSelectedInstrument] = useState<object>({});
-
-
+  const [selectedStudent, setSelectedStudent] = useState<{ studentID: string; studentName: string }>({ studentID: '', studentName: '' });
+  const [selectedCourse, setSelectedCourse] = useState<{ courseID: string; courseName: string }>({ courseID: '', courseName: '' });
+  const [selectedSemester, setSelectedSemester] = useState<{ semesterID: string; semesterName: string }>({ semesterID: '', semesterName: '' });
+  const [selectedInstrument, setSelectedInstrument] = useState<{ instrumentID: string; instrumentName: string }>({ instrumentID: '', instrumentName: '' });
+  const [activeSearchSelect, setActiveSearchSelect] = useState<string | null>(
+    null
+  );
 
   const JWT = useSelector((state: RootState) => state.auth.JWT);
 
@@ -35,7 +36,18 @@ const Enrolls = () => {
   const onSubmit = (data: EnrollType) => {
     const cleanedData = {
       ...data,
+      studentID: selectedStudent.studentID,
+      studentName: selectedStudent.studentName,
+      courseID: selectedCourse.courseID,
+      courseName: selectedCourse.courseName,
+      semesterID: selectedSemester.semesterID,
+      semesterName: selectedSemester.semesterName,
+      instrumentID: selectedInstrument.instrumentID,
+      instrumentName: selectedInstrument.instrumentName,
     };
+
+    console.log(cleanedData);
+    return;
 
     if (editEnroll) {
       updateItem.mutate(cleanedData);
@@ -104,8 +116,7 @@ const Enrolls = () => {
       },
       {
         label: "Semestre",
-        renderCell: (item: unknown) =>
-          (item as EnrollType).semesterName,
+        renderCell: (item: unknown) => (item as EnrollType).semesterName,
       },
       {
         label: "Instrumento",
@@ -133,7 +144,7 @@ const Enrolls = () => {
         onDeleteSelected={handleDeleteSelected}
         searchPlaceholder="Buscar matriculas"
         TextButtonCreate="matriculas"
-        gridTemplateColumns="50px 140px 1fr 1fr 1fr 130px 130px"
+        gridTemplateColumns="50px 140px 1fr 1fr 1fr 1fr 130px 130px"
       />
 
       {isOpen && (
@@ -160,48 +171,79 @@ const Enrolls = () => {
                   <span className="block text-sm font-medium mb-1">
                     Estudiante
                   </span>
-                  <SearchSelect entity="students" onSelect={(id, name) => {
-                    setSelectedStudent({ studentID: id, studentName: name });
-                  }} />
+                  <SearchSelect
+                    entity="students"
+                    onSelect={(id, name) => {
+                      setSelectedStudent({ studentID: id, studentName: name });
+                    }}
+                    isActive={activeSearchSelect === "students"}
+                    onFocus={() => setActiveSearchSelect("students")}
+                    onClose={() => setActiveSearchSelect(null)}
+                  />
                 </div>
                 <div className="mb-4">
-                  <span className="block text-sm font-medium mb-1">
-                    Curso
-                  </span>
-                  <SearchSelect entity="courses" onSelect={(id, name) => {
-                    setSelectedCourse({ courseID: id, courseName: name });
-                  }} />
+                  <span className="block text-sm font-medium mb-1">Curso</span>
+                  <SearchSelect
+                    entity="courses"
+                    onSelect={(id, name) => {
+                      setSelectedCourse({ courseID: id, courseName: name });
+                    }}
+                    isActive={activeSearchSelect === "courses"}
+                    onFocus={() => setActiveSearchSelect("courses")}
+                    onClose={() => setActiveSearchSelect(null)}
+                  />
                 </div>
                 <div className="mb-4">
                   <span className="block text-sm font-medium mb-1">
                     Semestre
                   </span>
-                  <SearchSelect entity="semesters" onSelect={(id, name) => {
-                    setSelectedSemester({ semesterID: id, semesterName: name });
-                  }} />
+                  <SearchSelect
+                    entity="semesters"
+                    onSelect={(id, name) => {
+                      setSelectedSemester({
+                        semesterID: id,
+                        semesterName: name,
+                      });
+                    }}
+                    isActive={activeSearchSelect === "semesters"}
+                    onFocus={() => setActiveSearchSelect("semesters")}
+                    onClose={() => setActiveSearchSelect(null)}
+                  />
                 </div>
                 <div className="mb-4">
                   <span className="block text-sm font-medium mb-1">
                     Instrumento
                   </span>
-                  <SearchSelect entity="instruments" onSelect={(id, name) => {
-                    setSelectedInstrument({ instrumentID: id, instrumentName: name });
-                  }} />
+                  <SearchSelect
+                    entity="instruments"
+                    onSelect={(id, name) => {
+                      setSelectedInstrument({
+                        instrumentID: id,
+                        instrumentName: name,
+                      });
+                    }}
+                    isActive={activeSearchSelect === "instruments"}
+                    onFocus={() => setActiveSearchSelect("instruments")}
+                    onClose={() => setActiveSearchSelect(null)}
+                  />
                 </div>
                 <div className="mb-4">
                   <label
                     className="block text-sm font-medium mb-1"
                     htmlFor="name"
                   >
-                    Estatus
+                    Estado{" "}
+                    <span className="font-normal">
+                      (inactivo no puede escoger su horario de instrumento)
+                    </span>
                   </label>
                   <select
                     id="status"
                     {...register("status", { required: true })}
                     className="input-primary w-full"
                   >
-                    <option value="activo">Activo</option>
                     <option value="inactivo">Inactivo</option>
+                    <option value="activo">Activo</option>
                   </select>
                 </div>
               </form>

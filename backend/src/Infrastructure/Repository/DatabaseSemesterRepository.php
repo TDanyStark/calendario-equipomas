@@ -88,7 +88,7 @@ class DatabaseSemesterRepository implements SemesterRepository
     $semesters = [];
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
       $semesters[] = Array(
-        'id' => $row['SemesterID'],
+        'id' => (string)$row['SemesterID'],
         'name' => $row['SemesterName'],
       );
     }

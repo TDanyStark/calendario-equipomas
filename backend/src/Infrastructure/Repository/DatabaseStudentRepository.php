@@ -203,7 +203,7 @@ class DatabaseStudentRepository implements StudentRepository
         $students = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $students[] = Array(
-                'id' => $row['StudentID'],
+                'id' => (string)$row['StudentID'],
                 'name' => $row['StudentFirstName'] . ' ' . $row['StudentLastName']
             );
         }

@@ -11,34 +11,31 @@ class Enrollment implements JsonSerializable
     private string $enrollmentID;
 
     private string $studentID;
-    private string $studentName;
     private string $courseID;
-    private string $courseName;
     private string $instrumentID;
-    private string $instrumentName;
     private string $status;
-    private string $enrollmentDate;
+    private ?string $studentName;
+    private ?string $instrumentName;
+    private ?string $courseName;
 
     public function __construct(
         string $enrollmentID,
         string $studentID,
-        string $studentName,
         string $courseID,
-        string $courseName,
         string $instrumentID,
-        string $instrumentName,
         string $status,
-        string $enrollmentDate
+        ?string $studentName,
+        ?string $courseName,
+        ?string $instrumentName,
     ) {
         $this->enrollmentID = $enrollmentID;
         $this->studentID = $studentID;
-        $this->studentName = $studentName;
         $this->courseID = $courseID;
-        $this->courseName = $courseName;
         $this->instrumentID = $instrumentID;
-        $this->instrumentName = $instrumentName;
         $this->status = $status;
-        $this->enrollmentDate = $enrollmentDate;
+        $this->studentName = $studentName;
+        $this->courseName = $courseName;
+        $this->instrumentName = $instrumentName;
     }
 
     public function getEnrollmentID(): string
@@ -81,11 +78,6 @@ class Enrollment implements JsonSerializable
         return $this->status;
     }
 
-    public function getEnrollmentDate(): string
-    {
-        return $this->enrollmentDate;
-    }
-
     public function jsonSerialize(): array
     {
         return [
@@ -97,7 +89,6 @@ class Enrollment implements JsonSerializable
             'instrumentID' => $this->instrumentID,
             'instrumentName' => $this->instrumentName,
             'status' => $this->status,
-            'enrollmentDate' => $this->enrollmentDate,
         ];
     }
     

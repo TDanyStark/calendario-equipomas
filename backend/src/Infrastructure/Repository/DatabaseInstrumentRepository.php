@@ -93,7 +93,7 @@ class DatabaseInstrumentRepository implements InstrumentRepository
         $instruments = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $instruments[] = Array(
-                'id' => $row['InstrumentID'],
+                'id' => (string)$row['InstrumentID'],
                 'name' => $row['InstrumentName']
             );
         }

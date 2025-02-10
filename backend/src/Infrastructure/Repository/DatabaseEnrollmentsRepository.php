@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Repository;
 
+use App\Domain\Enrollments\Enrollment;
 use App\Domain\Enrollments\EnrollmentsRepository;
 use App\Infrastructure\Database;
 use PDO;
@@ -29,7 +30,9 @@ class DatabaseEnrollmentsRepository implements EnrollmentsRepository
     OR s.StudentFirstName LIKE :query 
     OR s.StudentLastName LIKE :query 
     OR c.CourseName LIKE :query 
-    OR i.InstrumentName LIKE :query)';
+    OR i.InstrumentName LIKE :query
+    OR e.StudentID LIKE :query
+    OR e.Status LIKE :query)';
 
 
     // Obtener cantidad total de registros
@@ -47,7 +50,7 @@ class DatabaseEnrollmentsRepository implements EnrollmentsRepository
     $totalPages = $limit > 0 ? ceil($totalRecords / $limit) : 1;
 
     // Obtener datos paginados
-    $dataStmt = $this->pdo->prepare("SELECT s.StudentFirstName, s.StudentLastName, 
+    $dataStmt = $this->pdo->prepare("SELECT e.EnrollmentID, e.StudentID, e.CourseID, e.SemesterID, e.InstrumentID, e.Status, s.StudentFirstName, s.StudentLastName, 
     c.CourseName, i.InstrumentName
     FROM enrollments e
     JOIN students s ON e.StudentID = s.StudentID
@@ -62,7 +65,21 @@ class DatabaseEnrollmentsRepository implements EnrollmentsRepository
     $dataStmt->bindValue(':offset', $offset, PDO::PARAM_INT);
     $dataStmt->execute();
 
-    $enrollments = $dataStmt->fetchAll(PDO::FETCH_ASSOC);
+    $enrollments = [];
+
+    while ($row = $dataStmt->fetch(PDO::FETCH_ASSOC)) {
+      $enrollments[] = new Enrollment(
+        $row['EnrollmentID'],
+        $row['StudentID'],
+        $row['CourseID'],
+        $row['SemesterID'],
+        $row['InstrumentID'],
+        $row['Status'],
+        null,
+        null,
+        null,
+      );
+    }
 
     return ['data' => $enrollments, 'pages' => $totalPages];
   }
