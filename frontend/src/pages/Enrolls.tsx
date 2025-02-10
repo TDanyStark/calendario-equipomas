@@ -36,6 +36,7 @@ const Enrolls = () => {
   const onSubmit = (data: EnrollType) => {
     const cleanedData = {
       ...data,
+      id: editEnroll?.id || '',
       studentID: selectedStudent.studentID,
       studentName: selectedStudent.studentName,
       courseID: selectedCourse.courseID,

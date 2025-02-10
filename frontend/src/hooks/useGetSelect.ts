@@ -30,13 +30,14 @@ const fetchItems = async <T,>(
 const useGetSelect = <T,>(
   resource: ResourceType,
   JWT: string | null,
-  query: string
+  query: string,
+  isActive: boolean
 ) => {
   return useQuery(
     [resource, query], // Incluir page y query en la key de la query
     () => fetchItems<T>(resource, JWT, query),
     {
-      enabled: !!JWT,
+      enabled: !!JWT && isActive,
     }
   );
 };

@@ -133,7 +133,7 @@ return function (App $app) {
             $enrollGroup->get('', ListEnrollmentAction::class);
             // $enrollGroup->get('/query', GetEnrollmentsQueryAction::class);
             $enrollGroup->post('', CreateEnrollmentAction::class);
-            // $enrollGroup->put('/{id}', UpdateEnrollmentAction::class);
+            $enrollGroup->put('/{id}', UpdateEnrollmentAction::class);
             // $enrollGroup->delete('/{id}', DeleteEnrollmentAction::class);
             // $enrollGroup->delete('', DeleteMultipleEnrollmentsAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));

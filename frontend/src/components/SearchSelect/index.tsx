@@ -22,14 +22,13 @@ const SearchSelect = ({ onSelect, entity, defaultValue, isActive, onFocus, onClo
   const [selected, setSelected] = useState<string | null>(null);
   const JWT = useSelector((state: { auth: { JWT: string } }) => state.auth.JWT);
 
-  const { data, isLoading } = useGetSelect<ItemType>(entity, JWT, search);
+  const { data, isLoading } = useGetSelect<ItemType>(entity, JWT, search, isActive);
 
   useEffect(() => {
     if (!isActive && !defaultValue) setSearch("");
   }, [defaultValue, isActive]);
 
   function getSearchMessage() {
-    if (search.length <= 3) return 'Debes ingresar más de 3 dígitos';
     if (isLoading && selected === null) return 'Cargando...';
     return 'No se encontraron resultados';
   }

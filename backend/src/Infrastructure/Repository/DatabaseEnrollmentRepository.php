@@ -129,11 +129,10 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
   public function update(Enrollment $enrollment): bool
   {
     $stmt = $this->pdo->prepare("UPDATE enrollments 
-            SET StudentID = :studentID, CourseID = :courseID, SemesterID = :semesterID, InstrumentID = :instrumentID, Status = :status 
+            SET CourseID = :courseID, SemesterID = :semesterID, InstrumentID = :instrumentID, Status = :status 
             WHERE EnrollmentID = :id");
 
     $stmt->bindValue(':id', $enrollment->getEnrollmentID(), PDO::PARAM_INT);
-    $stmt->bindValue(':studentID', $enrollment->getStudentID(), PDO::PARAM_STR);
     $stmt->bindValue(':courseID', $enrollment->getCourseID(), PDO::PARAM_INT);
     $stmt->bindValue(':semesterID', $enrollment->getSemesterID(), PDO::PARAM_INT);
     $stmt->bindValue(':instrumentID', $enrollment->getInstrumentID(), PDO::PARAM_INT);

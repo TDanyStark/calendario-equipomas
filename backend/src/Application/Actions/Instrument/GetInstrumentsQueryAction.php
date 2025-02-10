@@ -11,7 +11,7 @@ class GetInstrumentsQueryAction extends InstrumentAction
 {
     protected function action(): Response
     {
-        $query = $this->request->getQueryParams()['query'] ?? '';
+        $query = $this->request->getQueryParams()['q'] ?? '';
         $instruments = $this->instrumentRepository->findInstrumentByQuery($query);
 
         return $this->respondWithData($instruments);
