@@ -56,6 +56,13 @@ use App\Application\Actions\Days\ScheduleDaysAction;
 use App\Application\Middleware\RoleMiddleware;
 
 use App\Application\Actions\Enrollments\ListEnrollmentsAction;
+use App\Application\Actions\Enrollments\GetEnrollmentsQueryAction;
+use App\Application\Actions\Enrollments\CreateEnrollmentAction;
+use App\Application\Actions\Enrollments\UpdateEnrollmentAction;
+use App\Application\Actions\Enrollments\DeleteEnrollmentAction;
+use App\Application\Actions\Enrollments\DeleteMultipleEnrollmentsAction;
+
+
 
 return function (App $app) {
     $app->options('/{routes:.*}', function (Request $request, Response $response) {
@@ -122,8 +129,13 @@ return function (App $app) {
             $studentGroup->delete('', DeleteMultipleStudentsAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
 
-        $group->group('/enrolls', function (Group $enrollsGroup) {
-            $enrollsGroup->get('', ListEnrollmentsAction::class);
+        $group->group('/enrolls', function (Group $enrollGroup) {
+            $enrollGroup->get('', ListEnrollmentsAction::class);
+            $enrollGroup->get('/query', GetEnrollmentsQueryAction::class);
+            $enrollGroup->post('', CreateEnrollmentAction::class);
+            $enrollGroup->put('/{id}', UpdateEnrollmentAction::class);
+            $enrollGroup->delete('/{id}', DeleteEnrollmentAction::class);
+            $enrollGroup->delete('', DeleteMultipleEnrollmentsAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
     });
 };

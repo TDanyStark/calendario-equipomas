@@ -33,6 +33,4 @@ class CreateStudentAction extends StudentAction
       return $this->respondWithData(['error' => 'Error interno en el servidor', $e->getMessage()], 500);
     }
   }
-  // "SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`u859885046_agenda_mas`.`students`, CONSTRAINT `students_ibfk_1` FOREIGN KEY (`StudentID`) REFERENCES `users` (`UserID`) ON DELETE CASCADE)"
-
 }

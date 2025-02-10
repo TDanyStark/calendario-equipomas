@@ -211,7 +211,7 @@ class DatabaseCourseRepository implements CourseRepository
         $courses = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $courses[] = Array(
-                'id' => $row['CourseID'],
+                'id' => (string)$row['CourseID'],
                 'name' => $row['CourseName']
             );
         }

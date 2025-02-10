@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useState, useCallback, useMemo } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
@@ -46,6 +46,22 @@ const Enrolls = () => {
       instrumentName: selectedInstrument.instrumentName,
     };
 
+    if (!cleanedData.studentID) {
+      return toast.error("Debes seleccionar un estudiante");
+    }
+
+    if (!cleanedData.courseID) { 
+      return toast.error("Debes seleccionar un curso");
+    }
+
+    if (!cleanedData.semesterID) {
+      return toast.error("Debes seleccionar un semestre");
+    }
+
+    if (!cleanedData.instrumentID) {
+      return toast.error("Debes seleccionar un instrumento");
+    }
+
     console.log(cleanedData);
     return;
 
@@ -55,6 +71,13 @@ const Enrolls = () => {
       createItem.mutate(cleanedData);
     }
   };
+
+  const cleanData = () => {
+    setSelectedStudent({ studentID: '', studentName: '' });
+    setSelectedCourse({ courseID: '', courseName: '' });
+    setSelectedSemester({ semesterID: '', semesterName: '' });
+    setSelectedInstrument({ instrumentID: '', instrumentName: '' });
+  }
 
   const {
     createItem,
@@ -69,6 +92,7 @@ const Enrolls = () => {
     setEditEnroll(null);
     setIsOpen(true);
     reset();
+    cleanData();
   }, [reset]);
 
   const handleEdit = useCallback(

@@ -18,7 +18,6 @@ class ListEnrollmentsAction extends EnrollmentsAction
         $limit = 10;
         $offset = ($page - 1) * $limit;
 
-
         // Obtiene todos los estudiantes desde el repositorio
         $enrollments = $this->enrollmentRepository->findAll($limit, $offset, $query);
 
