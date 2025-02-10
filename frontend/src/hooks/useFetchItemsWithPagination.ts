@@ -30,11 +30,11 @@ const useFetchItemsWithPagination = <T,>(
   resource: ResourceType,
   JWT: string | null,
   page: number,
-  query: string
+  debouncedQuery: string
 ) => {
   return useQuery(
-    [resource, page, query], // Incluir page y query en la key de la query
-    () => fetchItems<T>(resource, JWT, page, query),
+    [resource, page, debouncedQuery], // Incluir page y query en la key de la query
+    () => fetchItems<T>(resource, JWT,page, debouncedQuery ),
     {
       enabled: !!JWT,
       keepPreviousData: true, // Mejor experiencia durante paginación

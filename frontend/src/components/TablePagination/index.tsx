@@ -31,6 +31,8 @@ import PreviousPaginationBtn from "../buttons/PreviousPaginationBtn";
 import NextPaginationBtn from "../buttons/NextPaginationBtn";
 import useFetchItemsWithPagination from "../../hooks/useFetchItemsWithPagination";
 import { useSearchParams } from "react-router-dom";
+import CellItem from "../CellItem";
+import { useDebounce } from 'use-debounce';
 
 interface Column<T> {
   label: string;
@@ -69,13 +71,14 @@ function DataTablePagination<T extends TableNode>({
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("query") || "";
   const page = Number(searchParams.get("page") || "1");
+  const [debouncedQuery] = useDebounce(query, 500);
 
   // Actualizar useFetchItems para usar los parámetros de la URL
   const { data: fetchedData, isLoading, isError } = useFetchItemsWithPagination(
     entity,
     JWT,
     page,
-    query
+    debouncedQuery
   );
 
   const data: TableNode[] = (fetchedData?.data as TableNode[]) || [];
@@ -167,7 +170,11 @@ function DataTablePagination<T extends TableNode>({
             fill: #cacaca;
           }
         `,
-    Cell: ``,
+    Cell: `
+      div{
+        padding: 3px;
+      }
+    `,
   };
 
   const theme = useTheme(THEME);
@@ -194,15 +201,11 @@ function DataTablePagination<T extends TableNode>({
     select.fns.onRemoveAll();
   };
 
-  // totalPages ya viene del backend, ya no es necesario calcularlo aquí
-  // const totalPages = Math.ceil(totalCount / 10);
-
   if (isLoading) return <Loader />;
   if (isError) return <ErrorLoadingResourse resourse={entityName} />;
 
   return (
     <>
-      {/* Búsqueda y acciones */}
       <div className="pt-6 flex flex-col gap-3 md:flex-row items-center justify-between">
         <div className="flex gap-2">
           <input
@@ -256,11 +259,7 @@ function DataTablePagination<T extends TableNode>({
                       <CellSelect item={item} />
                       {columns.map((column) => (
                         <Cell key={column.label} className="text-lg">
-                          <span className={`
-                            ${column.renderCell(item) === 'inactivo' ? 'bg-red-200 text-red-900 font-medium px-3 py-1 rounded-full' : ''}
-                            ${column.renderCell(item) === 'activo' ? 'bg-green-200 text-green-900 font-medium px-3 py-1 rounded-full' : ''}`}>
-                            {column.renderCell(item)}
-                          </span>
+                          <CellItem item={item} column={column} />
                         </Cell>
                       ))}
                       <Cell>
