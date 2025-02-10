@@ -48,10 +48,11 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
 
     // Obtener datos paginados
     $dataStmt = $this->pdo->prepare("SELECT e.EnrollmentID, e.StudentID, e.CourseID, e.SemesterID, e.InstrumentID, e.Status, 
-            s.StudentFirstName, s.StudentLastName, c.CourseName, i.InstrumentName
+            s.StudentFirstName, s.StudentLastName, c.CourseName, i.InstrumentName, se.SemesterName
             FROM enrollments e
             JOIN students s ON e.StudentID = s.StudentID
             JOIN courses c ON e.CourseID = c.CourseID
+            JOIN semesters se ON e.SemesterID = se.SemesterID
             JOIN instruments i ON e.InstrumentID = i.InstrumentID
             WHERE $whereClause
             ORDER BY e.Updated_at DESC
@@ -66,14 +67,15 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
 
     while ($row = $dataStmt->fetch(PDO::FETCH_ASSOC)) {
       $enrollments[] = new Enrollment(
-        $row['EnrollmentID'],
-        $row['StudentID'],
-        $row['CourseID'],
-        $row['SemesterID'],
-        $row['InstrumentID'],
+        (string)$row['EnrollmentID'],
+        (string)$row['StudentID'],
+        (string)$row['CourseID'],
+        (string)$row['SemesterID'],
+        (string)$row['InstrumentID'],
         $row['Status'],
         $row['StudentFirstName'] . ' ' . $row['StudentLastName'],
         $row['CourseName'],
+        $row['SemesterName'],
         $row['InstrumentName']
       );
     }
@@ -101,7 +103,8 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
       $row['Status'],
       null,
       null,
-      null
+      null,
+      null,
     );
   }
 
@@ -112,7 +115,7 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
 
     $stmt->bindValue(':studentID', $enrollment->getStudentID(), PDO::PARAM_STR);
     $stmt->bindValue(':courseID', $enrollment->getCourseID(), PDO::PARAM_INT);
-    $stmt->bindValue(':semesterID', $enrollment->getCourseID(), PDO::PARAM_INT);
+    $stmt->bindValue(':semesterID', $enrollment->getSemesterID(), PDO::PARAM_INT);
     $stmt->bindValue(':instrumentID', $enrollment->getInstrumentID(), PDO::PARAM_INT);
     $stmt->bindValue(':status', $enrollment->getStatus(), PDO::PARAM_STR);
 

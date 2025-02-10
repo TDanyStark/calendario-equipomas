@@ -97,11 +97,7 @@ const Enrolls = () => {
   const handleEdit = useCallback(
     async (item: EnrollType) => {
       setEditEnroll(item);
-      setValue("id", item.id);
-      setValue("studentName", item.studentName);
-      setValue("courseName", item.courseName);
-      setValue("semesterName", item.semesterName);
-      setValue("instrumentName", item.instrumentName);
+      
       setValue("status", item.status);
       setIsOpen(true);
     },
@@ -167,7 +163,7 @@ const Enrolls = () => {
         onDeleteSelected={handleDeleteSelected}
         searchPlaceholder="Buscar matriculas"
         TextButtonCreate="matriculas"
-        gridTemplateColumns="50px 140px 1fr 1fr 1fr 1fr 130px 130px"
+        gridTemplateColumns="50px 70px 1fr 1fr 1fr 1fr 130px 130px"
       />
 
       {isOpen && (

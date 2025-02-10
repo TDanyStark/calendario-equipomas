@@ -257,8 +257,8 @@ function DataTablePagination<T extends TableNode>({
                       {columns.map((column) => (
                         <Cell key={column.label} className="text-lg">
                           <span className={`
-                            ${column.renderCell(item) === 'inactive' ? 'bg-red-200 text-red-900 font-medium px-3 py-1 rounded-full' : ''}
-                            ${column.renderCell(item) === 'active' ? 'bg-green-200 text-green-900 font-medium px-3 py-1 rounded-full' : ''}`}>
+                            ${column.renderCell(item) === 'inactivo' ? 'bg-red-200 text-red-900 font-medium px-3 py-1 rounded-full' : ''}
+                            ${column.renderCell(item) === 'activo' ? 'bg-green-200 text-green-900 font-medium px-3 py-1 rounded-full' : ''}`}>
                             {column.renderCell(item)}
                           </span>
                         </Cell>

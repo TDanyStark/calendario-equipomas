@@ -16,8 +16,9 @@ class Enrollment implements JsonSerializable
     private string $instrumentID;
     private string $status;
     private ?string $studentName;
-    private ?string $instrumentName;
     private ?string $courseName;
+    private ?string $semesterName;
+    private ?string $instrumentName;
 
     public function __construct(
         string $enrollmentID,
@@ -28,6 +29,7 @@ class Enrollment implements JsonSerializable
         string $status,
         ?string $studentName,
         ?string $courseName,
+        ?string $semesterName,
         ?string $instrumentName,
     ) {
         $this->enrollmentID = $enrollmentID;
@@ -38,6 +40,7 @@ class Enrollment implements JsonSerializable
         $this->status = $status;
         $this->studentName = $studentName;
         $this->courseName = $courseName;
+        $this->semesterName = $semesterName;
         $this->instrumentName = $instrumentName;
     }
 
@@ -81,6 +84,11 @@ class Enrollment implements JsonSerializable
         return $this->semesterID;
     }
 
+    public function getSemesterName(): string
+    {
+        return $this->semesterName;
+    }
+
     public function getStatus(): string
     {
         return $this->status;
@@ -94,6 +102,8 @@ class Enrollment implements JsonSerializable
             'studentName' => $this->studentName,
             'courseID' => $this->courseID,
             'courseName' => $this->courseName,
+            'semesterID' => $this->semesterID,
+            'semesterName' => $this->semesterName,
             'instrumentID' => $this->instrumentID,
             'instrumentName' => $this->instrumentName,
             'status' => $this->status,

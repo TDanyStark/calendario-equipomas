@@ -14,13 +14,9 @@ class CreateEnrollmentAction extends EnrollmentAction
     {
         $data = $this->request->getParsedBody();
 
-        $this->logger->info("sadsdasdas a new enrollment", $data);
-
         if (!isset($data['studentID']) || !isset($data['courseID']) || !isset($data['instrumentID']) || !isset($data['status']) || !isset($data['semesterID'])) {
             return $this->respondWithData(['error' => 'Missing required fields'], 400);
         }
-
-        $this->logger->info("Creating sssa new enrollment", $data);
 
         $enrollment = new Enrollment(
             "",
@@ -31,10 +27,9 @@ class CreateEnrollmentAction extends EnrollmentAction
             $data['status'],
             $data['studentName'] ?? null,
             $data['courseName'] ?? null,
+            $data['semesterName'] ?? null,
             $data['instrumentName'] ?? null
         );
-
-        $this->logger->info("Creating a new enrollment", $enrollment->jsonSerialize());
 
         try {
             $id = $this->enrollmentRepository->create($enrollment);
