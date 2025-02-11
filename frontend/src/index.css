@@ -26,16 +26,15 @@ table input[type="checkbox"]{
 
 
 .btn-primary {
-  @apply bg-primary text-white font-semibold py-2 px-4 rounded transition-colors;
+  @apply bg-primary-accent text-white font-semibold py-2 px-4 rounded transition-colors;
 }
 
 .btn-primary:hover {
   @apply bg-primary-accent;
 }
 
-
 .btn-secondary {
-  @apply  text-white border font-semibold py-2 px-4 rounded;
+  @apply  text-white border font-light py-2 px-4 rounded;
 }
 
 .input-disabled {
@@ -57,7 +56,7 @@ table input[type="checkbox"]{
 }
 
 .dialog_title{
-  @apply text-xl font-semibold text-gray-900 dark:text-white
+  @apply text-xl font-semibold text-white
 }
 
 .dialog_panel{
@@ -71,6 +70,8 @@ table input[type="checkbox"]{
 .modal_footer{
   @apply flex justify-end gap-4
 }
+
+
 
 /* Estilo para personalizar el scroll */
 .scroll-thin {

@@ -46,7 +46,7 @@ export interface Selectable {
 
 export interface InstrumentType {
   id: string;
-  instrumentName: string;
+  name: string;
 }
 
 export interface RoomType {

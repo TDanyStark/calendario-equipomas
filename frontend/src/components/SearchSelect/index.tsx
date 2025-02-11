@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useGetSelect from "../../hooks/useGetSelect";
 import { ResourceType } from "../../types/Api";
 import { useSelector } from "react-redux";
@@ -20,6 +20,7 @@ interface Props {
 const SearchSelect = ({ onSelect, entity, defaultValue, isActive, onFocus, onClose }: Props) => {
   const [search, setSearch] = useState(defaultValue || "");
   const [selected, setSelected] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const JWT = useSelector((state: { auth: { JWT: string } }) => state.auth.JWT);
 
   const { data, isLoading } = useGetSelect<ItemType>(entity, JWT, search, isActive);
@@ -36,6 +37,7 @@ const SearchSelect = ({ onSelect, entity, defaultValue, isActive, onFocus, onClo
   return (
     <div className="w-full relative">
       <input
+        ref={inputRef}
         type="text"
         placeholder="Buscar estudiante..."
         className="w-full px-3 py-2 border rounded-t"
@@ -65,6 +67,7 @@ const SearchSelect = ({ onSelect, entity, defaultValue, isActive, onFocus, onClo
                     onSelect(item.id, item.name);
                     setSelected(item.name);
                     onClose();  // Cierra al seleccionar
+                    inputRef.current?.focus();
                   }}
                 >
                   {item.name}

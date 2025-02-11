@@ -41,7 +41,7 @@ const Instruments = () => {
     if (editInstrument) {
       updateItem.mutate({
         id: editInstrument.id,
-        instrumentName: data.instrumentName,
+        name: data.name,
       });
       reset();
     } else {
@@ -67,7 +67,7 @@ const Instruments = () => {
     (item: InstrumentType) => {
       setEditInstrument(item);
       setIsOpen(true);
-      setValue("instrumentName", item.instrumentName);
+      setValue("name", item.name);
     },
     [setValue]
   );
@@ -104,9 +104,9 @@ const Instruments = () => {
       },
       {
         label: "Instrumento",
-        sortKey: "instrumentName",
+        sortKey: "name",
         renderCell: (item: unknown) =>
-          (item as InstrumentType).instrumentName as string | number,
+          (item as InstrumentType).name as string | number,
       },
     ],
     []
@@ -159,13 +159,13 @@ const Instruments = () => {
                 <div className="mb-4">
                   <label
                     className="block text-sm font-medium mb-1"
-                    htmlFor="InstrumentName"
+                    htmlFor="name"
                   >
                     Nombre del Instrumento
                   </label>
                   <input
-                    id="InstrumentName"
-                    {...register("instrumentName", { required: true })}
+                    id="name"
+                    {...register("name", { required: true })}
                     className="input-primary w-full"
                     type="text"
                   />

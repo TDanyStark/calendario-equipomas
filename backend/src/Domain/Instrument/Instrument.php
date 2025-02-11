@@ -55,7 +55,7 @@ class Instrument implements JsonSerializable
     {
         $data = [
             'id' => $this->id,
-            'instrumentName' => $this->instrumentName,
+            'name' => $this->instrumentName,
         ];
 
         return $data;
