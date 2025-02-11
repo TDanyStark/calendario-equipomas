@@ -3,6 +3,7 @@ import { ResourceType } from "@/types/Api";
 import useFetchItems from "@/hooks/useFetchItems";
 import { useSelector } from "react-redux";
 import ArrowSvg from "@/icons/ArrowSvg";
+import { useState } from "react";
 
 interface Props {
   entity: ResourceType;
@@ -18,14 +19,17 @@ interface ItemType {
 }
 
 const SelectWithFetch = ({ entity, displayName, isActive, onShow, onSelect }: Props) => {
+  const [placeholder, setPlaceholder] = useState(`Filtrar por ${displayName}`);
+
   const JWT = useSelector((state: RootState) => state.auth.JWT);
   // Fetch courses data
   const { data, isLoading, isError } = useFetchItems(entity, JWT);
 
+
   return (
-    <div className="relative">
-      <button className="px-3 py-2 border rounded flex justify-between gap-4" onClick={onShow}>
-        <span>Filtrar por {displayName}</span>
+    <div className="relative ">
+      <button className="px-3 py-2 border rounded flex justify-between gap-4 min-w-64" onClick={onShow}>
+        <span>{ placeholder }</span>
         <span>
           <ArrowSvg />
         </span>
@@ -39,7 +43,10 @@ const SelectWithFetch = ({ entity, displayName, isActive, onShow, onSelect }: Pr
               <li
                 key={item.id}
                 className="p-2 hover:bg-gray-800 rounded cursor-pointer"
-                onClick={() => onSelect(item.id)}
+                onClick={() => {
+                  onSelect(item.id);
+                  setPlaceholder(item.name);
+                }}
               >
                 {item.name}
               </li>

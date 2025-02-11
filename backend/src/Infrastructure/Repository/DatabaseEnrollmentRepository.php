@@ -19,8 +19,14 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
     $this->pdo = $database->getConnection();
   }
 
-  public function findAll(int $limit, int $offset, string $query): array
-  {
+  public function findAll(
+    int $limit,
+    int $offset,
+    string $query,
+    string $courseID,
+    string $instrumentID,
+    string $semesterID
+  ): array {
     $searchQuery = "%$query%";
 
     // Condición WHERE reutilizable
@@ -32,6 +38,17 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
             OR e.StudentID LIKE :query
             OR e.Status LIKE :query)';
 
+    // Agregar condiciones adicionales para los filtros
+    if (!empty($courseID)) {
+      $whereClause .= ' AND e.CourseID = :courseID';
+    }
+    if (!empty($instrumentID)) {
+      $whereClause .= ' AND e.InstrumentID = :instrumentID';
+    }
+    if (!empty($semesterID)) {
+      $whereClause .= ' AND e.SemesterID = :semesterID';
+    }
+
     // Obtener cantidad total de registros
     $countStmt = $this->pdo->prepare("SELECT COUNT(*) as total 
             FROM enrollments e
@@ -40,6 +57,18 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
             JOIN instruments i ON e.InstrumentID = i.InstrumentID
             WHERE $whereClause");
     $countStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
+
+    // Vincular valores de los filtros si no están vacíos
+    if (!empty($courseID)) {
+      $countStmt->bindValue(':courseID', $courseID, PDO::PARAM_STR);
+    }
+    if (!empty($instrumentID)) {
+      $countStmt->bindValue(':instrumentID', $instrumentID, PDO::PARAM_STR);
+    }
+    if (!empty($semesterID)) {
+      $countStmt->bindValue(':semesterID', $semesterID, PDO::PARAM_STR);
+    }
+
     $countStmt->execute();
     $totalRecords = (int) $countStmt->fetchColumn();
 
@@ -59,6 +88,18 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
             LIMIT :limit OFFSET :offset");
 
     $dataStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
+
+    // Vincular valores de los filtros si no están vacíos
+    if (!empty($courseID)) {
+      $dataStmt->bindValue(':courseID', $courseID, PDO::PARAM_STR);
+    }
+    if (!empty($instrumentID)) {
+      $dataStmt->bindValue(':instrumentID', $instrumentID, PDO::PARAM_STR);
+    }
+    if (!empty($semesterID)) {
+      $dataStmt->bindValue(':semesterID', $semesterID, PDO::PARAM_STR);
+    }
+
     $dataStmt->bindValue(':limit', $limit, PDO::PARAM_INT);
     $dataStmt->bindValue(':offset', $offset, PDO::PARAM_INT);
     $dataStmt->execute();

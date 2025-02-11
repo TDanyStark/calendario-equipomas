@@ -9,7 +9,7 @@ interface EnrollmentRepository
     /**
      * Obtiene todas las inscripciones con paginación y búsqueda.
      */
-    public function findAll(int $limit, int $offset, string $query): array;
+    public function findAll(int $limit, int $offset, string $query, string $courseID, string $instrumentID, string $semesterID): array;
 
     /**
      * Busca una inscripción por su ID.

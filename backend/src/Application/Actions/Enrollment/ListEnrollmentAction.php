@@ -13,13 +13,16 @@ class ListEnrollmentAction extends EnrollmentAction
         // Obtiene los parámetros de la URL
         $page = (int) ($this->request->getQueryParams()['page'] ?? 1);
         $query = $this->request->getQueryParams()['query'] ?? '';
+        $courseID = $this->request->getQueryParams()['course'] ?? '';
+        $instrumentID = $this->request->getQueryParams()['instrument'] ?? '';
+        $semesterID = $this->request->getQueryParams()['semester'] ?? '';
 
         // Calcula el offset y el límite
         $limit = 10;
         $offset = ($page - 1) * $limit;
 
         // Obtiene todos los estudiantes desde el repositorio
-        $enrollments = $this->enrollmentRepository->findAll($limit, $offset, $query);
+        $enrollments = $this->enrollmentRepository->findAll($limit, $offset, $query, $courseID, $instrumentID, $semesterID);
 
         return $this->respondWithData($enrollments);
     }

@@ -289,7 +289,7 @@ function DataTablePagination<T extends TableNode>({
             onSelect(id, "course");
           }}
         />
-        <SelectWithFetch
+        {/* <SelectWithFetch
           entity="instruments"
           displayName="Instrumentos"
           isActive={filterActive === "instruments"}
@@ -306,7 +306,7 @@ function DataTablePagination<T extends TableNode>({
           onSelect={(id) => {
             onSelect(id, "semester");
           }}
-        />
+        /> */}
         <button className="btn-secondary" onClick={handleClearFilters}>Limpiar</button>
       </div>
       <div className="flex flex-col gap-3 md:flex-row items-center justify-between">
