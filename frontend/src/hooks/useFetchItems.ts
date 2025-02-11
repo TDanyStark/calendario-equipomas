@@ -17,9 +17,9 @@ const fetchItems = async (resource: ResourceType, JWT: string | null) => {
   return [];
 };
 
-const FetchItems = (resource: ResourceType, JWT: string | null) => {
+const FetchItems = (resource: ResourceType, JWT: string | null, isActive: boolean) => {
   return useQuery([resource], () => fetchItems(resource, JWT), {
-    enabled: !!JWT,
+    enabled: !!JWT && isActive,
     // refetchOnWindowFocus: false, // Desactiva la refetch al reenfocar la ventana
   });
 };

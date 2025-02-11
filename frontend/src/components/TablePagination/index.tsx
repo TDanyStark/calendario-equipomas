@@ -34,6 +34,7 @@ import { useSearchParams } from "react-router-dom";
 import CellItem from "../CellItem";
 import { useDebounce } from "use-debounce";
 import SelectWithFetch from "../SelectWithFetch";
+import Theme from "@/lib/Theme";
 
 interface Column<T> {
   label: string;
@@ -181,75 +182,7 @@ function DataTablePagination<T extends TableNode>({
 
   const tableData = { nodes: data };
 
-  const THEME = {
-    Table: `
-          ${
-            gridTemplateColumns
-              ? `--data-table-library_grid-template-columns: ${gridTemplateColumns};`
-              : ""
-          }
-          border-spacing: 0;
-          border-collapse: collapse;
-          width: 100%;
-          font-size: 16px;
-          border: 1px solid white;
-        `,
-    Header: ``,
-    Body: ``,
-    BaseRow: `
-          background-color: #000000;
-          &.row-select-selected, &.row-select-single-selected {
-            background-color: var(--theme-ui-colors-background-secondary);
-            color: var(--theme-ui-colors-text);
-          }
-        `,
-    HeaderRow: `
-          font-size: 20px;
-          .th {
-            border-bottom: 1px solid white;
-          }
-        `,
-    Row: `
-          font-size: 16px;
-          &:not(:last-of-type) .td {
-            border-bottom: 1px solid white;
-          }
-          &:nth-of-type(odd) {
-            background-color: #171717;
-          }
-          &:nth-of-type(even) {
-            background-color: #000000;
-          }
-          &:hover {
-            background-color: #000275;
-          }
-        `,
-    BaseCell: `
-          border-right: 1px solid white;
-          padding: 8px;
-          height: ${heightRow}px;
-          text-align: center;
-          svg {
-            fill: var(--theme-ui-colors-text);
-          }
-        `,
-    HeaderCell: `
-          
-          div div{
-            justify-content: center;
-            gap: 10px;
-          }
-          div div span svg{
-            fill: #cacaca;
-          }
-        `,
-    Cell: `
-      div{
-        padding: 3px;
-      }
-    `,
-  };
-
+  const THEME = Theme({ gridTemplateColumns, heightRow });
   const theme = useTheme(THEME);
 
   const select = useRowSelect(

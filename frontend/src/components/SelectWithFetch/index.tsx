@@ -23,7 +23,7 @@ const SelectWithFetch = ({ entity, displayName, isActive, onShow, onSelect }: Pr
 
   const JWT = useSelector((state: RootState) => state.auth.JWT);
   // Fetch courses data
-  const { data, isLoading, isError } = useFetchItems(entity, JWT);
+  const { data, isLoading, isError } = useFetchItems(entity, JWT, isActive);
 
 
   return (

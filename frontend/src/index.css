@@ -30,7 +30,7 @@ table input[type="checkbox"]{
 }
 
 .btn-primary:hover {
-  @apply bg-primary-accent;
+  @apply bg-primary-accent/80;
 }
 
 .btn-secondary {
