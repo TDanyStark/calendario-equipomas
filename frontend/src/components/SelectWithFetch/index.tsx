@@ -3,11 +3,12 @@ import { ResourceType } from "@/types/Api";
 import useFetchItems from "@/hooks/useFetchItems";
 import { useSelector } from "react-redux";
 import ArrowSvg from "@/icons/ArrowSvg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
   entity: ResourceType;
   displayName: string;
+  filter?: string;
   isActive: boolean;
   onShow: () => void;
   onSelect: (id: string) => void;
@@ -18,22 +19,41 @@ interface ItemType {
   name: string;
 }
 
-const SelectWithFetch = ({ entity, displayName, isActive, onShow, onSelect }: Props) => {
-  const [placeholder, setPlaceholder] = useState(`Filtrar por ${displayName}`);
-
+const SelectWithFetch = ({
+  entity,
+  displayName,
+  filter,
+  isActive,
+  onShow,
+  onSelect,
+}: Props) => {
+  const [dots, setDots] = useState(".");
   const JWT = useSelector((state: RootState) => state.auth.JWT);
   // Fetch courses data
-  const { data, isLoading, isError } = useFetchItems(entity, JWT, isActive);
+  const { data, isLoading, isError } = useFetchItems(entity, JWT, isActive, filter);
+  const nameSelected = data?.find((item: ItemType) => item.id === filter)?.name;
+  const placeholder = nameSelected ? nameSelected : `Filtrar por ${displayName}`;
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots((prev) => (prev === "..." ? "." : prev + "."));
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="relative ">
-      <button className="px-3 py-2 border rounded flex justify-between gap-4 min-w-64" onClick={onShow}>
-        <span>{ placeholder }</span>
-        <span>
+      <button
+        className="px-3 py-2 border rounded flex justify-between items-center gap-2 w-64 overflow-hidden"
+        onClick={onShow}
+      >
+        <span className="truncate">{isLoading ? dots : placeholder}</span>
+        <span className="bg-principal-bg">
           <ArrowSvg />
         </span>
       </button>
+
       {isActive && (
         <ul className="flex flex-col rounded-b px-2 py-3 bg-gray-900 shadow-md max-h-56 overflow-auto absolute w-full z-10">
           {isLoading && <p>Cargando...</p>}
@@ -45,7 +65,6 @@ const SelectWithFetch = ({ entity, displayName, isActive, onShow, onSelect }: Pr
                 className="p-2 hover:bg-gray-800 rounded cursor-pointer"
                 onClick={() => {
                   onSelect(item.id);
-                  setPlaceholder(item.name);
                 }}
               >
                 {item.name}

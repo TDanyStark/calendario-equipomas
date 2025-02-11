@@ -168,7 +168,7 @@ const Enrolls = () => {
         onDelete={handleDelete}
         onDeleteSelected={handleDeleteSelected}
         searchPlaceholder="Buscar matriculas"
-        TextButtonCreate="matriculas"
+        TextButtonCreate="matricula"
         gridTemplateColumns="50px 70px 1fr 1fr 1fr 1fr 130px 130px"
       />
 

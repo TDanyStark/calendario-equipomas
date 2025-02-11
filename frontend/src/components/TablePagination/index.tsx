@@ -33,8 +33,8 @@ import useFetchItemsWithPagination from "../../hooks/useFetchItemsWithPagination
 import { useSearchParams } from "react-router-dom";
 import CellItem from "../CellItem";
 import { useDebounce } from "use-debounce";
-import SelectWithFetch from "../SelectWithFetch";
 import Theme from "@/lib/Theme";
+import FilterEnrolls from "../Filters/FilterEnrolls";
 
 interface Column<T> {
   label: string;
@@ -82,15 +82,15 @@ function DataTablePagination<T extends TableNode>({
 
   const [filterActive, setFilterActive] = useState<string | null>(null);
 
-    // Memoizar los filtros para optimizar
-    const filters = React.useMemo(
-      () => ({
-        course: courseFilter || "",
-        instrument: instrumentFilter || "",
-        semester: semesterFilter || "",
-      }),
-      [courseFilter, instrumentFilter, semesterFilter]
-    );
+  // Memoizar los filtros para optimizar
+  const filters = React.useMemo(
+    () => ({
+      course: courseFilter || "",
+      instrument: instrumentFilter || "",
+      semester: semesterFilter || "",
+    }),
+    [courseFilter, instrumentFilter, semesterFilter]
+  );
 
   // Actualizar useFetchItems para usar los parámetros de la URL
   const {
@@ -139,12 +139,20 @@ function DataTablePagination<T extends TableNode>({
     setFilterActive(null);
   };
 
+  const onShow = (filter: string) => {
+    if (filterActive === filter) {
+      setFilterActive(null);
+    } else {
+      setFilterActive(filter);
+    }
+  };
+
   const handleClearFilters = () => {
     const newParams = new URLSearchParams(searchParams);
     newParams.delete("course");
     newParams.delete("instrument");
     newParams.delete("semester");
-    newParams.delete('query');
+    newParams.delete("query");
     newParams.set("page", "1"); // Reiniciar la paginación
     setSearchParams(newParams);
   };
@@ -163,7 +171,7 @@ function DataTablePagination<T extends TableNode>({
     };
   }, []);
 
-   // Manejar clics fuera de los selects
+  // Manejar clics fuera de los selects
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -212,35 +220,16 @@ function DataTablePagination<T extends TableNode>({
 
   return (
     <>
-      <div ref={selectsContainerRef} className="pt-6 flex gap-3">
-        <SelectWithFetch
-          entity="courses"
-          displayName="Cursos"
-          isActive={filterActive === "courses"}
-          onShow={() => setFilterActive("courses")}
-          onSelect={(id) => {
-            onSelect(id, "course");
-          }}
+      <div ref={selectsContainerRef} className="pt-6 flex gap-3 w-fit">
+        <FilterEnrolls
+          courseFilter={courseFilter || ""}
+          instrumentFilter={instrumentFilter || ""}
+          semesterFilter={semesterFilter || ""}
+          filterActive={filterActive || ""}
+          onShow={onShow}
+          onSelect={onSelect}
+          handleClearFilters={handleClearFilters}
         />
-        {/* <SelectWithFetch
-          entity="instruments"
-          displayName="Instrumentos"
-          isActive={filterActive === "instruments"}
-          onShow={() => setFilterActive("instruments")}
-          onSelect={(id) => {
-            onSelect(id, "instrument");
-          }}
-        />
-        <SelectWithFetch
-          entity="semesters"
-          displayName="Semestre"
-          isActive={filterActive === "semesters"}
-          onShow={() => setFilterActive("semesters")}
-          onSelect={(id) => {
-            onSelect(id, "semester");
-          }}
-        /> */}
-        <button className="btn-secondary" onClick={handleClearFilters}>Limpiar</button>
       </div>
       <div className="flex flex-col gap-3 md:flex-row items-center justify-between">
         <div className="flex gap-2">
