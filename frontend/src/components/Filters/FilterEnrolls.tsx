@@ -59,7 +59,7 @@ const FilterEnrolls = ({
   return (
     <div
       ref={selectsContainerRef}
-      className="pt-6 flex flex-col flex-wrap lg:flex-row gap-3 w-fit"
+      className="pt-6 flex flex-col flex-wrap lg:flex-row gap-3 w-fit select-none"
     >
       <SelectWithFetch
         entity="courses"

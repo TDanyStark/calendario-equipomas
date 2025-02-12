@@ -48,7 +48,7 @@ const SelectWithFetch = ({
         className="px-3 py-2 border rounded flex justify-between items-center gap-2 w-64 overflow-hidden"
         onClick={onShow}
       >
-        <span className="truncate">{isLoading ? dots : placeholder}</span>
+        <span className="truncate select-none">{isLoading ? dots : placeholder}</span>
         <span className="bg-principal-bg">
           <ArrowSvg />
         </span>

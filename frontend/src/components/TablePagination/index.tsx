@@ -207,7 +207,7 @@ function DataTablePagination<T extends TableNode>({
           />
         </>
       )}
-      <div className={`${filtersProps ? '':'pt-6' } flex flex-col gap-3 md:flex-row items-center justify-between`}>
+      <div className={`${filtersProps ? '':'pt-6' } flex flex-col gap-3 md:flex-row items-center justify-between select-none`}>
         <div className="flex gap-2">
           <input
             type="text"

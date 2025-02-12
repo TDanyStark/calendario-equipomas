@@ -19,6 +19,7 @@ class ChangeSettingAction extends SettingAction
       "",
       $data['settingValue']
     );
+    $this->logger->info("Setting updated.", $setting->jsonSerialize());
     $this->settingRepository->updateSetting($setting);
     return $this->respondWithData($data);
   }

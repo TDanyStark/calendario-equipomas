@@ -28,8 +28,12 @@ class DbSettingRepository implements SettingRepository
 
     public function updateSetting(Setting $setting): void
     {
-        $stmt = $this->pdo->prepare('UPDATE settings SET value = :value WHERE id = :id');
-        $stmt->execute(['SettingValue' => $setting->getValue(), 'SettingID' => $setting->getId()]);
+        $stmt = $this->pdo->prepare('UPDATE settings SET SettingValue = :value WHERE SettingID  = :id');
+        $SettingID = $setting->getId();
+        $SettingValue = $setting->getValue();
+        $stmt->bindParam(':value', $SettingValue, PDO::PARAM_STR);
+        $stmt->bindParam(':id', $SettingID, PDO::PARAM_STR);
+        $stmt->execute();
     }
 
     public function findAll(): array
