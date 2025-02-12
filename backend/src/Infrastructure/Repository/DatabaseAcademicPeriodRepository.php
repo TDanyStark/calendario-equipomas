@@ -21,7 +21,11 @@ class DatabaseAcademicPeriodRepository implements AcademicPeriodRepository
 
     public function findAll(): array
     {
-        $stmt = $this->pdo->query('SELECT * FROM academic_periods');
+        $stmt = $this->pdo->query('
+            SELECT * FROM academic_periods
+            ORDER BY year DESC, semester DESC
+            LIMIT 10
+        ');
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return array_map(fn($row) => new AcademicPeriod(
@@ -90,15 +94,16 @@ class DatabaseAcademicPeriodRepository implements AcademicPeriodRepository
     {
         try {
             $this->pdo->beginTransaction();
-    
+
             // Primero, deseleccionamos todos los registros
-            $stmt = $this->pdo->prepare('UPDATE academic_periods SET selected = 0');
+            $stmt = $this->pdo->prepare('UPDATE academic_periods SET selected = 0 WHERE selected = 1');
             $stmt->execute();
-    
+
+
             // Luego, seleccionamos el nuevo registro
             $stmt = $this->pdo->prepare('UPDATE academic_periods SET selected = 1 WHERE id = :id');
             $stmt->execute(['id' => $id]);
-    
+
             $this->pdo->commit();
             return true;
         } catch (Exception $e) {
