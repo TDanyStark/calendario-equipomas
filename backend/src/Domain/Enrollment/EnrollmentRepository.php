@@ -35,4 +35,6 @@ interface EnrollmentRepository
      * Elimina múltiples inscripciones a partir de un array de IDs.
      */
     public function deleteMultiple(array $ids): int;
+
+    public function updateByGroup(string $changeTo, string $query, string $courseID, string $instrumentID, string $semesterID): int;
 }

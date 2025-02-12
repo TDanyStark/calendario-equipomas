@@ -59,6 +59,7 @@ use App\Application\Actions\Enrollment\ListEnrollmentAction;
 use App\Application\Actions\Enrollment\CreateEnrollmentAction;
 use App\Application\Actions\Enrollment\GetEnrollmentsQueryAction;
 use App\Application\Actions\Enrollment\UpdateEnrollmentAction;
+use App\Application\Actions\Enrollment\UpdateGroupAction;
 use App\Application\Actions\Enrollment\DeleteEnrollmentAction;
 use App\Application\Actions\Enrollment\DeleteMultipleEnrollmentsAction;
 
@@ -133,7 +134,10 @@ return function (App $app) {
             $enrollGroup->get('', ListEnrollmentAction::class);
             // $enrollGroup->get('/query', GetEnrollmentsQueryAction::class);
             $enrollGroup->post('', CreateEnrollmentAction::class);
+            $enrollGroup->put('/changegroup', UpdateGroupAction::class);
             $enrollGroup->put('/{id}', UpdateEnrollmentAction::class);
+
+            
             // $enrollGroup->delete('/{id}', DeleteEnrollmentAction::class);
             // $enrollGroup->delete('', DeleteMultipleEnrollmentsAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));

@@ -1,6 +1,6 @@
 // components/DataTablePagination.tsx
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Table,
   Header,
@@ -54,6 +54,7 @@ interface DataTablePaginationProps<T> {
   TextButtonCreate?: string;
   gridTemplateColumns: string;
   JWT: string;
+  filtersProps?: string;
 }
 
 function DataTablePagination<T extends TableNode>({
@@ -69,6 +70,7 @@ function DataTablePagination<T extends TableNode>({
   TextButtonCreate,
   gridTemplateColumns,
   JWT,
+  filtersProps,
 }: DataTablePaginationProps<T>) {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("query") || "";
@@ -76,7 +78,6 @@ function DataTablePagination<T extends TableNode>({
   const courseFilter = searchParams.get("course");
   const instrumentFilter = searchParams.get("instrument");
   const semesterFilter = searchParams.get("semester");
-  const selectsContainerRef = useRef<HTMLDivElement>(null);
 
   const [debouncedQuery] = useDebounce(query, 500);
 
@@ -157,36 +158,7 @@ function DataTablePagination<T extends TableNode>({
     setSearchParams(newParams);
   };
 
-  // Manejar la tecla Escape
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setFilterActive(null); // Cerrar todos los selects
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
-
-  // Manejar clics fuera de los selects
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        selectsContainerRef.current &&
-        !selectsContainerRef.current.contains(event.target as Node)
-      ) {
-        setFilterActive(null); // Cerrar todos los selects
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  
 
   const tableData = { nodes: data };
 
@@ -220,18 +192,22 @@ function DataTablePagination<T extends TableNode>({
 
   return (
     <>
-      <div ref={selectsContainerRef} className="pt-6 flex gap-3 w-fit">
-        <FilterEnrolls
-          courseFilter={courseFilter || ""}
-          instrumentFilter={instrumentFilter || ""}
-          semesterFilter={semesterFilter || ""}
-          filterActive={filterActive || ""}
-          onShow={onShow}
-          onSelect={onSelect}
-          handleClearFilters={handleClearFilters}
-        />
-      </div>
-      <div className="flex flex-col gap-3 md:flex-row items-center justify-between">
+      {filtersProps === "enrolls" && (
+        <>
+          <FilterEnrolls
+            courseFilter={courseFilter || ""}
+            instrumentFilter={instrumentFilter || ""}
+            semesterFilter={semesterFilter || ""}
+            filterActive={filterActive || ""}
+            onShow={onShow}
+            onSelect={onSelect}
+            handleClearFilters={handleClearFilters}
+            setFilterActive={setFilterActive}
+            debouncedQuery={debouncedQuery}
+          />
+        </>
+      )}
+      <div className={`${filtersProps ? '':'pt-6' } flex flex-col gap-3 md:flex-row items-center justify-between`}>
         <div className="flex gap-2">
           <input
             type="text"
@@ -246,6 +222,7 @@ function DataTablePagination<T extends TableNode>({
               handleClick={handleDeleteItems}
             />
           ) : null}
+          
         </div>
         <PrimaryButton handleClick={onCreate}>
           Crear nuevo {TextButtonCreate}

@@ -9,6 +9,7 @@ use App\Domain\Enrollment\EnrollmentRepository;
 use App\Infrastructure\Database;
 use PDO;
 use Exception;
+use Monolog\Logger;
 
 class DatabaseEnrollmentRepository implements EnrollmentRepository
 {
@@ -201,5 +202,54 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
 
     $stmt->execute();
     return $stmt->rowCount();
+  }
+
+  public function updateByGroup(string $changeTo, string $query, string $courseID, string $instrumentID, string $semesterID): int
+  {
+    // Validamos que $changeTo solo tenga valores permitidos
+    if (!in_array($changeTo, ['activo', 'inactivo'], true)) {
+      return 0;
+    }
+
+    // Construcción dinámica de la consulta
+    $sqlQuery = "
+          UPDATE enrollments 
+          SET Status = :status 
+          WHERE Status != 'withSchedule'
+            AND (
+                (:status = 'inactivo' AND Status = 'activo') 
+             OR (:status = 'activo' AND Status = 'inactivo')
+            )";
+
+    // Parámetros para la consulta
+    $params = [':status' => $changeTo];
+
+    // Agregamos condiciones dinámicamente solo si tienen valor
+    if (!empty($courseID)) {
+      $sqlQuery .= " AND CourseID = :courseID";
+      $params[':courseID'] = $courseID;
+    }
+    if (!empty($instrumentID)) {
+      $sqlQuery .= " AND InstrumentID = :instrumentID";
+      $params[':instrumentID'] = $instrumentID;
+    }
+    if (!empty($semesterID)) {
+      $sqlQuery .= " AND SemesterID = :semesterID";
+      $params[':semesterID'] = $semesterID;
+    }
+
+    $stmt = $this->pdo->prepare($sqlQuery);
+
+    // mostrar en el log la consola
+    $logger = new Logger('updateByGroup');
+    $logger->info('sqlQuery: ' . $sqlQuery);
+
+    // Asignamos los valores dinámicamente
+    foreach ($params as $key => $value) {
+      $stmt->bindValue($key, $value, PDO::PARAM_STR);
+    }
+
+    $stmt->execute();
+    return $stmt->rowCount(); // Devuelve el número de filas afectadas
   }
 }

@@ -162,6 +162,7 @@ const Enrolls = () => {
         entity={entity}
         entityName={entityName}
         JWT={JWT}
+        filtersProps="enrolls"
         columns={columns}
         onCreate={handleCreate}
         onEdit={handleEdit}
