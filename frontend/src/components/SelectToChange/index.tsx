@@ -31,8 +31,8 @@ const SelectToChange = ({ isActive, entity, filters, onShow }: Props) => {
       }),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(entity);
-      },
+        queryClient.invalidateQueries({ queryKey: [entity], exact: false });
+      }
     }
   );
 
