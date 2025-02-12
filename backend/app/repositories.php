@@ -36,9 +36,17 @@ use App\Infrastructure\Repository\DatabaseSemesterRepository;
 use App\Domain\Enrollment\EnrollmentRepository;
 use App\Infrastructure\Repository\DatabaseEnrollmentRepository;
 
+use App\Domain\AcademicPeriod\AcademicPeriodRepository;
+use App\Infrastructure\Repository\DatabaseAcademicPeriodRepository;
+
 return function (ContainerBuilder $containerBuilder) {
     // Here we map our UserRepository interface to its in memory implementation
     $containerBuilder->addDefinitions([
+
+        AcademicPeriodRepository::class => function ($container) {
+            $database = $container->get(Database::class);
+            return new DatabaseAcademicPeriodRepository($database);
+        },
 
         EnrollmentRepository::class => function ($container) {
             $database = $container->get(Database::class);

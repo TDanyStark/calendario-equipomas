@@ -14,6 +14,7 @@ import BackgroundDiv from "../components/modal/BackgroundDiv";
 import CancelModalBtn from "../components/buttons/CancelModalBtn";
 import SubmitModalBtn from "../components/buttons/SubmitModalBtn";
 import SearchSelect from "../components/SearchSelect";
+import ChangeAP from "@/components/ChangeAP";
 
 const entity = "enrolls";
 const entityName = "matriculas";
@@ -31,7 +32,6 @@ const Enrolls = () => {
 
   const JWT = useSelector((state: RootState) => state.auth.JWT);
 
-  const activeSemester = useSelector((state: RootState) => state.schedule.activeSemester);
 
   const { register, handleSubmit, setValue, reset } = useForm<EnrollType>();
 
@@ -163,7 +163,8 @@ const Enrolls = () => {
 
   return (
     <section className="section_page">
-      <Primaryh1>Matriculas {activeSemester}</Primaryh1>
+      <Primaryh1>Matriculas</Primaryh1>
+      <ChangeAP/>
       <DataTablePagination<EnrollType>
         entity={entity}
         entityName={entityName}

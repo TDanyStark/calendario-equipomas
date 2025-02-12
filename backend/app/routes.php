@@ -63,6 +63,8 @@ use App\Application\Actions\Enrollment\UpdateGroupAction;
 use App\Application\Actions\Enrollment\DeleteEnrollmentAction;
 use App\Application\Actions\Enrollment\DeleteMultipleEnrollmentsAction;
 
+use App\Application\Actions\AcademicPeriod\ListAcademicPeriodsAction;
+use App\Application\Actions\Setting\ChangeSettingAction;
 
 
 return function (App $app) {
@@ -140,6 +142,17 @@ return function (App $app) {
             
             // $enrollGroup->delete('/{id}', DeleteEnrollmentAction::class);
             // $enrollGroup->delete('', DeleteMultipleEnrollmentsAction::class);
+        })->add($this->get(RoleMiddleware::class)->withRole('admin'));
+
+        $group->group('/academic-periods', function (Group $academicPeriodGroup) {
+            // Ruta para listar los períodos académicos
+            $academicPeriodGroup->get('', ListAcademicPeriodsAction::class);
+        })->add($this->get(RoleMiddleware::class)->withRole('admin'));
+        
+
+        // gruop de settings
+        $group->group('/settings', function (Group $settingsGroup) {
+            $settingsGroup->put('', ChangeSettingAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
     });
 };

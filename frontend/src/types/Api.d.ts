@@ -1,6 +1,6 @@
 // types/Api.d.ts
 export type DayOfWeekNameType = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
-export type ResourceType = 'instruments' | 'rooms' | 'courses' | 'semesters' | 'professors' | 'students' | 'enrolls';
+export type ResourceType = 'instruments' | 'rooms' | 'courses' | 'semesters' | 'professors' | 'students' | 'enrolls' | 'academic-periods';
 
 interface Availability {
   startTime: string;
@@ -36,7 +36,15 @@ interface SelectScheduleType {
 interface ScheduleStateType {
   scheduleDays: ScheduleDayType[] | null;
   recurrence: number | null;
-  activeSemester: string | null;
+  academicPeriod: AcademicPeriodType | null;
+}
+
+interface AcademicPeriodType {
+  id: string;
+  year: number;
+  semester: number;
+  startDate: string;
+  endDate: string;
 }
 
 export interface Selectable {

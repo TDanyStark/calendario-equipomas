@@ -9,20 +9,24 @@ use App\Domain\Shared\Days\ScheduleDayRepository;
 use App\Application\Actions\Action;
 use Psr\Log\LoggerInterface;
 use App\Domain\Shared\Settings\SettingRepository;
+use App\Domain\AcademicPeriod\AcademicPeriodRepository;
 
 class ScheduleDaysAction extends Action
 {
     private ScheduleDayRepository $scheduleDayRepository;
     private SettingRepository $settingRepository;
+    private AcademicPeriodRepository $academicPeriodRepository;
 
     public function __construct(
         LoggerInterface $logger,
         ScheduleDayRepository $scheduleDayRepository,
-        SettingRepository $settingRepository
+        SettingRepository $settingRepository,
+        AcademicPeriodRepository $academicPeriodRepository
     ) {
         parent::__construct($logger);
         $this->scheduleDayRepository = $scheduleDayRepository;
         $this->settingRepository = $settingRepository;
+        $this->academicPeriodRepository = $academicPeriodRepository;
     }
 
     protected function action(): Response
@@ -32,12 +36,12 @@ class ScheduleDaysAction extends Action
         $recurrence = $this->settingRepository->findSetting('recurrence');
         $activeSemesterID = $this->settingRepository->findSetting('activeSemesterID');
 
-
+        $academicPeriod = $this->academicPeriodRepository->findById($activeSemesterID->getValue());
 
         $data = [
             'scheduleDays' => $scheduleDays,
             'recurrence' => (int)$recurrence->getValue(),
-            'activeSemester' => (string)$activeSemesterID->getValue()
+            'academicPeriod' => $academicPeriod
         ];
 
         return $this->respondWithData($data);

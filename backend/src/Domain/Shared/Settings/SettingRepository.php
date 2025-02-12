@@ -29,4 +29,6 @@ interface SettingRepository
      * @return Setting[] Arreglo de objetos Setting.
      */
     public function findAll(): array;
+
+    public function save(Setting $setting): void;
 }

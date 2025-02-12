@@ -41,4 +41,10 @@ class DbSettingRepository implements SettingRepository
             return new Setting((string)$setting['SettingID'], $setting['SettingName'], $setting['SettingValue']);
         }, $settings);
     }
+
+    public function save(Setting $setting): void
+    {
+        $stmt = $this->pdo->prepare('INSERT INTO settings (SettingName, SettingValue) VALUES (:SettingName, :SettingValue)');
+        $stmt->execute(['SettingName' => $setting->getName(), 'SettingValue' => $setting->getValue()]);
+    }
 }

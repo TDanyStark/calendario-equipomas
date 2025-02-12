@@ -1,21 +1,21 @@
 // src/store/scheduleSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ScheduleDayType, ScheduleStateType } from '../types/Api';
+import { AcademicPeriodType, ScheduleDayType, ScheduleStateType } from '../types/Api';
 
 const initialState: ScheduleStateType = {
   scheduleDays: null,
   recurrence: null,
-  activeSemester: null,
+  academicPeriod: null,
 };
 
 const scheduleSlice = createSlice({
   name: 'schedule',
   initialState,
   reducers: {
-    setSchedule: (state, action: PayloadAction<{ scheduleDays: ScheduleDayType[]; recurrence: number, activeSemester:string }>) => {
+    setSchedule: (state, action: PayloadAction<{ scheduleDays: ScheduleDayType[]; recurrence: number, academicPeriod:AcademicPeriodType }>) => {
       state.scheduleDays = action.payload.scheduleDays;
       state.recurrence = action.payload.recurrence;
-      state.activeSemester = action.payload.activeSemester;
+      state.academicPeriod = action.payload.academicPeriod;
     }
   },
 });
