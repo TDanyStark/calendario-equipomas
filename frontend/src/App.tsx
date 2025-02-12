@@ -22,12 +22,11 @@ function App() {
   
   const { daysOfWeek } = useFetchDaysOfWeek<ScheduleStateType>();
   useEffect(() => {
-    if (daysOfWeek?.scheduleDays && daysOfWeek?.recurrence && daysOfWeek?.academicPeriod) {
+    if (daysOfWeek?.scheduleDays && daysOfWeek?.recurrence) {
       dispatch(
         setSchedule({
           scheduleDays: daysOfWeek.scheduleDays,
           recurrence: daysOfWeek.recurrence,
-          academicPeriod: daysOfWeek.academicPeriod,
         })
       );
     }

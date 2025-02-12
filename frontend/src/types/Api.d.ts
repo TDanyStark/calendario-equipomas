@@ -36,7 +36,6 @@ interface SelectScheduleType {
 interface ScheduleStateType {
   scheduleDays: ScheduleDayType[] | null;
   recurrence: number | null;
-  academicPeriod: AcademicPeriodType | null;
 }
 
 interface AcademicPeriodType {

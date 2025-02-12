@@ -15,8 +15,8 @@ class ChangeSettingAction extends SettingAction
   {
     $data = $this->getFormData();
     $setting = new Setting(
-      $data['settingID'],
       "",
+      $data['settingName'],
       $data['settingValue']
     );
     $this->logger->info("Setting updated.", $setting->jsonSerialize());
