@@ -36,6 +36,7 @@ interface SelectScheduleType {
 interface ScheduleStateType {
   scheduleDays: ScheduleDayType[] | null;
   recurrence: number | null;
+  activeSemester: string | null;
 }
 
 export interface Selectable {
@@ -136,5 +137,7 @@ type EnrollType = {
   semesterName: string;
   instrumentID: string;
   instrumentName: string;
+  academicPeriodID: string;
+  academicPeriodName: string;
   status: string;
 }

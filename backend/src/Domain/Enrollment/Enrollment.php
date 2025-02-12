@@ -14,11 +14,13 @@ class Enrollment implements JsonSerializable
     private string $courseID;
     private string $semesterID;
     private string $instrumentID;
+    private string $academic_periodID;
     private string $status;
     private ?string $studentName;
     private ?string $courseName;
     private ?string $semesterName;
     private ?string $instrumentName;
+    private ?string $academicPeriodName;
 
     public function __construct(
         string $enrollmentID,
@@ -26,22 +28,26 @@ class Enrollment implements JsonSerializable
         string $courseID,
         string $semesterID,
         string $instrumentID,
+        string $academic_periodID,
         string $status,
         ?string $studentName,
         ?string $courseName,
         ?string $semesterName,
         ?string $instrumentName,
+        ?string $academicPeriodName
     ) {
         $this->enrollmentID = $enrollmentID;
         $this->studentID = $studentID;
         $this->courseID = $courseID;
         $this->semesterID = $semesterID;
         $this->instrumentID = $instrumentID;
+        $this->academic_periodID = $academic_periodID;
         $this->status = $status;
         $this->studentName = $studentName;
         $this->courseName = $courseName;
         $this->semesterName = $semesterName;
         $this->instrumentName = $instrumentName;
+        $this->academicPeriodName = $academicPeriodName;
     }
 
     public function getEnrollmentID(): string
@@ -89,6 +95,16 @@ class Enrollment implements JsonSerializable
         return $this->semesterName;
     }
 
+    public function getAcademicPeriodID(): string
+    {
+        return $this->academic_periodID;
+    }
+
+    public function getAcademicPeriodName(): string
+    {
+        return $this->academicPeriodName;
+    }
+
     public function getStatus(): string
     {
         return $this->status;
@@ -106,6 +122,8 @@ class Enrollment implements JsonSerializable
             'semesterName' => $this->semesterName,
             'instrumentID' => $this->instrumentID,
             'instrumentName' => $this->instrumentName,
+            'academicPeriodID' => $this->academic_periodID,
+            'academicPeriodName' => $this->academicPeriodName,
             'status' => $this->status,
         ];
     }

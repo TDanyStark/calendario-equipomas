@@ -24,11 +24,13 @@ class UpdateEnrollmentAction extends EnrollmentAction
             $data['courseID'],
             $data['semesterID'],
             $data['instrumentID'],
+            $data['academic_periodID'],
             $data['status'],
             $data['studentName'] ?? null,
             $data['courseName'] ?? null,
             $data['semesterName'] ?? null,
-            $data['instrumentName'] ?? null
+            $data['instrumentName'] ?? null,
+            null
         );
 
         try {

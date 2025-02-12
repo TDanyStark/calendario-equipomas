@@ -30,10 +30,14 @@ class ScheduleDaysAction extends Action
         // Obtener los horarios de cada día de la semana
         $scheduleDays = $this->scheduleDayRepository->findAll();
         $recurrence = $this->settingRepository->findSetting('recurrence');
+        $activeSemesterID = $this->settingRepository->findSetting('activeSemesterID');
+
+
 
         $data = [
             'scheduleDays' => $scheduleDays,
-            'recurrence' => (int)$recurrence->getValue()
+            'recurrence' => (int)$recurrence->getValue(),
+            'activeSemester' => (string)$activeSemesterID->getValue()
         ];
 
         return $this->respondWithData($data);

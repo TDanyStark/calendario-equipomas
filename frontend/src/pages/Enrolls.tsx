@@ -31,6 +31,8 @@ const Enrolls = () => {
 
   const JWT = useSelector((state: RootState) => state.auth.JWT);
 
+  const activeSemester = useSelector((state: RootState) => state.schedule.activeSemester);
+
   const { register, handleSubmit, setValue, reset } = useForm<EnrollType>();
 
   const onSubmit = (data: EnrollType) => {
@@ -148,6 +150,10 @@ const Enrolls = () => {
         renderCell: (item: unknown) => (item as EnrollType).instrumentName,
       },
       {
+        label: "PA",
+        renderCell: (item: unknown) => (item as EnrollType).academicPeriodName,
+      },
+      {
         label: "Estado",
         renderCell: (item: unknown) => (item as EnrollType).status,
       },
@@ -157,7 +163,7 @@ const Enrolls = () => {
 
   return (
     <section className="section_page">
-      <Primaryh1>Matriculas</Primaryh1>
+      <Primaryh1>Matriculas {activeSemester}</Primaryh1>
       <DataTablePagination<EnrollType>
         entity={entity}
         entityName={entityName}
@@ -170,7 +176,7 @@ const Enrolls = () => {
         onDeleteSelected={handleDeleteSelected}
         searchPlaceholder="Buscar matriculas"
         TextButtonCreate="matricula"
-        gridTemplateColumns="50px 70px 1fr 1fr 1fr 1fr 130px 130px"
+        gridTemplateColumns="50px 70px 1fr 1fr 1fr 1fr 100px 130px 130px"
       />
 
       {isOpen && (
