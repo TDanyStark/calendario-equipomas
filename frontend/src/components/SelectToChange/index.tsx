@@ -42,7 +42,6 @@ const SelectToChange = ({ isActive, entity, filters, onShow }: Props) => {
   };
 
   const handleConfirm = () => {
-    console.log("Confirmado", selectedOption);
     setIsOpen(false);
     if (selectedOption) {
       updateItem.mutate({ option: selectedOption });
