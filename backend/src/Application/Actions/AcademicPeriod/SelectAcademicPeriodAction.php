@@ -3,15 +3,16 @@
 declare(strict_types=1);
 
 namespace App\Application\Actions\AcademicPeriod;
+
 use Psr\Http\Message\ResponseInterface as Response;
 
-
-class UpdateAcademicPeriodAction extends AcademicPeriodAction
+class SelectAcademicPeriodAction extends AcademicPeriodAction
 {
     protected function action(): Response
     {
         $data = $this->getFormData();
-        $this->academicPeriodRepository->update($data);
+        $id = (int)$data['id'];
+        $this->academicPeriodRepository->changeSelect($id);
         return $this->respondWithData($data);
     }
 }

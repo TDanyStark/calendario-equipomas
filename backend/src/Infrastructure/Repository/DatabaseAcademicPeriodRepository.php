@@ -8,6 +8,7 @@ use App\Domain\AcademicPeriod\AcademicPeriod;
 use App\Domain\AcademicPeriod\AcademicPeriodRepository;
 use PDO;
 use App\Infrastructure\Database;
+use Exception;
 
 class DatabaseAcademicPeriodRepository implements AcademicPeriodRepository
 {
@@ -83,5 +84,26 @@ class DatabaseAcademicPeriodRepository implements AcademicPeriodRepository
             'startDate' => $academicPeriod->getStartDate(),
             'endDate' => $academicPeriod->getEndDate()
         ]);
+    }
+
+    public function changeSelect(int $id): bool
+    {
+        try {
+            $this->pdo->beginTransaction();
+    
+            // Primero, deseleccionamos todos los registros
+            $stmt = $this->pdo->prepare('UPDATE academic_periods SET selected = 0');
+            $stmt->execute();
+    
+            // Luego, seleccionamos el nuevo registro
+            $stmt = $this->pdo->prepare('UPDATE academic_periods SET selected = 1 WHERE id = :id');
+            $stmt->execute(['id' => $id]);
+    
+            $this->pdo->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->pdo->rollBack();
+            return false;
+        }
     }
 }

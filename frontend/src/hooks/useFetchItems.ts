@@ -20,6 +20,7 @@ const fetchItems = async (resource: ResourceType, JWT: string | null) => {
 const FetchItems = (resource: ResourceType, JWT: string | null) => {
   return useQuery([resource], () => fetchItems(resource, JWT), {
     enabled: !!JWT,
+    staleTime: 1000 * 60 * 5, // 5 minutos
     // refetchOnWindowFocus: false, // Desactiva la refetch al reenfocar la ventana
   });
 };

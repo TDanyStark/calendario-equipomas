@@ -30,6 +30,19 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
   ): array {
     $searchQuery = "%$query%";
 
+    // Obtener el período académico activo
+    $activePeriodStmt = $this->pdo->prepare("
+        SELECT id FROM academic_periods
+        WHERE selected = 1
+    ");
+    $activePeriodStmt->execute();
+    $activePeriodID = $activePeriodStmt->fetchColumn();
+
+    if (!$activePeriodID) {
+      // Si no hay un período académico activo, retornar vacío o manejar el caso de forma adecuada
+      return ['data' => [], 'pages' => 0];
+    }
+
     // Condición WHERE reutilizable
     $whereClause = '(:query = "" OR CONCAT(s.StudentFirstName, " ", s.StudentLastName) LIKE :query 
             OR s.StudentFirstName LIKE :query 
@@ -50,6 +63,9 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
       $whereClause .= ' AND e.SemesterID = :semesterID';
     }
 
+    // Filtrar por el período académico activo
+    $whereClause .= ' AND e.academic_periodID = :activePeriodID';
+
     // Obtener cantidad total de registros
     $countStmt = $this->pdo->prepare("SELECT COUNT(*) as total 
             FROM enrollments e
@@ -58,6 +74,7 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
             JOIN instruments i ON e.InstrumentID = i.InstrumentID
             WHERE $whereClause");
     $countStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
+    $countStmt->bindValue(':activePeriodID', $activePeriodID, PDO::PARAM_INT);
 
     // Vincular valores de los filtros si no están vacíos
     if (!empty($courseID)) {
@@ -90,6 +107,7 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
             LIMIT :limit OFFSET :offset");
 
     $dataStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
+    $dataStmt->bindValue(':activePeriodID', $activePeriodID, PDO::PARAM_INT);
 
     // Vincular valores de los filtros si no están vacíos
     if (!empty($courseID)) {
@@ -127,6 +145,7 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
 
     return ['data' => $enrollments, 'pages' => $totalPages];
   }
+
 
   public function findById(int $id): ?Enrollment
   {

@@ -39,7 +39,7 @@ interface ScheduleStateType {
 }
 
 interface AcademicPeriodType {
-  id: string;
+  id: number;
   year: number;
   semester: number;
   selected: number;

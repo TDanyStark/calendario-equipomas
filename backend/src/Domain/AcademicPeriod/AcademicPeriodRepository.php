@@ -9,4 +9,5 @@ interface AcademicPeriodRepository {
     public function findById(string $id): ?AcademicPeriod;
     public function create(AcademicPeriod $academicPeriod): int;
     public function update(AcademicPeriod $academicPeriod): bool;
+    public function changeSelect(int $id): bool;
 }

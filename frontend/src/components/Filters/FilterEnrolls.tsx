@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import SelectWithFetch from "../SelectWithFetch";
 import SelectToChange from "../SelectToChange";
+import useClickOutside from "@/hooks/useClickOutside";
 
 interface Props {
   courseFilter: string;
@@ -41,25 +42,11 @@ const FilterEnrolls = ({
   }, [setFilterActive]);
 
   // Manejar clics fuera de los selects
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        selectsContainerRef.current &&
-        !selectsContainerRef.current.contains(event.target as Node)
-      ) {
-        setFilterActive(null); // Cerrar todos los selects
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [setFilterActive]);
+  useClickOutside(selectsContainerRef, () =>  setFilterActive(null));
   return (
     <div
       ref={selectsContainerRef}
-      className="pt-6 flex flex-col flex-wrap lg:flex-row gap-3 w-fit select-none"
+      className="pt-6 flex flex-col lg:flex-wrap lg:gap-y-8 lg:flex-row gap-3 w-fit select-none"
     >
       <SelectWithFetch
         entity="courses"
