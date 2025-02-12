@@ -1,9 +1,9 @@
 import { RootState } from "@/store/store";
 import { ResourceType } from "@/types/Api";
-import useFetchItems from "@/hooks/useFetchItems";
 import { useSelector } from "react-redux";
 import ArrowSvg from "@/icons/ArrowSvg";
 import { useEffect, useState } from "react";
+import useFetchForSelect from "@/hooks/useFetchForSelect";
 
 interface Props {
   entity: ResourceType;
@@ -30,7 +30,7 @@ const SelectWithFetch = ({
   const [dots, setDots] = useState(".");
   const JWT = useSelector((state: RootState) => state.auth.JWT);
   // Fetch courses data
-  const { data, isLoading, isError } = useFetchItems(entity, JWT, isActive, filter);
+  const { data, isLoading, isError } = useFetchForSelect(entity, JWT, isActive, filter);
   const nameSelected = data?.find((item: ItemType) => item.id === filter)?.name;
   const placeholder = nameSelected ? nameSelected : `Filtrar por ${displayName}`;
 

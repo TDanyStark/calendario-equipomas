@@ -42,6 +42,7 @@ interface AcademicPeriodType {
   id: string;
   year: number;
   semester: number;
+  selected: number;
   startDate: string;
   endDate: string;
 }

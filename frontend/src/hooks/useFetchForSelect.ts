@@ -17,11 +17,12 @@ const fetchItems = async (resource: ResourceType, JWT: string | null) => {
   return [];
 };
 
-const FetchItems = (resource: ResourceType, JWT: string | null) => {
+const useFetchForSelect = (resource: ResourceType, JWT: string | null, isActive: boolean, filter: string | undefined) => {
   return useQuery([resource], () => fetchItems(resource, JWT), {
-    enabled: !!JWT,
+    enabled: !!JWT && filter ? true : isActive,
+    staleTime: 1000 * 60 * 5, // 5 minutos
     // refetchOnWindowFocus: false, // Desactiva la refetch al reenfocar la ventana
   });
 };
 
-export default FetchItems;
+export default useFetchForSelect;

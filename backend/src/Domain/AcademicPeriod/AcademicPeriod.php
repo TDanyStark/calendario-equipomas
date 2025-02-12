@@ -11,6 +11,7 @@ class AcademicPeriod implements JsonSerializable
     private string $id;
     private int $year;
     private int $semester;
+    private int $selected;
     private string $startDate;
     private string $endDate;
 
@@ -18,12 +19,14 @@ class AcademicPeriod implements JsonSerializable
         string $id,
         int $year,
         int $semester,
+        int $selected,
         string $startDate,
         string $endDate
     ) {
         $this->id = $id;
         $this->year = $year;
         $this->semester = $semester;
+        $this->selected = $selected;
         $this->startDate = $startDate;
         $this->endDate = $endDate;
     }
@@ -43,6 +46,11 @@ class AcademicPeriod implements JsonSerializable
         return $this->semester;
     }
 
+    public function getSelected(): int
+    {
+        return $this->selected;
+    }
+
     public function getStartDate(): string
     {
         return $this->startDate;
@@ -59,6 +67,7 @@ class AcademicPeriod implements JsonSerializable
             'id' => $this->id,
             'year' => $this->year,
             'semester' => $this->semester,
+            'selected' => $this->selected,
             'startDate' => $this->startDate,
             'endDate' => $this->endDate
         ];

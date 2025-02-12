@@ -10,6 +10,7 @@ class ListAcademicPeriodsAction extends AcademicPeriodAction
 {
     protected function action(): Response
     {
+        
         // Obtener todos los períodos académicos desde el repositorio
         $academicPeriods = $this->academicPeriodRepository->findAll();
         

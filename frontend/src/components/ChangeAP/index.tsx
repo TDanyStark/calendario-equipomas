@@ -1,10 +1,10 @@
 import ArrowSvg from "@/icons/ArrowSvg";
 import { useState } from "react";
-import useFetchItems from "@/hooks/useFetchItems";
 import { AcademicPeriodType } from "@/types/Api";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import selectAC from "@/utils/selectAP";
+import useFetchForSelect from "@/hooks/useFetchForSelect";
 
 const entity = "academic-periods";
 
@@ -12,16 +12,31 @@ const ChangeAP = () => {
   const [isActive, setIsActive] = useState(false);
 
   const JWT = useSelector((state: RootState) => state.auth.JWT);
-  
-  const { data, isLoading, isError } = useFetchItems(entity, JWT, true, undefined); 
 
+  const { data, isLoading, isError } = useFetchForSelect(
+    entity,
+    JWT,
+    true,
+    undefined
+  );
+
+  const selectedAP: AcademicPeriodType = data?.find(
+    (item: AcademicPeriodType) => item.selected === 1
+  );
+
+  const renderName = () => {
+    if (selectedAP) {
+      return `${selectedAP.year} - ${selectedAP.semester}`;
+    } else {
+      return "...";
+    }
+  };
 
   const handleClicked = async (id: string) => {
     if (JWT) {
       await selectAC("activeSemesterID", id, JWT);
       setIsActive(false);
     }
-    
   };
 
   return (
@@ -30,7 +45,9 @@ const ChangeAP = () => {
         className="px-3 py-2 border rounded flex justify-between items-center gap-2 overflow-hidden cursor-pointer"
         onClick={() => setIsActive(!isActive)}
       >
-        <span>--</span>
+        <span>
+          {renderName()}
+        </span>
         <span className="bg-principal-bg">
           <ArrowSvg />
         </span>
