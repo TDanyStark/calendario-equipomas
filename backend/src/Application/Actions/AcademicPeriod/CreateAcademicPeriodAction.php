@@ -20,28 +20,27 @@ class CreateAcademicPeriodAction extends AcademicPeriodAction
         $year = $data['year'];
         $semester = $data['semester'];
 
-        // validar que el año no sea menor al actual y el semestre solo sea 1 y 2
-        if ($year < date('Y') || ($semester !== 1 && $semester !== 2)) {
-            return $this->respondWithData(['error' => 'Invalid year or semester'], 400);
-        }
-
-        // calculate the start and end date of the academic period
+        // Calcular fechas de inicio y fin
         $startDate = $this->calculateStartDate($year, $semester);
         $endDate = $this->calculateEndDate($year, $semester);
         $selected = 1;
 
-        $academicPeriod = new AcademicPeriod(
-            "",
-            $data['year'],
-            $data['semester'],
-            $selected,
-            $startDate,
-            $endDate
-        );
+        try {
+            $academicPeriod = new AcademicPeriod(
+                null,
+                $year,
+                $semester,
+                $selected,
+                $startDate,
+                $endDate
+            );
 
-        $academicPeriod = $this->academicPeriodRepository->create($academicPeriod);
+            $academicPeriod = $this->academicPeriodRepository->create($academicPeriod);
 
-        return $this->respondWithData($academicPeriod);
+            return $this->respondWithData($academicPeriod);
+        } catch (\DomainException $e) {
+            return $this->respondWithData(['error' => $e->getMessage()], 400);
+        }
     }
 
     private function calculateStartDate(int $year, int $semester): string

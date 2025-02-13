@@ -21,8 +21,10 @@ class ListEnrollmentAction extends EnrollmentAction
         $limit = 10;
         $offset = ($page - 1) * $limit;
 
+        $academic_periodID = $this->academicPeriodRepository->getActivePeriodID();
+
         // Obtiene todos los estudiantes desde el repositorio
-        $enrollments = $this->enrollmentRepository->findAll($limit, $offset, $query, $courseID, $instrumentID, $semesterID);
+        $enrollments = $this->enrollmentRepository->findAll($limit, $offset, $query, $courseID, $instrumentID, $semesterID, $academic_periodID);
 
         return $this->respondWithData($enrollments);
     }

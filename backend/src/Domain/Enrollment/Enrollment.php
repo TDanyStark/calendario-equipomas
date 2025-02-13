@@ -14,7 +14,7 @@ class Enrollment implements JsonSerializable
     private string $courseID;
     private string $semesterID;
     private string $instrumentID;
-    private string $academic_periodID;
+    private int $academic_periodID;
     private string $status;
     private ?string $studentName;
     private ?string $courseName;
@@ -28,7 +28,7 @@ class Enrollment implements JsonSerializable
         string $courseID,
         string $semesterID,
         string $instrumentID,
-        string $academic_periodID,
+        int $academic_periodID,
         string $status,
         ?string $studentName,
         ?string $courseName,
@@ -95,7 +95,7 @@ class Enrollment implements JsonSerializable
         return $this->semesterName;
     }
 
-    public function getAcademicPeriodID(): string
+    public function getAcademicPeriodID(): int
     {
         return $this->academic_periodID;
     }

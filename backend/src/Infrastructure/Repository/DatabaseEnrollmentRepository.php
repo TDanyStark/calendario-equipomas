@@ -26,13 +26,13 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
     string $query,
     string $courseID,
     string $instrumentID,
-    string $semesterID
+    string $semesterID,
+    int $academic_periodID
   ): array {
     $searchQuery = "%$query%";
 
-    $activePeriodID = $this->getActivePeriodID();
 
-    if (!$activePeriodID) {
+    if (!$academic_periodID) {
       // Si no hay un período académico activo, retornar vacío o manejar el caso de forma adecuada
       return ['data' => [], 'pages' => 0];
     }
@@ -58,7 +58,7 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
     }
 
     // Filtrar por el período académico activo
-    $whereClause .= ' AND e.academic_periodID = :activePeriodID';
+    $whereClause .= ' AND e.academic_periodID = :academic_periodID';
 
     // Obtener cantidad total de registros
     $countStmt = $this->pdo->prepare("SELECT COUNT(*) as total 
@@ -69,7 +69,7 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
             WHERE $whereClause");
     $countStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
     $countStmt->bindValue(':queryClean', $query, PDO::PARAM_STR);
-    $countStmt->bindValue(':activePeriodID', $activePeriodID, PDO::PARAM_INT);
+    $countStmt->bindValue(':academic_periodID', $academic_periodID, PDO::PARAM_INT);
 
     // Vincular valores de los filtros si no están vacíos
     if (!empty($courseID)) {
@@ -103,7 +103,7 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
 
     $dataStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
     $dataStmt->bindValue(':queryClean', $query, PDO::PARAM_STR);
-    $dataStmt->bindValue(':activePeriodID', $activePeriodID, PDO::PARAM_INT);
+    $dataStmt->bindValue(':academic_periodID', $academic_periodID, PDO::PARAM_INT);
 
     // Vincular valores de los filtros si no están vacíos
     if (!empty($courseID)) {
@@ -129,7 +129,7 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
         (string)$row['CourseID'],
         (string)$row['SemesterID'],
         (string)$row['InstrumentID'],
-        (string)$row['academic_periodID'],
+        (int)$row['academic_periodID'],
         $row['Status'],
         $row['StudentFirstName'] . ' ' . $row['StudentLastName'],
         $row['CourseName'],
@@ -176,11 +176,6 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
       // empzar transaccion
       $this->pdo->beginTransaction();
       // obtener el periodo academico activo
-      $activePeriodID = $this->getActivePeriodID();
-
-      if (!$activePeriodID) {
-        throw new Exception("No hay un período académico activo");
-      }
 
       $stmt = $this->pdo->prepare("INSERT INTO enrollments (StudentID, CourseID, SemesterID, InstrumentID, academic_periodID, Status) 
       VALUES (:studentID, :courseID, :semesterID, :instrumentID, :academic_periodID, :status)");
@@ -189,7 +184,7 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
       $stmt->bindValue(':courseID', $enrollment->getCourseID(), PDO::PARAM_INT);
       $stmt->bindValue(':semesterID', $enrollment->getSemesterID(), PDO::PARAM_INT);
       $stmt->bindValue(':instrumentID', $enrollment->getInstrumentID(), PDO::PARAM_INT);
-      $stmt->bindValue(':academic_periodID', $activePeriodID, PDO::PARAM_INT);
+      $stmt->bindValue(':academic_periodID', $enrollment->getAcademicPeriodID(), PDO::PARAM_INT);
       $stmt->bindValue(':status', $enrollment->getStatus(), PDO::PARAM_STR);
 
       if ($stmt->execute()) {
@@ -286,16 +281,5 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
     return $stmt->rowCount(); // Devuelve el número de filas afectadas
   }
 
-  private function getActivePeriodID(): ?int
-  {
-    // Obtener el período académico activo
-    $activePeriodStmt = $this->pdo->prepare("
-        SELECT id FROM academic_periods
-        WHERE selected = 1
-    ");
-    $activePeriodStmt->execute();
-    $activePeriodID = $activePeriodStmt->fetchColumn();
-
-    return $activePeriodID ? (int) $activePeriodID : null;
-  }
+  
 }

@@ -18,13 +18,15 @@ class CreateEnrollmentAction extends EnrollmentAction
             return $this->respondWithData(['error' => 'Missing required fields'], 400);
         }
 
+        $academic_periodID = $this->academicPeriodRepository->getActivePeriodID();
+
         $enrollment = new Enrollment(
             "",
             $data['studentID'],
             $data['courseID'],
             $data['semesterID'],
             $data['instrumentID'],
-            $data['academic_periodID'],
+            $academic_periodID,
             $data['status'],
             $data['studentName'] ?? null,
             $data['courseName'] ?? null,

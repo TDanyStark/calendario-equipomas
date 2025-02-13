@@ -76,11 +76,10 @@ class DatabaseAcademicPeriodRepository implements AcademicPeriodRepository
                 'startDate' => $academicPeriod->getStartDate(),
                 'endDate' => $academicPeriod->getEndDate()
             ]);
-            
+
             $this->pdo->commit();
 
             return (int) $this->pdo->lastInsertId();
-
         } catch (Exception $e) {
             $this->pdo->rollBack();
             return 0;
@@ -122,7 +121,8 @@ class DatabaseAcademicPeriodRepository implements AcademicPeriodRepository
         }
     }
 
-    private function changeSelectedToZero(){
+    private function changeSelectedToZero()
+    {
         $stmt = $this->pdo->prepare('UPDATE academic_periods SET selected = 0 WHERE selected = 1');
         $stmt->execute();
     }
@@ -140,5 +140,18 @@ class DatabaseAcademicPeriodRepository implements AcademicPeriodRepository
             $row['startDate'],
             $row['endDate']
         );
+    }
+
+    public function getActivePeriodID(): ?int
+    {
+        // Obtener el período académico activo
+        $activePeriodStmt = $this->pdo->prepare("
+        SELECT id FROM academic_periods
+        WHERE selected = 1
+    ");
+        $activePeriodStmt->execute();
+        $activePeriodID = $activePeriodStmt->fetchColumn();
+
+        return $activePeriodID ? (int) $activePeriodID : null;
     }
 }

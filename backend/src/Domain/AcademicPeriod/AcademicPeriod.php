@@ -8,7 +8,7 @@ use JsonSerializable;
 
 class AcademicPeriod implements JsonSerializable
 {
-    private string $id;
+    private ?string $id;
     private int $year;
     private int $semester;
     private int $selected;
@@ -16,13 +16,14 @@ class AcademicPeriod implements JsonSerializable
     private string $endDate;
 
     public function __construct(
-        string $id,
+        ?string $id,
         int $year,
         int $semester,
         int $selected,
         string $startDate,
         string $endDate
     ) {
+        $this->validateSemester($semester);
         $this->id = $id;
         $this->year = $year;
         $this->semester = $semester;
@@ -59,6 +60,13 @@ class AcademicPeriod implements JsonSerializable
     public function getEndDate(): string
     {
         return $this->endDate;
+    }
+
+    private function validateSemester(int $semester): void
+    {
+        if ($semester !== 1 && $semester !== 2) {
+            throw new \DomainException("El semestre solo puede ser 1 o 2.");
+        }
     }
 
     public function jsonSerialize(): array

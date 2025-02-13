@@ -11,4 +11,5 @@ interface AcademicPeriodRepository {
     public function update(AcademicPeriod $academicPeriod): bool;
     public function changeSelect(int $id): bool;
     public function getSelected(): ?AcademicPeriod;
+    public function getActivePeriodID(): ?int;
 }

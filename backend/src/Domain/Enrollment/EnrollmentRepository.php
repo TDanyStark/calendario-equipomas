@@ -9,7 +9,7 @@ interface EnrollmentRepository
     /**
      * Obtiene todas las inscripciones con paginación y búsqueda.
      */
-    public function findAll(int $limit, int $offset, string $query, string $courseID, string $instrumentID, string $semesterID): array;
+    public function findAll(int $limit, int $offset, string $query, string $courseID, string $instrumentID, string $semesterID, int $academic_periodID): array;
 
     /**
      * Busca una inscripción por su ID.
@@ -37,4 +37,5 @@ interface EnrollmentRepository
     public function deleteMultiple(array $ids): int;
 
     public function updateByGroup(string $changeTo, string $query, string $courseID, string $instrumentID, string $semesterID): int;
+
 }
