@@ -18,7 +18,7 @@ const Sidebar = ({ role }: Props) => {
   };
 
   return (
-    <div className="aside relative bg-secondary-bg">
+    <div className="aside  bg-secondary-bg absolute z-50 lg:relative">
       <aside
         id="sidebar-multi-level-sidebar"
         className={`relative z-30 w-64 h-screen transition-transform ${

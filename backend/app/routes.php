@@ -66,6 +66,7 @@ use App\Application\Actions\Enrollment\DeleteMultipleEnrollmentsAction;
 use App\Application\Actions\AcademicPeriod\ListAcademicPeriodsAction;
 use App\Application\Actions\Setting\ChangeSettingAction;
 use App\Application\Actions\AcademicPeriod\SelectAcademicPeriodAction;
+use App\Application\Actions\AcademicPeriod\CreateAcademicPeriodAction;
 
 
 
@@ -150,6 +151,7 @@ return function (App $app) {
             // Ruta para listar los períodos académicos
             $academicPeriodGroup->get('', ListAcademicPeriodsAction::class);
             $academicPeriodGroup->put('/change-select', SelectAcademicPeriodAction::class);
+            $academicPeriodGroup->post('/', CreateAcademicPeriodAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
         
 
