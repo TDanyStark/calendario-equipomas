@@ -66,10 +66,9 @@ class DatabaseAcademicPeriodRepository implements AcademicPeriodRepository
             $this->changeSelectedToZero();
 
             $stmt = $this->pdo->prepare(
-                'INSERT INTO academic_periods (id, year, semester, selected, startDate, endDate) VALUES (:id, :year, :semester, :selected, :startDate, :endDate)'
+                'INSERT INTO academic_periods (year, semester, selected, startDate, endDate) VALUES (:year, :semester, :selected, :startDate, :endDate)'
             );
             $stmt->execute([
-                'id' => $academicPeriod->getId(),
                 'year' => $academicPeriod->getYear(),
                 'semester' => $academicPeriod->getSemester(),
                 'selected' => $academicPeriod->getSelected(),
@@ -80,9 +79,15 @@ class DatabaseAcademicPeriodRepository implements AcademicPeriodRepository
             $this->pdo->commit();
 
             return (int) $this->pdo->lastInsertId();
-        } catch (Exception $e) {
+        } catch (\PDOException $e) {
             $this->pdo->rollBack();
-            return 0;
+    
+            // Si el código de error es 23000 (clave única violada), lanza una excepción personalizada
+            if ($e->getCode() == '23000') {
+                throw new \DomainException('El período académico ya existe.');
+            }
+    
+            throw $e; // Relanza cualquier otro error inesperado
         }
     }
 

@@ -89,13 +89,14 @@ const ChangeAP = () => {
             )}
             {data &&
               data.map((item: AcademicPeriodType) => {
-                if (item.selected === 1) return null;
                 return (
                   <li
                     key={item.id}
                     className={`px-2 py-1 hover:bg-gray-800 cursor-pointer flex justify-between items-center ${
                       isSaving ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
+                    }
+                    ${item.selected === 1 ? "bg-primary" : ""}
+                    `}
                     onClick={
                       !isSaving
                         ? () => handleClicked(Number(item.id))

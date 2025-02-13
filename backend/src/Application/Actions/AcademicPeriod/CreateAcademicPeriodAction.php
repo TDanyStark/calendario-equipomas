@@ -40,6 +40,8 @@ class CreateAcademicPeriodAction extends AcademicPeriodAction
             return $this->respondWithData($academicPeriod);
         } catch (\DomainException $e) {
             return $this->respondWithData(['error' => $e->getMessage()], 400);
+        } catch (\Exception $e) {
+            return $this->respondWithData(['error' => $e->getMessage()], 500);
         }
     }
 
