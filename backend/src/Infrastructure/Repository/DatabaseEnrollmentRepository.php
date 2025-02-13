@@ -30,13 +30,7 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
   ): array {
     $searchQuery = "%$query%";
 
-    // Obtener el período académico activo
-    $activePeriodStmt = $this->pdo->prepare("
-        SELECT id FROM academic_periods
-        WHERE selected = 1
-    ");
-    $activePeriodStmt->execute();
-    $activePeriodID = $activePeriodStmt->fetchColumn();
+    $activePeriodID = $this->getActivePeriodID();
 
     if (!$activePeriodID) {
       // Si no hay un período académico activo, retornar vacío o manejar el caso de forma adecuada
@@ -103,7 +97,7 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
             JOIN instruments i ON e.InstrumentID = i.InstrumentID
             JOIN academic_periods ap ON e.academic_periodID = ap.id
             WHERE $whereClause
-            ORDER BY e.Updated_at DESC
+            ORDER BY e.Updated_at DESC, e.Created_at DESC
             LIMIT :limit OFFSET :offset");
 
     $dataStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
@@ -176,21 +170,33 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
 
   public function create(Enrollment $enrollment): int
   {
-    $stmt = $this->pdo->prepare("INSERT INTO enrollments (StudentID, CourseID, SemesterID, InstrumentID, academic_periodID, Status) 
-            VALUES (:studentID, :courseID, :semesterID, :instrumentID, :academic_periodID, :status)");
+    try {
+      // empzar transaccion
+      $this->pdo->beginTransaction();
+      // obtener el periodo academico activo
+      $activePeriodID = $this->getActivePeriodID();
 
-    $stmt->bindValue(':studentID', $enrollment->getStudentID(), PDO::PARAM_STR);
-    $stmt->bindValue(':courseID', $enrollment->getCourseID(), PDO::PARAM_INT);
-    $stmt->bindValue(':semesterID', $enrollment->getSemesterID(), PDO::PARAM_INT);
-    $stmt->bindValue(':instrumentID', $enrollment->getInstrumentID(), PDO::PARAM_INT);
-    $stmt->bindValue(':academic_periodID', $enrollment->getAcademicPeriodID(), PDO::PARAM_INT);
-    $stmt->bindValue(':status', $enrollment->getStatus(), PDO::PARAM_STR);
+      if (!$activePeriodID) {
+        throw new Exception("No hay un período académico activo");
+      }
 
-    if ($stmt->execute()) {
-      return (int) $this->pdo->lastInsertId();
+      $stmt = $this->pdo->prepare("INSERT INTO enrollments (StudentID, CourseID, SemesterID, InstrumentID, academic_periodID, Status) 
+      VALUES (:studentID, :courseID, :semesterID, :instrumentID, :academic_periodID, :status)");
+
+      $stmt->bindValue(':studentID', $enrollment->getStudentID(), PDO::PARAM_STR);
+      $stmt->bindValue(':courseID', $enrollment->getCourseID(), PDO::PARAM_INT);
+      $stmt->bindValue(':semesterID', $enrollment->getSemesterID(), PDO::PARAM_INT);
+      $stmt->bindValue(':instrumentID', $enrollment->getInstrumentID(), PDO::PARAM_INT);
+      $stmt->bindValue(':academic_periodID', $activePeriodID, PDO::PARAM_INT);
+      $stmt->bindValue(':status', $enrollment->getStatus(), PDO::PARAM_STR);
+
+      if ($stmt->execute()) {
+        $this->pdo->commit();
+        return (int) $this->pdo->lastInsertId();
+      }
+    } catch (Exception $e) {
+      throw new Exception("Error al obtener el período académico activo");
     }
-
-    throw new Exception("Error al crear la inscripción");
   }
 
   public function update(Enrollment $enrollment): bool
@@ -276,5 +282,18 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
 
     $stmt->execute();
     return $stmt->rowCount(); // Devuelve el número de filas afectadas
+  }
+
+  private function getActivePeriodID(): ?int
+  {
+    // Obtener el período académico activo
+    $activePeriodStmt = $this->pdo->prepare("
+        SELECT id FROM academic_periods
+        WHERE selected = 1
+    ");
+    $activePeriodStmt->execute();
+    $activePeriodID = $activePeriodStmt->fetchColumn();
+
+    return $activePeriodID ? (int) $activePeriodID : null;
   }
 }
