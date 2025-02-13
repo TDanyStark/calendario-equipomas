@@ -7,6 +7,10 @@ import { useForm } from "react-hook-form";
 import { AcademicPeriodType } from "@/types/Api";
 import { toast } from "react-toastify";
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { createAcademicPeriod } from "@/utils/AcademicPeriodAxios";
+import { useQueryClient } from "react-query";
 
 export interface PopupCreateProps {
   isOpen: boolean;
@@ -26,6 +30,10 @@ const PopupCreate = ({ isOpen, setIsOpen }: PopupCreateProps) => {
   const currentMonth = new Date().getMonth();
   const isFirstSemester = currentMonth < 6;
 
+  const JWT = useSelector((state: RootState) => state.auth.JWT);
+  const queryClient = useQueryClient();
+  
+
   const onSubmit = async (data: AcademicPeriodType) => {
     const { year, semester } = data;
 
@@ -34,20 +42,22 @@ const PopupCreate = ({ isOpen, setIsOpen }: PopupCreateProps) => {
       toast.error("El año debe ser el actual o el próximo");
       return;
     }
-
-    setIsSaving(true);
-    try {
-      // Aquí iría la lógica para crear el nuevo período académico
-      // await createAcademicPeriod({ year, semester });
-
-      toast.success("Período académico creado con éxito!");
-      setIsOpen(false);
-      reset(); // Limpiar el formulario después de enviar
-    } catch (error) {
-      toast.error("Error al crear el período académico");
-      console.error(error);
-    } finally {
-      setIsSaving(false);
+    if (JWT) {
+      setIsSaving(true);
+      try {
+        // Aquí iría la lógica para crear el nuevo período académico
+        await createAcademicPeriod({ year: Number(year), semester: Number(semester) }, JWT);
+        queryClient.invalidateQueries("academic-periods");
+        queryClient.invalidateQueries("enrolls");
+        toast.success("Período académico creado con éxito!");
+        setIsOpen(false);
+        reset(); // Limpiar el formulario después de enviar
+      } catch (error) {
+        toast.error("Error al crear el período académico");
+        console.error(error);
+      } finally {
+        setIsSaving(false);
+      }
     }
   };
 

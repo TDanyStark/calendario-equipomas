@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Application\Actions\AcademicPeriod;
 
+use App\Domain\AcademicPeriod\AcademicPeriod;
 use Psr\Http\Message\ResponseInterface as Response;
+
 
 class CreateAcademicPeriodAction extends AcademicPeriodAction
 {
@@ -18,11 +20,26 @@ class CreateAcademicPeriodAction extends AcademicPeriodAction
         $year = $data['year'];
         $semester = $data['semester'];
 
+        // validar que el año no sea menor al actual y el semestre solo sea 1 y 2
+        if ($year < date('Y') || ($semester !== 1 && $semester !== 2)) {
+            return $this->respondWithData(['error' => 'Invalid year or semester'], 400);
+        }
+
         // calculate the start and end date of the academic period
         $startDate = $this->calculateStartDate($year, $semester);
         $endDate = $this->calculateEndDate($year, $semester);
+        $selected = 1;
 
-        $academicPeriod = $this->academicPeriodRepository->create($data);
+        $academicPeriod = new AcademicPeriod(
+            "",
+            $data['year'],
+            $data['semester'],
+            $selected,
+            $startDate,
+            $endDate
+        );
+
+        $academicPeriod = $this->academicPeriodRepository->create($academicPeriod);
 
         return $this->respondWithData($academicPeriod);
     }

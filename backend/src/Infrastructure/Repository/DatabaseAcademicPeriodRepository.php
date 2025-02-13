@@ -60,19 +60,31 @@ class DatabaseAcademicPeriodRepository implements AcademicPeriodRepository
 
     public function create(AcademicPeriod $academicPeriod): int
     {
-        $stmt = $this->pdo->prepare(
-            'INSERT INTO academic_periods (id, year, semester, selected, startDate, endDate) VALUES (:id, :year, :semester, :selected, :startDate, :endDate)'
-        );
-        $stmt->execute([
-            'id' => $academicPeriod->getId(),
-            'year' => $academicPeriod->getYear(),
-            'semester' => $academicPeriod->getSemester(),
-            'selected' => $academicPeriod->getSelected(),
-            'startDate' => $academicPeriod->getStartDate(),
-            'endDate' => $academicPeriod->getEndDate()
-        ]);
+        try {
+            $this->pdo->beginTransaction();
 
-        return (int) $this->pdo->lastInsertId();
+            $this->changeSelectedToZero();
+
+            $stmt = $this->pdo->prepare(
+                'INSERT INTO academic_periods (id, year, semester, selected, startDate, endDate) VALUES (:id, :year, :semester, :selected, :startDate, :endDate)'
+            );
+            $stmt->execute([
+                'id' => $academicPeriod->getId(),
+                'year' => $academicPeriod->getYear(),
+                'semester' => $academicPeriod->getSemester(),
+                'selected' => $academicPeriod->getSelected(),
+                'startDate' => $academicPeriod->getStartDate(),
+                'endDate' => $academicPeriod->getEndDate()
+            ]);
+            
+            $this->pdo->commit();
+
+            return (int) $this->pdo->lastInsertId();
+
+        } catch (Exception $e) {
+            $this->pdo->rollBack();
+            return 0;
+        }
     }
 
     public function update(AcademicPeriod $academicPeriod): bool
@@ -96,9 +108,7 @@ class DatabaseAcademicPeriodRepository implements AcademicPeriodRepository
             $this->pdo->beginTransaction();
 
             // Primero, deseleccionamos todos los registros
-            $stmt = $this->pdo->prepare('UPDATE academic_periods SET selected = 0 WHERE selected = 1');
-            $stmt->execute();
-
+            $this->changeSelectedToZero();
 
             // Luego, seleccionamos el nuevo registro
             $stmt = $this->pdo->prepare('UPDATE academic_periods SET selected = 1 WHERE id = :id');
@@ -110,5 +120,10 @@ class DatabaseAcademicPeriodRepository implements AcademicPeriodRepository
             $this->pdo->rollBack();
             return false;
         }
+    }
+
+    private function changeSelectedToZero(){
+        $stmt = $this->pdo->prepare('UPDATE academic_periods SET selected = 0 WHERE selected = 1');
+        $stmt->execute();
     }
 }

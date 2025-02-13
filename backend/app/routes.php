@@ -151,7 +151,7 @@ return function (App $app) {
             // Ruta para listar los períodos académicos
             $academicPeriodGroup->get('', ListAcademicPeriodsAction::class);
             $academicPeriodGroup->put('/change-select', SelectAcademicPeriodAction::class);
-            $academicPeriodGroup->post('/', CreateAcademicPeriodAction::class);
+            $academicPeriodGroup->post('', CreateAcademicPeriodAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
         
 
