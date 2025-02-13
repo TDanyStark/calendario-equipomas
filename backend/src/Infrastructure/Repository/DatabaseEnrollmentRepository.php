@@ -44,7 +44,7 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
             OR c.CourseName LIKE :query 
             OR i.InstrumentName LIKE :query
             OR e.StudentID LIKE :query
-            OR e.Status LIKE :query)';
+            OR e.Status = :queryClean)';
 
     // Agregar condiciones adicionales para los filtros
     if (!empty($courseID)) {
@@ -68,6 +68,7 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
             JOIN instruments i ON e.InstrumentID = i.InstrumentID
             WHERE $whereClause");
     $countStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
+    $countStmt->bindValue(':queryClean', $query, PDO::PARAM_STR);
     $countStmt->bindValue(':activePeriodID', $activePeriodID, PDO::PARAM_INT);
 
     // Vincular valores de los filtros si no están vacíos
@@ -101,6 +102,7 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
             LIMIT :limit OFFSET :offset");
 
     $dataStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
+    $dataStmt->bindValue(':queryClean', $query, PDO::PARAM_STR);
     $dataStmt->bindValue(':activePeriodID', $activePeriodID, PDO::PARAM_INT);
 
     // Vincular valores de los filtros si no están vacíos

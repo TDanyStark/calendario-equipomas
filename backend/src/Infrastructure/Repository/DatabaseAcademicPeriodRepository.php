@@ -126,4 +126,19 @@ class DatabaseAcademicPeriodRepository implements AcademicPeriodRepository
         $stmt = $this->pdo->prepare('UPDATE academic_periods SET selected = 0 WHERE selected = 1');
         $stmt->execute();
     }
+
+    public function getSelected(): AcademicPeriod
+    {
+        $stmt = $this->pdo->query('SELECT * FROM academic_periods WHERE selected = 1');
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return new AcademicPeriod(
+            (string)$row['id'],
+            (int) $row['year'],
+            (int) $row['semester'],
+            (int) $row['selected'],
+            $row['startDate'],
+            $row['endDate']
+        );
+    }
 }

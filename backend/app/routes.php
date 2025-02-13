@@ -67,6 +67,7 @@ use App\Application\Actions\AcademicPeriod\ListAcademicPeriodsAction;
 use App\Application\Actions\Setting\ChangeSettingAction;
 use App\Application\Actions\AcademicPeriod\SelectAcademicPeriodAction;
 use App\Application\Actions\AcademicPeriod\CreateAcademicPeriodAction;
+use App\Application\Actions\AcademicPeriod\GetSelectedAcademicPeriod;
 
 
 
@@ -150,6 +151,8 @@ return function (App $app) {
         $group->group('/academic-periods', function (Group $academicPeriodGroup) {
             // Ruta para listar los períodos académicos
             $academicPeriodGroup->get('', ListAcademicPeriodsAction::class);
+            // obtener el periodo academico actual
+            $academicPeriodGroup->get('/current', GetSelectedAcademicPeriod::class);
             $academicPeriodGroup->put('/change-select', SelectAcademicPeriodAction::class);
             $academicPeriodGroup->post('', CreateAcademicPeriodAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));

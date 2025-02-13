@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -11,6 +11,7 @@ import useFetchForSelect from "@/hooks/useFetchForSelect";
 import useClickOutside from "@/hooks/useClickOutside";
 import AddIcon from "@/icons/AddIcon";
 import PopupCreate from "./PopupCreate";
+import { setPeriod } from "@/store/academicPeriodSlice";
 
 const entity = "academic-periods";
 
@@ -21,6 +22,7 @@ const ChangeAP = () => {
   const JWT = useSelector((state: RootState) => state.auth.JWT);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const dispatch = useDispatch();
 
   const { data, isLoading, isError } = useFetchForSelect(
     entity,
@@ -28,9 +30,15 @@ const ChangeAP = () => {
     true,
     undefined
   );
-  const selectedAP: AcademicPeriodType = data?.find(
+  const currentAP: AcademicPeriodType = data?.find(
     (item: AcademicPeriodType) => item.selected === 1
   );
+
+  useEffect(() => {
+    if (currentAP) {
+      dispatch(setPeriod({ year: currentAP.year, semester: currentAP.semester })); // Guardar en Redux
+    }
+  }, [currentAP, dispatch]);
 
   useClickOutside(containerRef, () => setIsActive(false));
 
@@ -61,7 +69,7 @@ const ChangeAP = () => {
         >
           <span className="font-light">Semestre activo: </span>
           <span className="font-bold">
-            {selectedAP ? `${selectedAP.year} - ${selectedAP.semester}` : "..."}
+            {currentAP ? `${currentAP.year} - ${currentAP.semester}` : "..."}
           </span>
           <span className="bg-principal-bg">
             {isSaving ? (

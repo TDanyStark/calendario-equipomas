@@ -15,6 +15,7 @@ import CancelModalBtn from "../components/buttons/CancelModalBtn";
 import SubmitModalBtn from "../components/buttons/SubmitModalBtn";
 import SearchSelect from "../components/SearchSelect";
 import ChangeAP from "@/components/ChangeAP";
+import ActivePeriod from "@/components/ChangeAP/ActivePeriod";
 
 const entity = "enrolls";
 const entityName = "matriculas";
@@ -22,23 +23,34 @@ const entityName = "matriculas";
 const Enrolls = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [editEnroll, setEditEnroll] = useState<EnrollType | null>(null);
-  const [selectedStudent, setSelectedStudent] = useState<{ studentID: string; studentName: string }>({ studentID: '', studentName: '' });
-  const [selectedCourse, setSelectedCourse] = useState<{ courseID: string; courseName: string }>({ courseID: '', courseName: '' });
-  const [selectedSemester, setSelectedSemester] = useState<{ semesterID: string; semesterName: string }>({ semesterID: '', semesterName: '' });
-  const [selectedInstrument, setSelectedInstrument] = useState<{ instrumentID: string; instrumentName: string }>({ instrumentID: '', instrumentName: '' });
+  const [selectedStudent, setSelectedStudent] = useState<{
+    studentID: string;
+    studentName: string;
+  }>({ studentID: "", studentName: "" });
+  const [selectedCourse, setSelectedCourse] = useState<{
+    courseID: string;
+    courseName: string;
+  }>({ courseID: "", courseName: "" });
+  const [selectedSemester, setSelectedSemester] = useState<{
+    semesterID: string;
+    semesterName: string;
+  }>({ semesterID: "", semesterName: "" });
+  const [selectedInstrument, setSelectedInstrument] = useState<{
+    instrumentID: string;
+    instrumentName: string;
+  }>({ instrumentID: "", instrumentName: "" });
   const [activeSearchSelect, setActiveSearchSelect] = useState<string | null>(
     null
   );
 
   const JWT = useSelector((state: RootState) => state.auth.JWT);
 
-
   const { register, handleSubmit, setValue, reset } = useForm<EnrollType>();
 
   const onSubmit = (data: EnrollType) => {
     const cleanedData = {
       ...data,
-      id: editEnroll?.id || '',
+      id: editEnroll?.id || "",
       studentID: selectedStudent.studentID,
       studentName: selectedStudent.studentName,
       courseID: selectedCourse.courseID,
@@ -53,7 +65,7 @@ const Enrolls = () => {
       return toast.error("Debes seleccionar un estudiante");
     }
 
-    if (!cleanedData.courseID) { 
+    if (!cleanedData.courseID) {
       return toast.error("Debes seleccionar un curso");
     }
 
@@ -75,11 +87,11 @@ const Enrolls = () => {
   };
 
   const cleanData = () => {
-    setSelectedStudent({ studentID: '', studentName: '' });
-    setSelectedCourse({ courseID: '', courseName: '' });
-    setSelectedSemester({ semesterID: '', semesterName: '' });
-    setSelectedInstrument({ instrumentID: '', instrumentName: '' });
-  }
+    setSelectedStudent({ studentID: "", studentName: "" });
+    setSelectedCourse({ courseID: "", courseName: "" });
+    setSelectedSemester({ semesterID: "", semesterName: "" });
+    setSelectedInstrument({ instrumentID: "", instrumentName: "" });
+  };
 
   const {
     createItem,
@@ -101,10 +113,22 @@ const Enrolls = () => {
   const handleEdit = useCallback(
     async (item: EnrollType) => {
       setEditEnroll(item);
-      setSelectedStudent({ studentID: item.studentID, studentName: item.studentName });
-      setSelectedCourse({ courseID: item.courseID, courseName: item.courseName });
-      setSelectedSemester({ semesterID: item.semesterID, semesterName: item.semesterName });
-      setSelectedInstrument({ instrumentID: item.instrumentID, instrumentName: item.instrumentName });
+      setSelectedStudent({
+        studentID: item.studentID,
+        studentName: item.studentName,
+      });
+      setSelectedCourse({
+        courseID: item.courseID,
+        courseName: item.courseName,
+      });
+      setSelectedSemester({
+        semesterID: item.semesterID,
+        semesterName: item.semesterName,
+      });
+      setSelectedInstrument({
+        instrumentID: item.instrumentID,
+        instrumentName: item.instrumentName,
+      });
       setValue("status", item.status);
       setActiveSearchSelect(null);
       setIsOpen(true);
@@ -164,7 +188,7 @@ const Enrolls = () => {
   return (
     <section className="section_page">
       <Primaryh1>Matriculas</Primaryh1>
-      <ChangeAP/>
+      <ChangeAP />
       <DataTablePagination<EnrollType>
         entity={entity}
         entityName={entityName}
@@ -191,7 +215,10 @@ const Enrolls = () => {
             <DialogPanel className="dialog_panel">
               <div className="modal_header">
                 <DialogTitle className="dialog_title">
-                  {editEnroll ? "Editar Matricula" : "Crear Matricula"}
+                  <div className="flex flex-wrap items-end gap-2">
+                    {editEnroll ? "Editar Matricula" : "Crear Matricula"}
+                    <ActivePeriod />
+                  </div>
                 </DialogTitle>
                 <CloseModalBtn onClick={() => setIsOpen(false)} />
               </div>
@@ -204,30 +231,29 @@ const Enrolls = () => {
                   <span className="block text-sm font-medium mb-1">
                     Estudiante
                   </span>
-                  {
-                    editEnroll ? (
-                      <p>
-                        {editEnroll.studentName}
-                      </p>
-                    ) : (
-                      <SearchSelect
-                        entity="students"
-                        defaultValue={selectedStudent.studentName}
-                        onSelect={(id, name) => {
-                          setSelectedStudent({ studentID: id, studentName: name });
-                        }}
-                        isActive={activeSearchSelect === "students"}
-                        onFocus={() => setActiveSearchSelect("students")}
-                        onClose={() => setActiveSearchSelect(null)}
-                      />
-                    )
-                  }
+                  {editEnroll ? (
+                    <p>{editEnroll.studentName}</p>
+                  ) : (
+                    <SearchSelect
+                      entity="students"
+                      defaultValue={selectedStudent.studentName}
+                      onSelect={(id, name) => {
+                        setSelectedStudent({
+                          studentID: id,
+                          studentName: name,
+                        });
+                      }}
+                      isActive={activeSearchSelect === "students"}
+                      onFocus={() => setActiveSearchSelect("students")}
+                      onClose={() => setActiveSearchSelect(null)}
+                    />
+                  )}
                 </div>
                 <div className="mb-4">
                   <span className="block text-sm font-medium mb-1">Curso</span>
                   <SearchSelect
                     entity="courses"
-                    defaultValue={editEnroll ? editEnroll.courseName : ''}
+                    defaultValue={editEnroll ? editEnroll.courseName : ""}
                     onSelect={(id, name) => {
                       setSelectedCourse({ courseID: id, courseName: name });
                     }}
@@ -242,7 +268,7 @@ const Enrolls = () => {
                   </span>
                   <SearchSelect
                     entity="semesters"
-                    defaultValue={editEnroll ? editEnroll.semesterName : ''}
+                    defaultValue={editEnroll ? editEnroll.semesterName : ""}
                     onSelect={(id, name) => {
                       setSelectedSemester({
                         semesterID: id,
@@ -260,7 +286,7 @@ const Enrolls = () => {
                   </span>
                   <SearchSelect
                     entity="instruments"
-                    defaultValue={editEnroll ? editEnroll.instrumentName : ''}
+                    defaultValue={editEnroll ? editEnroll.instrumentName : ""}
                     onSelect={(id, name) => {
                       setSelectedInstrument({
                         instrumentID: id,
