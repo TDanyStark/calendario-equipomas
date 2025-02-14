@@ -101,6 +101,11 @@ const Students = () => {
           (item as StudentType).phone || "No disponible",
       },
       {
+        label: "Email",
+        renderCell: (item: unknown) =>
+          (item as StudentType).user.email || "No disponible",
+      },
+      {
         label: "Estado",
         renderCell: (item: unknown) => (item as StudentType).status,
       },
@@ -122,7 +127,7 @@ const Students = () => {
           onDeleteSelected={handleDeleteSelected}
           searchPlaceholder="Buscar estudiante"
           TextButtonCreate="estudiante"
-          gridTemplateColumns="50px 140px 1fr 1fr 1fr 130px 130px"
+          gridTemplateColumns="50px 140px 1fr 1fr 1fr 1fr 130px 130px"
       />
 
 
@@ -231,8 +236,8 @@ const Students = () => {
                     {...register("status", { required: true })}
                     className="input-primary w-full"
                   >
-                    <option value="active">Activo</option>
-                    <option value="inactive">Inactivo</option>
+                    <option value="activo">Activo</option>
+                    <option value="inactivo">Inactivo</option>
                   </select>
                 </div>
               </form>

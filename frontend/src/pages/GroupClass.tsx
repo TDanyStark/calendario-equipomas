@@ -61,7 +61,7 @@ const GroupClass = () => {
   }), [courseFilter, instrumentFilter, professorFilter, semesterFilter, studentFilter]);
 
 
-  const {data, isLoading, isError} = useFetchForSelect(entity, JWT, isActive, filters, offPagination);
+  // const {data, isLoading, isError} = useFetchForSelect(entity, JWT, isActive, filters, offPagination);
 
 
   return (
