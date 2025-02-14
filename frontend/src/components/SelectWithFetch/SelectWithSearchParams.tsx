@@ -37,7 +37,6 @@ const SelectWithFetch = ({
 
   useEffect(() => {
     if (data && filter && !hasInitialized) {
-      console.log("entro");
       const selectedItem = data.find((item: ItemType) => item.id === filter);
       if (selectedItem) {
         setSearch(selectedItem.name);
