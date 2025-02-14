@@ -1,7 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import SelectWithFetch from "../SelectWithFetch";
 import SelectToChange from "../SelectToChange";
 import useClickOutside from "@/hooks/useClickOutside";
+import useEscapeKey from "@/hooks/useEscapeKey";
 
 interface Props {
   courseFilter: string;
@@ -28,18 +29,9 @@ const FilterEnrolls = ({
 }: Props) => {
   const selectsContainerRef = useRef<HTMLDivElement>(null);
   // Manejar la tecla Escape
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setFilterActive(null); // Cerrar todos los selects
-      }
-    };
+  const handleEscape = () => setFilterActive(null);
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [setFilterActive]);
+  useEscapeKey(handleEscape);
 
   // Manejar clics fuera de los selects
   useClickOutside(selectsContainerRef, () =>  setFilterActive(null));

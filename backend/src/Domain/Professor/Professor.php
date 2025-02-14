@@ -106,6 +106,7 @@ class Professor implements PersonInterface
     {
         return [
             'id' => $this->professorID,
+            'name' => $this->firstName . ' ' . $this->lastName,
             'firstName' => $this->firstName,
             'lastName' => $this->lastName,
             'phone' => $this->phone,
