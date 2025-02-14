@@ -3,7 +3,7 @@ interface Props {
 }
 
 const Skeleton = ({ className }: Props) => {
-  return <div className={`bg-gray-800 rounded animate-pulse ${className}`} />;
+  return <span className={`bg-gray-800 rounded animate-pulse inline-block ${className}`} />;
 };
 
 export default Skeleton;

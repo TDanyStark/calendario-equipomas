@@ -114,7 +114,7 @@ const GroupClass = () => {
         </Dialog>
       )}
 
-      <ToastContainer theme="dark" limit={1} />
+      <ToastContainer theme="dark" limit={2} />
     </section>
   );
 };

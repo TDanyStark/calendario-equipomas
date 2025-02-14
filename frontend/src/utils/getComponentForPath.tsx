@@ -12,6 +12,8 @@ import Users from "../pages/Users";
 import GeneralSettings from "../pages/GeneralSettings";
 import StudentSchedule from "../pages/StudentSchedule";
 import MyClasses from "../pages/MyClasses";
+import GroupClassCreate from "../pages/GroupClassCreate";
+import GroupClassEdit from "../pages/GroupClassEdit";
 import { RolesExisting } from "../types/Roles";
 import { Menus } from "../data/Roles";
 import ErrorPage from "../pages/ErrorPage";
@@ -51,7 +53,9 @@ const getComponentForPath = (path: string) => {
     case "/group-class":
       return <GroupClass />;
     case "/group-class/create":
-      return <GroupClass />;
+      return <GroupClassCreate />;
+    case "/group-class/edit/:id":
+      return <GroupClassEdit />;
     case "/enrolls":
       return <Enrolls />;
     case "/students":

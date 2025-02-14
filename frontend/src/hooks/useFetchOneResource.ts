@@ -12,10 +12,9 @@ const fetchItem = async (endpoint: string, JWT: string | null) => {
   return response.data.data
 };
 
-const useFetchOneResource = (endpoint: string,JWT: string | null) => {
+const useFetchOneResource = (endpoint: string,JWT: string | null, condition?: boolean) => {
   return useQuery([endpoint], () => fetchItem(endpoint, JWT), {
-    enabled: !!JWT,
-    // refetchOnWindowFocus: false, // Desactiva la refetch al reenfocar la ventana
+    enabled: !!JWT && condition,
   });
 };
 

@@ -149,3 +149,14 @@ type EnrollType = {
   academicPeriodName: string;
   status: string;
 }
+
+type GroupClassType = {
+  id: string;
+  name: string;
+  roomId: int;
+  day_id: int;
+  startTime: string;
+  endTime: string;
+  professors: [];
+  enrollments: [];
+}
