@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -32,7 +32,7 @@ const GroupClass = () => {
 
   const onShowSearchInput = (filter: string) => {
     setFilterActive(filter);
-  }
+  };
 
   const onSelect = (id: string, filter: string) => {
     const newParams = new URLSearchParams(searchParams);
@@ -51,24 +51,37 @@ const GroupClass = () => {
     setSearchParams(newParams);
   };
 
+  
+  const filters = useMemo( () => ({
+    course: courseFilter || "",
+    instrument: instrumentFilter || "",
+    semester: semesterFilter || "",
+    professor: professorFilter || "",
+    student: studentFilter || "",
+  }), [courseFilter, instrumentFilter, professorFilter, semesterFilter, studentFilter]);
+
+
+  const {data, isLoading, isError} = useFetchForSelect(entity, JWT, isActive, filters, offPagination);
+
+
   return (
     <section className="section_page">
       <Primaryh1>Clases Grupales</Primaryh1>
-      <div>
-        <FilterGroupClass 
-          courseFilter={courseFilter || ""}
-          instrumentFilter={instrumentFilter || ""}
-          semesterFilter={semesterFilter || ""}
-          studentFilter={studentFilter || ""}
-          professorFilter={professorFilter || ""}
-          filterActive={filterActive || ""}
-          onShow={onShow}
-          onShowSearchInput={onShowSearchInput}
-          onSelect={onSelect}
-          handleClearFilters={handleClearFilters}
-          setFilterActive={setFilterActive}
-        />
-        <button onClick={() => setIsOpen(true)} className="btn-primary">
+      <FilterGroupClass
+        courseFilter={courseFilter || ""}
+        instrumentFilter={instrumentFilter || ""}
+        semesterFilter={semesterFilter || ""}
+        studentFilter={studentFilter || ""}
+        professorFilter={professorFilter || ""}
+        filterActive={filterActive || ""}
+        onShow={onShow}
+        onShowSearchInput={onShowSearchInput}
+        onSelect={onSelect}
+        handleClearFilters={handleClearFilters}
+        setFilterActive={setFilterActive}
+      />
+      <div className="flex justify-end">
+        <button onClick={() => setIsOpen(true)} className="btn-primary w-fit">
           Crear Clase Grupal
         </button>
       </div>

@@ -36,20 +36,13 @@ const FilterGroupClass = ({
   
     useEscapeKey(handleEscape);
 
-    const filters = useMemo( () => ({
-      course: courseFilter || "",
-      instrument: instrumentFilter || "",
-      semester: semesterFilter || "",
-      professor: professorFilter || "",
-      student: studentFilter || "",
-    }), [courseFilter, instrumentFilter, professorFilter, semesterFilter, studentFilter]);
   
     // Manejar clics fuera de los selects
     useClickOutside(selectsContainerRef, () =>  setFilterActive(null));
     return (
       <div
         ref={selectsContainerRef}
-        className="pt-6 flex flex-col lg:flex-wrap lg:gap-y-8 lg:flex-row gap-3 w-fit select-none mx-auto lg:mx-0"
+        className="pt-6 flex flex-col lg:flex-wrap lg:gap-y-4 lg:flex-row gap-3 w-fit select-none mx-auto lg:mx-0"
       >
         <SelectWithFetch
           entity="courses"

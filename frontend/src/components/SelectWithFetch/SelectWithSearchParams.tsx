@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import useGetSelect from "@/hooks/useGetSelect";
 import { useDebounce } from "use-debounce";
+import Skeleton from "../Loader/Skeleton";
 
 interface Props {
   entity: ResourceType;
@@ -32,7 +33,13 @@ const SelectWithFetch = ({
   const JWT = useSelector((state: RootState) => state.auth.JWT);
   const [hasInitialized, setHasInitialized] = useState(false);
   // Fetch courses data
-  const { data, isLoading, isError } = useGetSelect<ItemType[]>(entity, JWT, query, isActive, filter);
+  const { data, isLoading, isError } = useGetSelect<ItemType[]>(
+    entity,
+    JWT,
+    query,
+    isActive,
+    filter
+  );
   const placeholder = `Filtrar por ${displayName}`;
 
   useEffect(() => {
@@ -46,24 +53,28 @@ const SelectWithFetch = ({
   }, [data, filter, hasInitialized]);
 
   useEffect(() => {
-    if(filter === undefined){
+    if (filter === undefined) {
       setSearch("");
     }
   }, [filter]);
 
   return (
-    <div className="relative ">
-      <input
-        className="px-3 py-2 border rounded flex justify-between items-center gap-2 w-64 overflow-hidden"
-        onClick={onShow}
-        placeholder={placeholder}
-        value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-        }}
-        type="text"
-      />
-
+    <div className="relative">
+      {!hasInitialized && search !== "" && (
+        <Skeleton className="w-64 h-[41.6px]" />
+      )}
+      {(hasInitialized || search === "") && (
+        <input
+          className="px-3 py-2 border rounded flex justify-between items-center gap-2 w-64 overflow-hidden"
+          onClick={onShow}
+          placeholder={placeholder}
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+          }}
+          type="text"
+        />
+      )}
       {isActive && (
         <ul className="flex flex-col rounded-b px-2 py-3 bg-gray-900 shadow-md max-h-56 overflow-auto absolute w-full z-10">
           {isLoading && <p>Cargando...</p>}
