@@ -17,8 +17,6 @@ import { Menus } from "../data/Roles";
 import ErrorPage from "../pages/ErrorPage";
 import { Route } from "react-router-dom";
 
-
-
 // Función para generar rutas dinámicamente
 export const generateRoutes = (role: RolesExisting) => {
   const roleMenus = Menus[role] || Menus.default;
@@ -51,6 +49,8 @@ const getComponentForPath = (path: string) => {
     case "/dashboard":
       return <Dashboard />;
     case "/group-class":
+      return <GroupClass />;
+    case "/group-class/create":
       return <GroupClass />;
     case "/enrolls":
       return <Enrolls />;

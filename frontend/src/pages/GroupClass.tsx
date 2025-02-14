@@ -7,10 +7,13 @@ import CloseModalBtn from "../components/buttons/CloseModalBtn";
 import BackgroundDiv from "../components/modal/BackgroundDiv";
 import CancelModalBtn from "../components/buttons/CancelModalBtn";
 import FilterGroupClass from "@/components/Filters/FilterGroupClass";
-import { useSearchParams } from "react-router-dom";
+import { NavLink, useSearchParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import useFetchWithFilters from "@/hooks/useFetchWithFilters";
 
 const entity = "groupclass";
-const entityName = "clases grupales";
+// const entityName = "clases grupales";
 
 const GroupClass = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -60,8 +63,10 @@ const GroupClass = () => {
     student: studentFilter || "",
   }), [courseFilter, instrumentFilter, professorFilter, semesterFilter, studentFilter]);
 
+  const JWT = useSelector((state: RootState) => state.auth.JWT);
+  const {data, isLoading, isError} = useFetchWithFilters(entity, JWT, filters);
 
-  // const {data, isLoading, isError} = useFetchForSelect(entity, JWT, isActive, filters, offPagination);
+  console.log(data, isLoading, isError);
 
 
   return (
@@ -81,9 +86,9 @@ const GroupClass = () => {
         setFilterActive={setFilterActive}
       />
       <div className="flex justify-end">
-        <button onClick={() => setIsOpen(true)} className="btn-primary w-fit">
+        <NavLink to="/group-class/create" className="btn-primary">
           Crear Clase Grupal
-        </button>
+        </NavLink>
       </div>
 
       {isOpen && (

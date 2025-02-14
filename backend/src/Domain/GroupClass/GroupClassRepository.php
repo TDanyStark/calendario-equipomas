@@ -9,16 +9,16 @@ interface GroupClassRepository
     /**
      * Obtiene todas las clases grupales con paginación y búsqueda.
      */
-    public function findAll(int $limit, int $offset, string $query): array;
+    public function findAll(): array;
 
-    /**
-     * Busca una clase grupal por su ID.
-     */
-    public function findById(int $id): ?GroupClass;
+    // /**
+    //  * Busca una clase grupal por su ID.
+    //  */
+    // public function findById(int $id): ?GroupClass;
 
-    public function create(GroupClass $groupClass): int;
+    // public function create(GroupClass $groupClass): int;
 
-    public function update(GroupClass $groupClass): bool;
+    // public function update(GroupClass $groupClass): bool;
 
-    public function delete(int $id): bool;
+    // public function delete(int $id): bool;
 }

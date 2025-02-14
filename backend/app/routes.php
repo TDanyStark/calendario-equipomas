@@ -70,6 +70,7 @@ use App\Application\Actions\AcademicPeriod\SelectAcademicPeriodAction;
 use App\Application\Actions\AcademicPeriod\CreateAcademicPeriodAction;
 use App\Application\Actions\AcademicPeriod\GetSelectedAcademicPeriod;
 
+use App\Application\Actions\GroupClass\ListGroupClassAction;
 
 
 return function (App $app) {
@@ -144,7 +145,6 @@ return function (App $app) {
             $enrollGroup->post('', CreateEnrollmentAction::class);
             $enrollGroup->put('/changegroup', UpdateGroupAction::class);
             $enrollGroup->put('/{id}', UpdateEnrollmentAction::class);
-
             
             // $enrollGroup->delete('/{id}', DeleteEnrollmentAction::class);
             // $enrollGroup->delete('', DeleteMultipleEnrollmentsAction::class);
@@ -163,6 +163,11 @@ return function (App $app) {
         // gruop de settings
         $group->group('/settings', function (Group $settingsGroup) {
             $settingsGroup->put('', ChangeSettingAction::class);
+        })->add($this->get(RoleMiddleware::class)->withRole('admin'));
+
+        $group->group('/groupclass', function (Group $groupClassGroup) {
+            $groupClassGroup->get('', ListGroupClassAction::class);
+
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
     });
 };

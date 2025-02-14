@@ -13,12 +13,13 @@ class GroupClass implements JsonSerializable
     private string $name;
     private int $roomId;
     private int $academicPeriodId;
+    private int $day_id;
     private string $startTime;
     private string $endTime;
     private ?array $professors = [];
     private ?array $enrollments = [];
 
-    public function __construct(int $id, string $name, int $roomId, int $academicPeriodId, string $startTime, string $endTime)
+    public function __construct(int $id, string $name, int $roomId, int $academicPeriodId, int $day_id, string $startTime, string $endTime)
     {
         $this->id = $id;
         $this->name = $name;
@@ -67,6 +68,11 @@ class GroupClass implements JsonSerializable
         return $this->academicPeriodId;
     }
 
+    public function getDayId(): int
+    {
+        return $this->day_id;
+    }
+
     public function getStartTime(): string
     {
         return $this->startTime;
@@ -104,6 +110,7 @@ class GroupClass implements JsonSerializable
             'name' => $this->name,
             'roomId' => $this->roomId,
             'academicPeriodId' => $this->academicPeriodId,
+            'day_id' => $this->day_id,
             'startTime' => $this->startTime,
             'endTime' => $this->endTime,
             'professors' => $this->professors,

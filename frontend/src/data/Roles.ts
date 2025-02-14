@@ -26,6 +26,7 @@ export const Menus: TypeMenusByRole = {
         { id: 10, name: "Semestres", icon: "semesters", path: "/semesters", isHidden:true },
         { id: 11, name: "Usuarios", icon: "users", path: "/users" },
         { id: 12, name: "Generales", icon: "general-settings", path: "/general-settings" },
+        { id: 13, name: "Clases grupales", icon: "group-class", path: "/group-class/create", isHidden:true  },
       ],
     },
   ],
