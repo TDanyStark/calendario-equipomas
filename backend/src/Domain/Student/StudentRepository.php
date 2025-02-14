@@ -20,7 +20,7 @@ interface StudentRepository
      * 
      * @return array
      */
-    public function findAll(int $limit, int $offset, string $query): array;
+    public function findAll(int $limit, int $offset, string $query, bool $offPagination): array;
     public function create(Student $student): int;
     public function update(Student $student): bool;
     public function delete(string $id): bool;

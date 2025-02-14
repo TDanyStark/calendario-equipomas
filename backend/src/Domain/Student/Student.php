@@ -66,6 +66,7 @@ class Student implements PersonInterface
     {
         return [
             'id' => $this->studentID,
+            'name' => $this->firstName . ' ' . $this->lastName,
             'firstName' => $this->firstName,
             'lastName' => $this->lastName,
             'phone' => $this->phone,

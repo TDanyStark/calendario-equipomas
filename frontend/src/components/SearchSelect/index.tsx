@@ -23,7 +23,7 @@ const SearchSelect = ({ onSelect, entity, defaultValue, isActive, onFocus, onClo
   const inputRef = useRef<HTMLInputElement>(null);
   const JWT = useSelector((state: { auth: { JWT: string } }) => state.auth.JWT);
 
-  const { data, isLoading } = useGetSelect<ItemType>(entity, JWT, search, isActive);
+  const { data, isLoading } = useGetSelect<ItemType[]>(entity, JWT, search, isActive);
 
   useEffect(() => {
     if (!isActive && !defaultValue) setSearch("");

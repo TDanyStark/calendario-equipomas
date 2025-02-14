@@ -4,6 +4,7 @@ import { URL_BACKEND } from "../variables";
 import axios from "axios";
 
 interface FetchItemsResponse<T> {
+  find: (arg0: (item: { id: string; name: string; }) => boolean) => { id: string; name: string; } | undefined;
   map(arg0: (item: { id: string; name: string; }) => import("react/jsx-runtime").JSX.Element): import("react").ReactNode;
   length: number;
   data: T[];
@@ -13,7 +14,7 @@ interface FetchItemsResponse<T> {
 const fetchItems = async <T,>(
   resource: ResourceType,
   JWT: string | null,
-  query: string
+  query: string,
 ): Promise<FetchItemsResponse<T>> => {
   const response = await axios.get(
     `${URL_BACKEND}${resource}/query?q=${encodeURIComponent(query)}`,
@@ -31,13 +32,14 @@ const useGetSelect = <T,>(
   resource: ResourceType,
   JWT: string | null,
   query: string,
-  isActive: boolean
+  isActive: boolean,
+  filter?: string
 ) => {
   return useQuery(
     [resource, query], // Incluir page y query en la key de la query
     () => fetchItems<T>(resource, JWT, query),
     {
-      enabled: !!JWT && isActive,
+      enabled: !!JWT && filter ? true : isActive,
     }
   );
 };

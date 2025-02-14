@@ -30,6 +30,10 @@ const GroupClass = () => {
     }
   };
 
+  const onShowSearchInput = (filter: string) => {
+    setFilterActive(filter);
+  }
+
   const onSelect = (id: string, filter: string) => {
     const newParams = new URLSearchParams(searchParams);
     newParams.set(filter, id);
@@ -42,6 +46,8 @@ const GroupClass = () => {
     newParams.delete("course");
     newParams.delete("instrument");
     newParams.delete("semester");
+    newParams.delete("student");
+    newParams.delete("professor");
     setSearchParams(newParams);
   };
 
@@ -57,6 +63,7 @@ const GroupClass = () => {
           professorFilter={professorFilter || ""}
           filterActive={filterActive || ""}
           onShow={onShow}
+          onShowSearchInput={onShowSearchInput}
           onSelect={onSelect}
           handleClearFilters={handleClearFilters}
           setFilterActive={setFilterActive}

@@ -46,7 +46,7 @@ class DatabaseStudentRepository implements StudentRepository
         return new Student($data['StudentID'], $data['StudentFirstName'], $data['StudentLastName'], $data['StudentPhone'], $data['StudentStatus'], $user);
     }
 
-    public function findAll(int $limit, int $offset, string $query): array
+    public function findAll(int $limit, int $offset, string $query, bool $offPagination): array
     {
         $searchQuery = "%$query%";
 
@@ -93,6 +93,10 @@ class DatabaseStudentRepository implements StudentRepository
                 $row['StudentStatus'],
                 $user
             );
+        }
+
+        if($offPagination) {
+            return $students;
         }
 
         return ['data' => $students, 'pages' => $totalPages];
@@ -189,8 +193,6 @@ class DatabaseStudentRepository implements StudentRepository
             JOIN users u ON s.StudentID = u.UserID
             WHERE s.StudentID LIKE :query
             OR CONCAT(s.StudentFirstName, " ", s.StudentLastName) LIKE :query
-            OR s.StudentFirstName LIKE :query
-            OR s.StudentLastName LIKE :query
             OR s.StudentPhone LIKE :query
             OR s.StudentStatus LIKE :query
             OR u.UserEmail LIKE :query

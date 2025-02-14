@@ -1,5 +1,6 @@
 import useEscapeKey from "@/hooks/useEscapeKey";
 import SelectWithFetch from "../SelectWithFetch";
+import SelectWithSearchParams from "../SelectWithFetch/SelectWithSearchParams";
 import useClickOutside from "@/hooks/useClickOutside";
 import { useMemo, useRef } from "react";
 
@@ -11,6 +12,7 @@ interface Props{
   professorFilter: string;
   filterActive: string;
   onShow: (entity: string) => void;
+  onShowSearchInput: (entity: string) => void;
   onSelect: (id: string, entity: string) => void;
   handleClearFilters: () => void;
   setFilterActive: (entity: string | null) => void;
@@ -24,6 +26,7 @@ const FilterGroupClass = ({
   professorFilter,
   filterActive,
   onShow,
+  onShowSearchInput,
   onSelect,
   handleClearFilters,
   setFilterActive,}: Props) => {
@@ -79,23 +82,23 @@ const FilterGroupClass = ({
           }}
         />
         {/* students */}
-        <SelectWithFetch
+        <SelectWithSearchParams
           entity="students"
           displayName="Estudiantes"
           filter={studentFilter || undefined}
           isActive={filterActive === "students"}
-          onShow={() => onShow("students")}
+          onShow={() => onShowSearchInput("students")}
           onSelect={(id) => {
             onSelect(id, "student");
           }}
         />
         {/* professors */}
-        <SelectWithFetch
+        <SelectWithSearchParams
           entity="professors"
           displayName="Profesores"
           filter={professorFilter || undefined}
           isActive={filterActive === "professors"}
-          onShow={() => onShow("professors")}
+          onShow={() => onShowSearchInput("professors")}
           onSelect={(id) => {
             onSelect(id, "professor");
           }}
