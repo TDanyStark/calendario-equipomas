@@ -17,6 +17,7 @@ use App\Application\Actions\Instrument\DeleteInstrumentAction;
 use App\Application\Actions\Instrument\DeleteMultipleInstrumentsAction;
 
 use App\Application\Actions\Room\ListRoomsAction;
+use App\Application\Actions\Room\GetRoomsQueryAction;
 use App\Application\Actions\Room\CreateRoomAction;
 use App\Application\Actions\Room\UpdateRoomAction;
 use App\Application\Actions\Room\DeleteRoomAction;
@@ -96,6 +97,7 @@ return function (App $app) {
 
         $group->group('/rooms', function (Group $roomGroup) {
             $roomGroup->get('', ListRoomsAction::class);
+            $roomGroup->get('/query', GetRoomsQueryAction::class);
             $roomGroup->post('', CreateRoomAction::class);
             $roomGroup->put('/{id}', UpdateRoomAction::class);
             $roomGroup->delete('/{id}', DeleteRoomAction::class);

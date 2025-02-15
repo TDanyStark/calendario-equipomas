@@ -39,7 +39,7 @@ const SearchSelect = ({ onSelect, entity, defaultValue, isActive, onFocus, onClo
       <input
         ref={inputRef}
         type="text"
-        placeholder="Buscar estudiante..."
+        placeholder="Buscar..."
         className="w-full px-3 py-2 border rounded-t"
         value={selected || search}
         onChange={(e) => {

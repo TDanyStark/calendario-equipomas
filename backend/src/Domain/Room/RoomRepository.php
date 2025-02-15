@@ -12,4 +12,5 @@ interface RoomRepository
     public function update(Room $room): bool;
     public function delete(int $id): bool;
     public function deleteMultiple(array $ids): int;
+    public function findRoomByQuery(string $query): array;
 }

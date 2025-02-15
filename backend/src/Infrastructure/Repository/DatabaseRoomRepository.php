@@ -74,4 +74,15 @@ class DatabaseRoomRepository implements RoomRepository
 
     return $stmt->rowCount();
   }
+
+  public function findRoomByQuery(string $query): array
+  {
+    $stmt = $this->pdo->prepare("SELECT * FROM rooms WHERE RoomName LIKE :query");
+    $stmt->execute(['query' => "%$query%"]);
+    $rooms = [];
+    while ($row = $stmt->fetch()) {
+      $rooms[] = new Room((string)$row['RoomID'], $row['RoomName'], (int)$row['RoomCapacity'], $row['Created_at'], $row['Updated_at']);
+    }
+    return $rooms;
+  }
 }
