@@ -59,6 +59,7 @@ use App\Application\Middleware\RoleMiddleware;
 
 use App\Application\Actions\Enrollment\ListEnrollmentAction;
 use App\Application\Actions\Enrollment\CreateEnrollmentAction;
+use App\Application\Actions\Enrollment\ListEnrollmentIdsActiveAction;
 use App\Application\Actions\Enrollment\GetEnrollmentsQueryAction;
 use App\Application\Actions\Enrollment\UpdateEnrollmentAction;
 use App\Application\Actions\Enrollment\UpdateGroupAction;
@@ -143,6 +144,7 @@ return function (App $app) {
 
         $group->group('/enrolls', function (Group $enrollGroup) {
             $enrollGroup->get('', ListEnrollmentAction::class);
+            $enrollGroup->get('/idsactive', ListEnrollmentIdsActiveAction::class);
             // $enrollGroup->get('/query', GetEnrollmentsQueryAction::class);
             $enrollGroup->post('', CreateEnrollmentAction::class);
             $enrollGroup->put('/changegroup', UpdateGroupAction::class);

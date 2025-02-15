@@ -61,7 +61,7 @@ const SelectWithFetch = ({
   return (
     <div className="relative">
       {!hasInitialized && search !== "" && (
-        <Skeleton className="w-64 h-[41.6px]" />
+        <Skeleton className="w-64 h-[35px]" />
       )}
       {(hasInitialized || search === "") && (
         <input

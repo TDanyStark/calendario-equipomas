@@ -232,7 +232,7 @@ function DataTablePagination<T extends TableNode>({
       {/* Tabla */}
       <div
         style={{
-          minHeight: `${heightRow * 11}px`,
+          minHeight: `${(heightRow * 11) + 18.4}px`,
         }}
       >
         <Table

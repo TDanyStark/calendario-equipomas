@@ -16,6 +16,7 @@ class ListEnrollmentAction extends EnrollmentAction
         $courseID = $this->request->getQueryParams()['course'] ?? '';
         $instrumentID = $this->request->getQueryParams()['instrument'] ?? '';
         $semesterID = $this->request->getQueryParams()['semester'] ?? '';
+        $onlyActive = filter_var($this->request->getQueryParams()['onlyActive'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
         // Calcula el offset y el límite
         $limit = 10;
@@ -24,7 +25,7 @@ class ListEnrollmentAction extends EnrollmentAction
         $academic_periodID = $this->academicPeriodRepository->getActivePeriodID();
 
         // Obtiene todos los estudiantes desde el repositorio
-        $enrollments = $this->enrollmentRepository->findAll($limit, $offset, $query, $courseID, $instrumentID, $semesterID, $academic_periodID);
+        $enrollments = $this->enrollmentRepository->findAll($limit, $offset, $query, $courseID, $instrumentID, $semesterID, $academic_periodID, $onlyActive);
 
         return $this->respondWithData($enrollments);
     }

@@ -27,10 +27,11 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
     string $courseID,
     string $instrumentID,
     string $semesterID,
-    int $academic_periodID
+    int $academic_periodID,
+    bool $onlyActive
   ): array {
-    $searchQuery = "%$query%";
 
+    $searchQuery = "%$query%";
 
     if (!$academic_periodID) {
       // Si no hay un período académico activo, retornar vacío o manejar el caso de forma adecuada
@@ -44,6 +45,7 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
             OR c.CourseName LIKE :query 
             OR i.InstrumentName LIKE :query
             OR e.StudentID LIKE :query
+            OR se.SemesterName LIKE :query
             OR e.Status = :queryClean)';
 
     // Agregar condiciones adicionales para los filtros
@@ -56,6 +58,9 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
     if (!empty($semesterID)) {
       $whereClause .= ' AND e.SemesterID = :semesterID';
     }
+    if ($onlyActive) {
+      $whereClause .= ' AND e.Status = "activo"';
+    }
 
     // Filtrar por el período académico activo
     $whereClause .= ' AND e.academic_periodID = :academic_periodID';
@@ -66,6 +71,7 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
             JOIN students s ON e.StudentID = s.StudentID
             JOIN courses c ON e.CourseID = c.CourseID
             JOIN instruments i ON e.InstrumentID = i.InstrumentID
+            JOIN semesters se ON e.SemesterID = se.SemesterID
             WHERE $whereClause");
     $countStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
     $countStmt->bindValue(':queryClean', $query, PDO::PARAM_STR);
@@ -98,7 +104,7 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
             JOIN instruments i ON e.InstrumentID = i.InstrumentID
             JOIN academic_periods ap ON e.academic_periodID = ap.id
             WHERE $whereClause
-            ORDER BY e.Updated_at DESC, e.Created_at DESC
+            ORDER BY e.Updated_at DESC, e.Created_at DESC, e.EnrollmentID ASC
             LIMIT :limit OFFSET :offset");
 
     $dataStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
@@ -239,40 +245,55 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
       return 0;
     }
 
-    // Construcción dinámica de la consulta
+    // Construcción de la cláusula WHERE dinámica
+    $whereClause = '(:query = "" OR CONCAT(s.StudentFirstName, " ", s.StudentLastName) LIKE :query 
+        OR s.StudentFirstName LIKE :query 
+        OR s.StudentLastName LIKE :query 
+        OR c.CourseName LIKE :query 
+        OR i.InstrumentName LIKE :query
+        OR e.StudentID LIKE :query
+        OR e.Status = :queryClean)';
+
+    // Construcción dinámica de la consulta con JOINs
     $sqlQuery = "
-          UPDATE enrollments 
-          SET Status = :status 
-          WHERE Status != 'withSchedule'
+          UPDATE enrollments e
+          JOIN students s ON e.StudentID = s.StudentID
+          JOIN courses c ON e.CourseID = c.CourseID
+          JOIN instruments i ON e.InstrumentID = i.InstrumentID
+          JOIN semesters se ON e.SemesterID = se.SemesterID
+          SET e.Status = :status
+          WHERE e.Status != 'withSchedule'
             AND (
-                (:status = 'inactivo' AND Status = 'activo') 
-             OR (:status = 'activo' AND Status = 'inactivo')
+                (:status = 'inactivo' AND e.Status = 'activo') 
+             OR (:status = 'activo' AND e.Status = 'inactivo')
             )";
 
-    // Parámetros para la consulta
+    // Parámetros iniciales
     $params = [':status' => $changeTo];
 
     // Agregamos condiciones dinámicamente solo si tienen valor
     if (!empty($courseID)) {
-      $sqlQuery .= " AND CourseID = :courseID";
+      $sqlQuery .= " AND e.CourseID = :courseID";
       $params[':courseID'] = $courseID;
     }
     if (!empty($instrumentID)) {
-      $sqlQuery .= " AND InstrumentID = :instrumentID";
+      $sqlQuery .= " AND e.InstrumentID = :instrumentID";
       $params[':instrumentID'] = $instrumentID;
     }
     if (!empty($semesterID)) {
-      $sqlQuery .= " AND SemesterID = :semesterID";
+      $sqlQuery .= " AND e.SemesterID = :semesterID";
       $params[':semesterID'] = $semesterID;
     }
 
+    // Agregamos la cláusula WHERE de búsqueda
+    $sqlQuery .= " AND " . $whereClause;
+    $params[':query'] = "%$query%";  // Agregamos comodines para LIKE
+    $params[':queryClean'] = $query; // Para comparaciones exactas
+
+    // Preparar y ejecutar consulta
     $stmt = $this->pdo->prepare($sqlQuery);
 
-    // mostrar en el log la consola
-    $logger = new Logger('updateByGroup');
-    $logger->info('sqlQuery: ' . $sqlQuery);
-
-    // Asignamos los valores dinámicamente
+    // Asignar valores dinámicos
     foreach ($params as $key => $value) {
       $stmt->bindValue($key, $value, PDO::PARAM_STR);
     }
@@ -281,5 +302,12 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
     return $stmt->rowCount(); // Devuelve el número de filas afectadas
   }
 
-  
+  public function findEnrollmentIdsActive(int $academic_periodID): array
+  {
+    $stmt = $this->pdo->prepare("SELECT EnrollmentID FROM enrollments WHERE academic_periodID = :academic_periodID AND Status = 'activo'");
+    $stmt->bindValue(':academic_periodID', $academic_periodID, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_COLUMN);
+  }
 }

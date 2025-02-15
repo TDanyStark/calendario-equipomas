@@ -79,7 +79,7 @@ const FilterEnrolls = ({
       >
         Limpiar
       </button>
-      {courseFilter || instrumentFilter || semesterFilter ? (
+      {courseFilter || instrumentFilter || semesterFilter || debouncedQuery !== "" ? (
         <SelectToChange 
           isActive={filterActive === "change"}
           entity="enrolls"

@@ -386,11 +386,15 @@ class DatabaseProfessorRepository implements ProfessorRepository
             SELECT p.ProfessorID, p.ProfessorFirstName, p.ProfessorLastName
             FROM professors p
             JOIN users u ON p.ProfessorID = u.UserID
-            WHERE p.ProfessorID LIKE :query
-            OR CONCAT(p.ProfessorFirstName, " ", p.ProfessorLastName) LIKE :query
-            OR p.ProfessorPhone LIKE :query
-            OR p.ProfessorStatus LIKE :query
-            OR u.UserEmail LIKE :query
+            WHERE p.ProfessorIsDelete = 0 
+            AND (
+                p.ProfessorID LIKE :query
+                OR CONCAT(p.ProfessorFirstName, " ", p.ProfessorLastName) LIKE :query
+                OR p.ProfessorPhone LIKE :query
+                OR p.ProfessorStatus LIKE :query
+                OR u.UserEmail LIKE :query
+            )
+            
             ORDER BY p.ProfessorFirstName ASC
             LIMIT 5
         ');
