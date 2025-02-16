@@ -31,7 +31,6 @@ import useGetDataForMiniTable from "@/hooks/useGetDataForMiniTable";
 import Skeleton from "../Loader/Skeleton";
 import { getActiveIdsEnrollments } from "@/utils/getActiveIdsEnrollments";
 import { toast } from "react-toastify";
-import { set } from "react-hook-form";
 
 interface Column<T> {
   label: string;
