@@ -16,6 +16,7 @@ const entity = "groupclass";
 const GroupClassCreate = () => {
   const JWT = useSelector((state: RootState) => state.auth.JWT);
   const [filterActive, setFilterActive] = useState<string | null>(null);
+  const [tabActive, setTabActive] = useState<string>("students");
 
   const daysOfWeek = useSelector(
     (state: { schedule: ScheduleStateType }) => state.schedule.scheduleDays
@@ -67,7 +68,11 @@ const GroupClassCreate = () => {
             <label htmlFor="name" className="block text-sm font-medium mb-1">
               Nombre de la clase
             </label>
-            <input id="name" className="px-3 py-2 border rounded w-full" type="text" />
+            <input
+              id="name"
+              className="px-3 py-2 border rounded w-full"
+              type="text"
+            />
           </div>
           <div>
             <span className="block text-sm font-medium mb-1">Salón</span>
@@ -88,7 +93,11 @@ const GroupClassCreate = () => {
             <label className="block text-sm font-medium mb-1" htmlFor="day">
               Día
             </label>
-            <select name="day" id="day" className="px-3 py-2 border rounded w-full">
+            <select
+              name="day"
+              id="day"
+              className="px-3 py-2 border rounded w-full"
+            >
               <option value="">Escoge un día</option>
               {daysOfWeek?.map(
                 (day: { id: string; dayDisplayName: string }) => (
@@ -133,7 +142,29 @@ const GroupClassCreate = () => {
           </div>
         </div>
         <div className="p-6 border rounded-lg flex-1 overflow-hidden">
-            <span className="block text-xl font-medium mb-1">Estudiantes</span>
+          <div className="flex gap-4 mb-4">
+            <button
+              className={`block text-xl py-1 px-3 rounded mb-1  ${
+                tabActive === "students"
+                  ? "font-medium bg-primary"
+                  : "font-light border"
+              }`}
+              onClick={() => setTabActive("students")}
+            >
+              Estudiantes
+            </button>
+            <button
+              className={`block text-xl py-1 px-3 rounded mb-1 ${
+                tabActive === "professors"
+                  ? "font-medium bg-primary"
+                  : "font-light border"
+              }`}
+              onClick={() => setTabActive("professors")}
+            >
+              Profesores
+            </button>
+          </div>
+          {tabActive === "students" && (
             <MiniTable
               entity="enrolls"
               entityName="estudiantes"
@@ -143,6 +174,18 @@ const GroupClassCreate = () => {
               gridTemplateColumns="50px 1fr 2fr 2fr 1fr 1fr"
               handleSelectedIds={handleSelectedIds}
             />
+          )}
+          {tabActive === "professors" && (
+            <MiniTable
+              entity="professors"
+              entityName="profesores"
+              JWT={JWT || ""}
+              columns={columns}
+              searchPlaceholder="Buscar profesor..."
+              gridTemplateColumns="50px 1fr 2fr 2fr 1fr 1fr"
+              handleSelectedIds={handleSelectedIds}
+            />
+          )}
         </div>
       </div>
 
