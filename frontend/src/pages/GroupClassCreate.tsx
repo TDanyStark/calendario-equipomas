@@ -4,7 +4,7 @@ import Primaryh1 from "../components/titles/Primaryh1";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import useItemMutations from "@/hooks/useItemsMutation";
-import { EnrollType, GroupClassType, ScheduleStateType } from "@/types/Api";
+import { EnrollType, GroupClassType, ProfessorType, ScheduleStateType } from "@/types/Api";
 import ActivePeriod from "@/components/ChangeAP/ActivePeriod";
 import SearchSelect from "@/components/SearchSelect";
 import { useMemo, useState } from "react";
@@ -17,6 +17,7 @@ const GroupClassCreate = () => {
   const JWT = useSelector((state: RootState) => state.auth.JWT);
   const [filterActive, setFilterActive] = useState<string | null>(null);
   const [tabActive, setTabActive] = useState<string>("students");
+  const [idsStudents, setIdsStudents] = useState<string[]>([]);
 
   const daysOfWeek = useSelector(
     (state: { schedule: ScheduleStateType }) => state.schedule.scheduleDays
@@ -28,10 +29,10 @@ const GroupClassCreate = () => {
   );
 
   const handleSelectedIds = (ids: string[]) => {
-    console.log("IDs únicos seleccionados:", ids);
+    setIdsStudents(ids);
   };
 
-  const columns = useMemo(
+  const columnsStudents = useMemo(
     () => [
       {
         label: "ID",
@@ -52,6 +53,24 @@ const GroupClassCreate = () => {
       {
         label: "Instrumento",
         renderCell: (item: unknown) => (item as EnrollType).instrumentName,
+      },
+    ],
+    []
+  );
+
+  const columnsProfessors = useMemo(
+    () => [
+      {
+        label: "ID",
+        renderCell: (item: unknown) => (item as ProfessorType).id,
+      },
+      {
+        label: "Profesor",
+        renderCell: (item: unknown) => (item as ProfessorType).name,
+      },
+      {
+        label: "Instrumentos",
+        renderCell: (item: unknown) => (item as ProfessorType).instruments,
       },
     ],
     []
@@ -151,7 +170,7 @@ const GroupClassCreate = () => {
               }`}
               onClick={() => setTabActive("students")}
             >
-              Estudiantes
+              Estudiantes - {idsStudents.length}
             </button>
             <button
               className={`block text-xl py-1 px-3 rounded mb-1 ${
@@ -169,7 +188,7 @@ const GroupClassCreate = () => {
               entity="enrolls"
               entityName="estudiantes"
               JWT={JWT || ""}
-              columns={columns}
+              columns={columnsStudents}
               searchPlaceholder="Buscar estudiante..."
               gridTemplateColumns="50px 1fr 2fr 2fr 1fr 1fr"
               handleSelectedIds={handleSelectedIds}
@@ -180,9 +199,9 @@ const GroupClassCreate = () => {
               entity="professors"
               entityName="profesores"
               JWT={JWT || ""}
-              columns={columns}
+              columns={columnsProfessors}
               searchPlaceholder="Buscar profesor..."
-              gridTemplateColumns="50px 1fr 2fr 2fr 1fr 1fr"
+              gridTemplateColumns="50px 150px 1fr 1fr"
               handleSelectedIds={handleSelectedIds}
             />
           )}

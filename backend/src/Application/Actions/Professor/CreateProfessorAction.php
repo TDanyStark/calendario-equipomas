@@ -26,7 +26,7 @@ class CreateProfessorAction extends ProfessorAction
         
         $professorInstrumentsArray = [];
         foreach ($data['instruments'] as $professorInstrument) {
-            $professorInstrumentsArray[] = new ProfessorInstruments(0, $ID, (int)$professorInstrument['id']);
+            $professorInstrumentsArray[] = new ProfessorInstruments(0, $ID, (int)$professorInstrument['id'], null);
         }
 
         $professorRoomsArray = [];

@@ -23,19 +23,50 @@ class DatabaseProfessorRepository implements ProfessorRepository
         $this->pdo = $database->getConnection();
     }
 
-    public function findAll(): array
+    public function findAll(int $limit, int $offset, string $query, bool $offPagination): array
     {
-        $stmt = $this->pdo->query("
-            SELECT p.*, u.UserID, u.UserEmail, u.UserPassword, u.RoleID 
-            FROM professors p 
-            INNER JOIN users u ON p.ProfessorID = u.UserID 
-            WHERE p.ProfessorIsDelete = 0
-            ORDER BY p.Update_at DESC
-        ");
-
+        $searchQuery = "%$query%";
+    
+        // Condición WHERE reutilizable
+        $whereClause = '(:query = "" OR p.ProfessorID LIKE :query 
+        OR p.ProfessorFirstName LIKE :query 
+        OR p.ProfessorLastName LIKE :query 
+        OR p.ProfessorPhone LIKE :query 
+        OR p.ProfessorStatus LIKE :query 
+        OR u.UserEmail LIKE :query) AND p.ProfessorIsDelete = 0';
+    
+        // Obtener cantidad total de registros
+        $countStmt = $this->pdo->prepare("SELECT COUNT(*) as total FROM professors p 
+        JOIN users u ON p.ProfessorID = u.UserID WHERE $whereClause");
+        $countStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
+        $countStmt->execute();
+        $totalRecords = (int) $countStmt->fetchColumn();
+    
+        // Calcular número de páginas
+        $totalPages = $limit > 0 ? ceil($totalRecords / $limit) : 1;
+    
+        // Obtener datos paginados
+        $dataStmt = $this->pdo->prepare("SELECT p.*, u.UserID, u.UserEmail, u.UserPassword, u.RoleID 
+        FROM professors p 
+        JOIN users u ON p.ProfessorID = u.UserID 
+        WHERE $whereClause 
+        ORDER BY p.Update_at DESC, p.ProfessorFirstName ASC 
+        LIMIT :limit OFFSET :offset");
+    
+        $dataStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
+        $dataStmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $dataStmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $dataStmt->execute();
+    
         $professors = [];
-        while ($row = $stmt->fetch()) {
+        // obtener los instrumentos, los salones, y la disponibilidad de los profesores
+        
+
+        while ($row = $dataStmt->fetch(PDO::FETCH_ASSOC)) {
             $user = new User($row['UserID'], $row['UserEmail'], $row['UserPassword'], (int)$row['RoleID']);
+            $instruments = $this->getProfessorInstruments($row['ProfessorID']);
+            $rooms = $this->getProfessorRooms($row['ProfessorID']);
+            $availability = $this->getProfessorAvailability($row['ProfessorID']);
             $professors[] = new Professor(
                 (string)$row['ProfessorID'],
                 $row['ProfessorFirstName'],
@@ -44,11 +75,20 @@ class DatabaseProfessorRepository implements ProfessorRepository
                 $row['ProfessorStatus'],
                 $user,
                 $row['ProfessorHasContract'],
-                (int)$row['ProfessorTimeContract']
+                (int)$row['ProfessorTimeContract'],
+                $instruments,
+                $rooms,
+                $availability
             );
         }
-        return $professors;
+    
+        if ($offPagination) {
+            return $professors;
+        }
+    
+        return ['data' => $professors, 'pages' => $totalPages];
     }
+    
 
     public function findProfessorById(string $id): ?Professor
     {
@@ -325,8 +365,12 @@ class DatabaseProfessorRepository implements ProfessorRepository
     private function getProfessorInstruments(string $professorId): array
     {
         $stmt = $this->pdo->prepare(
-            "SELECT * FROM professor_instruments WHERE ProfessorID = :id"
-        );
+            "
+            SELECT pi.*, i.InstrumentName
+            FROM professor_instruments pi
+            JOIN instruments i ON pi.InstrumentID = i.InstrumentID
+            WHERE ProfessorID = :id
+            ");
         $stmt->execute(['id' => $professorId]);
 
         $instruments = [];
@@ -334,7 +378,8 @@ class DatabaseProfessorRepository implements ProfessorRepository
             $instruments[] = new ProfessorInstruments(
                 (int)$row['ProfessorInstrumentID'],
                 $row['ProfessorID'],
-                (int)$row['InstrumentID']
+                (int)$row['InstrumentID'],
+                $row['InstrumentName']
             );
         }
         return $instruments;

@@ -13,7 +13,7 @@ interface ProfessorRepository
      * @return Professor|null
      */
     public function findProfessorById(string $id): ?Professor;
-    public function findAll(): array;
+    public function findAll(int $limit, int $offset, string $query, bool $offPagination): array;
     public function create(Professor $profesor): int;
     public function update(Professor $profesor): bool;
     public function delete(string $id): bool;

@@ -5,7 +5,6 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
-import { Loader } from "../components/Loader/Loader";
 import {
   InstrumentType,
   ProfessorType,
@@ -15,17 +14,17 @@ import {
 } from "../types/Api";
 import useItemMutations from "../hooks/useItemsMutation";
 import useFetchItems from "../hooks/useFetchItems";
-import DataTable from "../components/table/DataTable";
 import Primaryh1 from "../components/titles/Primaryh1";
 import CloseModalBtn from "../components/buttons/CloseModalBtn";
 import BackgroundDiv from "../components/modal/BackgroundDiv";
 import CancelModalBtn from "../components/buttons/CancelModalBtn";
 import SubmitModalBtn from "../components/buttons/SubmitModalBtn";
-import ErrorLoadingResourse from "../components/error/ErrorLoadingResourse";
 import { ScheduleType } from "../types/Api";
 import SelectShedulePro from "../components/SelectShedulePro";
 import SelectMultiple from "../components/SelectMultiple";
 import fetchItemByID from "../utils/fetchItemByID";
+import DataTablePagination from "../components/TablePagination";
+import Skeleton from "@/components/Loader/Skeleton";
 
 const entity = "professors";
 const entityName = "profesores";
@@ -80,10 +79,6 @@ const Professors = () => {
       fillDefaultValues();
     }
   }, [fillDefaultValues, isLoadingInstruments, isLoadingRooms]);
-
-  // Fetch professors data
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
-  const { data: professors, isLoading, isError } = useFetchItems(entity, JWT);
 
   const { register, handleSubmit, watch, setValue, reset } =
     useForm<ProfessorType>();
@@ -140,6 +135,7 @@ const Professors = () => {
     deleteItem,
     deleteItems,
   } = useItemMutations<ProfessorType>(entity, JWT, setIsOpen);
+
   // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleCreate = useCallback(() => {
     setEditProfessor(null);
@@ -171,7 +167,7 @@ const Professors = () => {
           setValue("id", professor.id);
           setValue("phone", professor.phone);
           setValue("status", professor.status);
-          setValue("hasContract", professor.hasContract);
+          setValue("hasContract", professor.hasContract === 1 ? true : false);
           setValue("timeContract", professor.timeContract === "0" ? "" : professor.timeContract);
           setValue("user.email", professor.user.email);
 
@@ -262,15 +258,13 @@ const Professors = () => {
     []
   );
 
-  if (isLoading) return <Loader />;
-  if (isError) return <ErrorLoadingResourse resourse={entityName} />;
-
   return (
     <section className="section_page">
       <Primaryh1>Profesores</Primaryh1>
-      {/* @ts-expect-error: DataTable is a generic component */}
-      <DataTable<ProfessorType>
-        data={professors || []}
+      <DataTablePagination<ProfessorType>
+        entity={entity}
+        entityName={entityName}
+        JWT={JWT}
         columns={columns}
         onCreate={handleCreate}
         onEdit={handleEdit}
@@ -298,7 +292,7 @@ const Professors = () => {
               </div>
 
               {isLoadingDetails ? (
-                <p>loading ...</p>
+                <Skeleton className="w-full h-[1000px]" />
               ) : (
                 <>
                   <form
@@ -331,6 +325,7 @@ const Professors = () => {
                         Nombre
                       </label>
                       <input
+                        autoFocus 
                         id="firstName"
                         {...register("firstName", { required: true })}
                         className="input-primary w-full"
@@ -377,8 +372,8 @@ const Professors = () => {
                         {...register("status", { required: true })}
                         className="input-primary w-full"
                       >
-                        <option value="active">Activo</option>
-                        <option value="inactive">Inactivo</option>
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
                       </select>
                     </div>
                     <div className="mb-4">
@@ -412,7 +407,6 @@ const Professors = () => {
                           Tiempo de contrato (Horas)
                         </label>
                         <input
-                          autoFocus
                           id="timeContract"
                           {...register("timeContract", { required: true })}
                           className="input-primary w-full"
@@ -425,7 +419,7 @@ const Professors = () => {
                     <div className="flex-1">
                       <SelectMultiple<SelectableInstrument>
                         items={instrumentProfessor}
-                        propName="instrumentName"
+                        propName="name"
                         setItems={setInstrumentProfessor}
                         title="Instrumentos"
                       />

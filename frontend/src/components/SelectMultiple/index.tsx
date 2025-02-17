@@ -15,6 +15,7 @@ const SelectMultiple = <T extends Selectable>({
   setItems,
   title,
 }: Props<T>) => {
+  console.log(items);
 
   const handleChangeSeleted = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = e.target.value;

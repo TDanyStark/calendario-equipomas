@@ -112,7 +112,7 @@ type ProfessorType ={
   lastName: string;
   phone: string;
   status: string;
-  hasContract: boolean;
+  hasContract: boolean | number;
   timeContract: string;
   user: {
     email: string;
