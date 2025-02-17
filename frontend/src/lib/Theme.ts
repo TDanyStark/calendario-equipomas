@@ -1,11 +1,11 @@
-interface Props{
+interface Props {
   gridTemplateColumns: string;
   heightRow: number;
 }
 
-const Theme = ({gridTemplateColumns, heightRow}: Props) => {
+const Theme = ({ gridTemplateColumns, heightRow }: Props) => {
   return {
-      Table: `
+    Table: `
             ${
               gridTemplateColumns
                 ? `--data-table-library_grid-template-columns: ${gridTemplateColumns};`
@@ -17,11 +17,11 @@ const Theme = ({gridTemplateColumns, heightRow}: Props) => {
             font-size: 16px;
             border: 1px solid white;
           `,
-      Header: `
+    Header: `
             
       `,
-      Body: ``,
-      BaseRow: `
+    Body: ``,
+    BaseRow: `
             background-color: #000000;
             &.row-select-selected, &.row-select-single-selected {
               background-color: #000275 !important;
@@ -29,7 +29,7 @@ const Theme = ({gridTemplateColumns, heightRow}: Props) => {
               color: #ffffff;
             }
           `,
-      HeaderRow: `
+    HeaderRow: `
             font-size: 20px;
             
             .th {
@@ -37,9 +37,10 @@ const Theme = ({gridTemplateColumns, heightRow}: Props) => {
             }
               div{
                 font-weight: 300;
+                font-size: 1rem;
               }
           `,
-      Row: `
+    Row: `
             font-size: 16px;
             &:not(:last-of-type) .td {
               border-bottom: 1px solid white;
@@ -54,7 +55,7 @@ const Theme = ({gridTemplateColumns, heightRow}: Props) => {
               background-color: #000275;
             }
           `,
-      BaseCell: `
+    BaseCell: `
             border-right: 1px solid white;
             padding: 8px;
             height: ${heightRow}px;
@@ -63,7 +64,7 @@ const Theme = ({gridTemplateColumns, heightRow}: Props) => {
               fill: var(--theme-ui-colors-text);
             }
           `,
-      HeaderCell: `
+    HeaderCell: `
             
             div div{
               justify-content: center;
@@ -73,12 +74,12 @@ const Theme = ({gridTemplateColumns, heightRow}: Props) => {
               fill: #cacaca;
             }
           `,
-      Cell: `
+    Cell: `
         div{
           padding: 3px;
         }
       `,
-    };
+  };
 };
 
 export default Theme;
