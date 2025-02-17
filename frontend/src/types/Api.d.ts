@@ -99,6 +99,7 @@ type ProfessorAvailabilityType = {
 type ProfessorInstrumentType = {
   ProfessorInstrumentID: number;
   id: string;
+  name: string;
 }
 
 type ProfessorRoomType = {
@@ -108,6 +109,7 @@ type ProfessorRoomType = {
 
 type ProfessorType ={
   id: string;
+  name: string;
   firstName: string;
   lastName: string;
   phone: string;

@@ -4,7 +4,12 @@ import Primaryh1 from "../components/titles/Primaryh1";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import useItemMutations from "@/hooks/useItemsMutation";
-import { EnrollType, GroupClassType, ProfessorType, ScheduleStateType } from "@/types/Api";
+import {
+  EnrollType,
+  GroupClassType,
+  ProfessorType,
+  ScheduleStateType,
+} from "@/types/Api";
 import ActivePeriod from "@/components/ChangeAP/ActivePeriod";
 import SearchSelect from "@/components/SearchSelect";
 import { useMemo, useState } from "react";
@@ -16,8 +21,12 @@ const entity = "groupclass";
 const GroupClassCreate = () => {
   const JWT = useSelector((state: RootState) => state.auth.JWT);
   const [filterActive, setFilterActive] = useState<string | null>(null);
+
+  const [roomId, setRoomId] = useState<string>("");
+
   const [tabActive, setTabActive] = useState<string>("students");
   const [idsStudents, setIdsStudents] = useState<string[]>([]);
+  const [idsProfessors, setIdsProfessors] = useState<string[]>([]);
 
   const daysOfWeek = useSelector(
     (state: { schedule: ScheduleStateType }) => state.schedule.scheduleDays
@@ -28,8 +37,13 @@ const GroupClassCreate = () => {
     JWT
   );
 
-  const handleSelectedIds = (ids: string[]) => {
-    setIdsStudents(ids);
+  const handleSelectedIds = (ids: string[], entity: string) => {
+    if (entity === "enrolls") {
+      setIdsStudents(ids);
+    }
+    if (entity === "professors") {
+      setIdsProfessors(ids);
+    }
   };
 
   const columnsStudents = useMemo(
@@ -70,7 +84,10 @@ const GroupClassCreate = () => {
       },
       {
         label: "Instrumentos",
-        renderCell: (item: unknown) => (item as ProfessorType).instruments,
+        renderCell: (item: unknown) =>
+          (item as ProfessorType).instruments
+            .map((instrument) => instrument.name)
+            .join(", "),
       },
     ],
     []
@@ -94,11 +111,15 @@ const GroupClassCreate = () => {
             />
           </div>
           <div>
-            <span className="block text-sm font-medium mb-1">Salón</span>
+            <span className="block text-sm font-medium mb-1">
+              Salón {roomId}
+            </span>
             <SearchSelect
               entity="rooms"
               defaultValue=""
-              onSelect={(id, name) => {}}
+              onSelect={(id) => {
+                setRoomId(id);
+              }}
               isActive={filterActive === "rooms"}
               onFocus={() => {
                 setFilterActive("rooms");
@@ -108,54 +129,58 @@ const GroupClassCreate = () => {
               }}
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="day">
-              Día
-            </label>
-            <select
-              name="day"
-              id="day"
-              className="px-3 py-2 border rounded w-full"
-            >
-              <option value="">Escoge un día</option>
-              {daysOfWeek?.map(
-                (day: { id: string; dayDisplayName: string }) => (
-                  <option key={day.id} value={day.id}>
-                    {day.dayDisplayName}
-                  </option>
-                )
-              )}
-            </select>
-          </div>
-          <div className="flex gap-4 items-center">
-            <div>
-              <label
-                htmlFor="startTime"
-                className="block  text-sm font-medium mb-1"
-              >
-                Hora de inicio
-              </label>
-              <input
-                id="startTime"
-                type="time"
-                className="px-3 py-2 border rounded"
-              />
+          {roomId && (
+            <div className="flex flex-col gap-6">
+              <div>
+                <label className="block text-sm font-medium mb-1" htmlFor="day">
+                  Día
+                </label>
+                <select
+                  name="day"
+                  id="day"
+                  className="px-3 py-2 border rounded w-full"
+                >
+                  <option value="">Escoge un día</option>
+                  {daysOfWeek?.map(
+                    (day: { id: string; dayDisplayName: string }) => (
+                      <option key={day.id} value={day.id}>
+                        {day.dayDisplayName}
+                      </option>
+                    )
+                  )}
+                </select>
+              </div>
+              <div className="flex gap-4 items-center">
+                <div>
+                  <label
+                    htmlFor="startTime"
+                    className="block  text-sm font-medium mb-1"
+                  >
+                    Hora de inicio
+                  </label>
+                  <input
+                    id="startTime"
+                    type="time"
+                    className="px-3 py-2 border rounded"
+                  />
+                </div>
+                <span className="mt-5"> - </span>
+                <div>
+                  <label
+                    htmlFor="endTime"
+                    className="block text-sm font-medium mb-1"
+                  >
+                    Hora de fin
+                  </label>
+                  <input
+                    id="endTime"
+                    type="time"
+                    className="px-3 py-2 border rounded"
+                  />
+                </div>
+              </div>
             </div>
-            <span className="mt-5"> - </span>
-            <div>
-              <label
-                htmlFor="endTime"
-                className="block text-sm font-medium mb-1"
-              >
-                Hora de fin
-              </label>
-              <input
-                id="endTime"
-                type="time"
-                className="px-3 py-2 border rounded"
-              />
-            </div>
-          </div>
+          )}
           <div>
             <button className="btn-primary w-full">Crear</button>
           </div>
@@ -170,7 +195,8 @@ const GroupClassCreate = () => {
               }`}
               onClick={() => setTabActive("students")}
             >
-              Estudiantes - {idsStudents.length}
+              Estudiantes{" "}
+              {idsStudents.length === 0 ? "" : `(${idsStudents.length})`}
             </button>
             <button
               className={`block text-xl py-1 px-3 rounded mb-1 ${
@@ -180,7 +206,8 @@ const GroupClassCreate = () => {
               }`}
               onClick={() => setTabActive("professors")}
             >
-              Profesores
+              Profesores{" "}
+              {idsProfessors.length === 0 ? "" : `(${idsProfessors.length})`}
             </button>
           </div>
           {tabActive === "students" && (

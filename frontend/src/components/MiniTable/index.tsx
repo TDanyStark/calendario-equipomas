@@ -29,7 +29,7 @@ import { useDebounce } from "use-debounce";
 import Theme from "@/lib/Theme";
 import useGetDataForMiniTable from "@/hooks/useGetDataForMiniTable";
 import Skeleton from "../Loader/Skeleton";
-import { getActiveIdsEnrollments } from "@/utils/getActiveIdsEnrollments";
+import { getActiveIdsForAEntity } from "@/utils/getActiveIdsForAEntity";
 import { toast } from "react-toastify";
 
 interface Column<T> {
@@ -45,7 +45,7 @@ interface MiniTableProps<T> {
   searchPlaceholder?: string;
   gridTemplateColumns: string;
   JWT: string;
-  handleSelectedIds?: (ids: string[]) => void;
+  handleSelectedIds?: (ids: string[], entity: string) => void;
 }
 
 function MiniTable<T extends TableNode>({
@@ -94,7 +94,7 @@ function MiniTable<T extends TableNode>({
         const uniqueIds = Array.from(new Set(selectedIds));
 
         if (handleSelectedIds) {
-          handleSelectedIds(uniqueIds as string[]);
+          handleSelectedIds(uniqueIds as string[], entity);
         }
       },
     },
@@ -108,13 +108,14 @@ function MiniTable<T extends TableNode>({
   // que no hayan ids repetidos
   const handleSelectAll = async () => {
     setChecked(!checked);
-    if (selectedIds.length >= data.length) {
+    // tener en cuenta que aqui revisamos el antiguo estado de checked
+    if (checked === true) {
       select.fns.onRemoveAll();
     } else {
       select.fns.onAddAll(data.map((item) => item.id));
       try{
         setWaitGetIds(true);
-        const res = await getActiveIdsEnrollments(JWT);
+        const res = await getActiveIdsForAEntity(JWT, entity);
         if(res && res.statusCode === 200){
           select.fns.onRemoveAll();
           // pasar a string los ids de res.data
@@ -124,6 +125,8 @@ function MiniTable<T extends TableNode>({
         }
       }catch(e){
         toast.error("Error al obtener las inscripciones activas");
+        select.fns.onRemoveAll();
+        setChecked(false);
         console.error(e);
       }finally{
         setWaitGetIds(false);

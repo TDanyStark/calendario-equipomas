@@ -38,6 +38,7 @@ use App\Application\Actions\Semester\DeleteSemesterAction;
 use App\Application\Actions\Semester\DeleteMultipleSemestersAction;
 
 use App\Application\Actions\Professor\ListProfessorsAction;
+use App\Application\Actions\Professor\ListProfessorIdsActiveAction;
 use App\Application\Actions\Professor\GetProfessorQueryAction;
 use App\Application\Actions\Professor\GetProfessorAction;
 use App\Application\Actions\Professor\CreateProfessorAction;
@@ -126,6 +127,7 @@ return function (App $app) {
         $group->group('/professors', function (Group $professorGroup) {
             $professorGroup->get('', ListProfessorsAction::class);
             $professorGroup->get('/query', GetProfessorQueryAction::class);
+            $professorGroup->get('/idsactive', ListProfessorIdsActiveAction::class);
             $professorGroup->get('/{id}', GetProfessorAction::class);
             $professorGroup->post('', CreateProfessorAction::class);
             $professorGroup->put('/{id}', UpdateProfessorAction::class);

@@ -67,6 +67,7 @@ const SearchSelect = ({
         className="w-full px-3 py-2 border rounded-t"
         value={selected || search}
         onChange={(e) => {
+          if(e.target.value === "") onSelect("", "");
           setSearch(e.target.value);
           setSelected(null);
         }}

@@ -23,7 +23,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
         $this->pdo = $database->getConnection();
     }
 
-    public function findAll(int $limit, int $offset, string $query, bool $offPagination): array
+    public function findAll(int $limit, int $offset, string $query, bool $offPagination, bool $onlyActive): array
     {
         $searchQuery = "%$query%";
     
@@ -34,6 +34,10 @@ class DatabaseProfessorRepository implements ProfessorRepository
         OR p.ProfessorPhone LIKE :query 
         OR p.ProfessorStatus LIKE :query 
         OR u.UserEmail LIKE :query) AND p.ProfessorIsDelete = 0';
+
+        if ($onlyActive) {
+            $whereClause .= ' AND p.ProfessorStatus = "activo"';
+        }
     
         // Obtener cantidad total de registros
         $countStmt = $this->pdo->prepare("SELECT COUNT(*) as total FROM professors p 
@@ -454,5 +458,21 @@ class DatabaseProfessorRepository implements ProfessorRepository
             ];
         }
         return $professors;
+    }
+
+    public function findProfessorIdsActive(): array
+    {
+        $stmt = $this->pdo->prepare('
+            SELECT p.ProfessorID
+            FROM professors p
+            WHERE p.ProfessorIsDelete = 0 AND p.ProfessorStatus = "activo"
+        ');
+        $stmt->execute();
+
+        $professorIds = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $professorIds[] = (string)$row['ProfessorID'];
+        }
+        return $professorIds;
     }
 }
