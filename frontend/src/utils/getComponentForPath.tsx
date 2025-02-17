@@ -1,25 +1,20 @@
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
 import { Route } from "react-router-dom";
 import { RolesExisting } from "../types/Roles";
 import { Menus } from "../data/Roles";
 import ErrorPage from "../pages/ErrorPage";
 
 // 📌 Lazy load SOLO para algunos componentes
-const GroupClass = lazy(() => import("../pages/GroupClass"));
-const GroupClassCreate = lazy(() => import("../pages/GroupClassCreate"));
-const GroupClassEdit = lazy(() => import("../pages/GroupClassEdit"));
+import { Instruments, Rooms, Courses, Semesters, Users, GeneralSettings } from "./lazyComponents";
 
 // 📌 Importación normal para los demás
 import Dashboard from "../pages/Dashboard";
 import Enrolls from "../pages/Enrolls";
 import Students from "../pages/Students";
 import Professors from "../pages/Professors";
-import Instruments from "../pages/Instruments";
-import Rooms from "../pages/Rooms";
-import Courses from "../pages/Courses";
-import Semesters from "../pages/Semesters";
-import Users from "../pages/Users";
-import GeneralSettings from "../pages/GeneralSettings";
+import GroupClass from "../pages/GroupClass";
+import GroupClassCreate from "../pages/GroupClassCreate";
+import GroupClassEdit from "../pages/GroupClassEdit";
 import StudentSchedule from "../pages/StudentSchedule";
 import MyClasses from "../pages/MyClasses";
 import { Loader } from "@/components/Loader/Loader";
@@ -59,8 +54,6 @@ export const generateRoutes = (role: RolesExisting) => {
 const getComponentForPath = (path: string) => {
   switch (path) {
     // 🔸 Carga diferida solo para estos componentes
-    case "/group-class/create":
-    case "/group-class/edit/:id":
     case "/instruments":
     case "/rooms":
     case "/courses":
@@ -80,6 +73,10 @@ const getComponentForPath = (path: string) => {
       return <Students />;
     case "/professors":
       return <Professors />;
+      case "/group-class/create":
+    return <GroupClassCreate />;
+    case "/group-class/edit/:id":
+      return <GroupClassEdit />;
 
     case "/student-schedule":
       return <StudentSchedule />;
@@ -93,10 +90,6 @@ const getComponentForPath = (path: string) => {
 // 🔹 Función auxiliar para retornar el componente lazy correspondiente
 const lazyComponent = (path: string) => {
   switch (path) {
-    case "/group-class/create":
-      return <GroupClassCreate />;
-    case "/group-class/edit/:id":
-      return <GroupClassEdit />;
     case "/instruments":
       return <Instruments />;
     case "/rooms":

@@ -24,8 +24,9 @@ const Theme = ({gridTemplateColumns, heightRow}: Props) => {
       BaseRow: `
             background-color: #000000;
             &.row-select-selected, &.row-select-single-selected {
-              background-color: var(--theme-ui-colors-background-secondary);
-              color: var(--theme-ui-colors-text);
+              background-color: #000275 !important;
+              font-weight: 400;
+              color: #ffffff;
             }
           `,
       HeaderRow: `
