@@ -14,6 +14,7 @@ import ActivePeriod from "@/components/ChangeAP/ActivePeriod";
 import SearchSelect from "@/components/SearchSelect";
 import { useMemo, useState } from "react";
 import MiniTable from "@/components/MiniTable";
+import SelectDayAndHourCreate from "@/components/SelectDayAndHour/SelectDayAndHourCreate";
 
 const entity = "groupclass";
 // const entityName = "clases grupales";
@@ -27,15 +28,13 @@ const GroupClassCreate = () => {
   const [tabActive, setTabActive] = useState<string>("students");
   const [idsStudents, setIdsStudents] = useState<string[]>([]);
   const [idsProfessors, setIdsProfessors] = useState<string[]>([]);
-
-  const daysOfWeek = useSelector(
-    (state: { schedule: ScheduleStateType }) => state.schedule.scheduleDays
-  );
   // Mutaciones
   const { createItem, isCreateLoading } = useItemMutations<GroupClassType>(
     entity,
     JWT
   );
+
+  
 
   const handleSelectedIds = (ids: string[], entity: string) => {
     if (entity === "enrolls") {
@@ -130,56 +129,7 @@ const GroupClassCreate = () => {
             />
           </div>
           {roomId && (
-            <div className="flex flex-col gap-6">
-              <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="day">
-                  Día
-                </label>
-                <select
-                  name="day"
-                  id="day"
-                  className="px-3 py-2 border rounded w-full"
-                >
-                  <option value="">Escoge un día</option>
-                  {daysOfWeek?.map(
-                    (day: { id: string; dayDisplayName: string }) => (
-                      <option key={day.id} value={day.id}>
-                        {day.dayDisplayName}
-                      </option>
-                    )
-                  )}
-                </select>
-              </div>
-              <div className="flex gap-4 items-center">
-                <div>
-                  <label
-                    htmlFor="startTime"
-                    className="block  text-sm font-medium mb-1"
-                  >
-                    Hora de inicio
-                  </label>
-                  <input
-                    id="startTime"
-                    type="time"
-                    className="px-3 py-2 border rounded"
-                  />
-                </div>
-                <span className="mt-5"> - </span>
-                <div>
-                  <label
-                    htmlFor="endTime"
-                    className="block text-sm font-medium mb-1"
-                  >
-                    Hora de fin
-                  </label>
-                  <input
-                    id="endTime"
-                    type="time"
-                    className="px-3 py-2 border rounded"
-                  />
-                </div>
-              </div>
-            </div>
+            <SelectDayAndHourCreate roomId={roomId} />
           )}
           <div>
             <button className="btn-primary w-full">Crear</button>

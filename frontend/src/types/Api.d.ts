@@ -162,3 +162,16 @@ type GroupClassType = {
   professors: [];
   enrollments: [];
 }
+
+
+type AvailableSlotType = {
+  dayDisplayName: string;
+  dayName: string;
+  id: number;
+  slots: { start: string; end: string }[];
+}
+
+type AvailabilityByRoomType = {
+  availableSlots: AvailableSlotType[];
+  recurrence: number;
+}

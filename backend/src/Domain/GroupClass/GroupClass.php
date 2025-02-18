@@ -12,19 +12,20 @@ class GroupClass implements JsonSerializable
     private int $id;
     private string $name;
     private int $roomId;
-    private int $academicPeriodId;
+    private ?int $academicPeriodId;
     private int $day_id;
     private string $startTime;
     private string $endTime;
     private ?array $professors = [];
     private ?array $enrollments = [];
 
-    public function __construct(int $id, string $name, int $roomId, int $academicPeriodId, int $day_id, string $startTime, string $endTime)
+    public function __construct(int $id, string $name, int $roomId, ?int $academicPeriodId, int $day_id, string $startTime, string $endTime)
     {
         $this->id = $id;
         $this->name = $name;
         $this->roomId = $roomId;
         $this->academicPeriodId = $academicPeriodId;
+        $this->day_id = $day_id;
         $this->startTime = $this->validateTimeFormat($startTime);
         $this->endTime = $this->validateTimeFormat($endTime);
 

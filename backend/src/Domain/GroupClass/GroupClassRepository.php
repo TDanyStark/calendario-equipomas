@@ -21,4 +21,6 @@ interface GroupClassRepository
     // public function update(GroupClass $groupClass): bool;
 
     // public function delete(int $id): bool;
+
+    public function findAvailabilityByRoom(int $roomId, int $academicPeriodId): array;
 }
