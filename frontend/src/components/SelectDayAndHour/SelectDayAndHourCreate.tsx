@@ -4,17 +4,15 @@ import { useSelector } from "react-redux";
 import Skeleton from "../Loader/Skeleton";
 import { AvailableSlotType } from "@/types/Api";
 import { useState } from "react";
-import { generarIntervalos } from "@/utils/timeConversionUtils";
+import { formatToHHMM, generarIntervalos, to12HourFormat } from "@/utils/timeConversionUtils";
 
 interface Props {
   roomId: string;
 }
 
 const SelectDayAndHourCreate = ({ roomId }: Props) => {
-  const [selectedDay, setSelectedDay] = useState<string | null>(null);
-  const [selectedStartTime, setSelectedStartTime] = useState<string | null>(
-    null
-  );
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const [selectedStartTime, setSelectedStartTime] = useState<string | null>(null);
   const [selectedEndTime, setSelectedEndTime] = useState<string | null>(null);
   const [endTimeOptions, setEndTimeOptions] = useState<string[]>([]);
 
@@ -31,9 +29,7 @@ const SelectDayAndHourCreate = ({ roomId }: Props) => {
 
   // Procesar las opciones de hora inicial
   const startTimeOptions = selectedDay
-    ? availability
-        ?.find((day) => day.dayName === selectedDay)
-        ?.slots.flatMap((slot) => {
+    ? availability?.find((day) => day.id === selectedDay)?.slots.flatMap((slot) => {
           const times = generarIntervalos(slot.start, slot.end, recurrence);
           return times.slice(0, -1).map((time) => ({
             time,
@@ -44,9 +40,7 @@ const SelectDayAndHourCreate = ({ roomId }: Props) => {
 
   // Manejar cambio de hora inicial
   const handleStartTimeChange = (selectedTime: string, slotEnd: string) => {
-    const endTimes = generarIntervalos(selectedTime, slotEnd, recurrence).slice(
-      1
-    );
+    const endTimes = generarIntervalos(selectedTime, slotEnd, recurrence).slice(1);
     setSelectedStartTime(selectedTime);
     setEndTimeOptions(endTimes);
     setSelectedEndTime(null);
@@ -67,7 +61,7 @@ const SelectDayAndHourCreate = ({ roomId }: Props) => {
           <select
             value={selectedDay || ""}
             onChange={(e) => {
-              setSelectedDay(e.target.value);
+              setSelectedDay(Number(e.target.value));
               setSelectedStartTime(null);
               setSelectedEndTime(null);
             }}
@@ -77,7 +71,7 @@ const SelectDayAndHourCreate = ({ roomId }: Props) => {
             {availability?.map(
               (day: AvailableSlotType) =>
                 day.slots.length > 0 && (
-                  <option key={day.id} value={day.dayName}>
+                  <option key={day.id} value={day.id}>
                     {day.dayDisplayName}
                   </option>
                 )
