@@ -356,7 +356,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
                 (int)$row['AvailabilityID'],
                 $row['ProfessorID'],
                 (int)$row['DayID'],
-                (int)$row['academic_period_id'],
+                (int) $row['academic_period_id'],
                 $row['StartTime'],
                 $row['EndTime']
             );
