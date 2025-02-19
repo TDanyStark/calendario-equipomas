@@ -13,19 +13,22 @@ class ProfessorAvailability implements JsonSerializable
     private int $DayID;
     private string $StartTime;
     private string $EndTime;
+    private int $academicPeriodID;
 
     public function __construct(
         int $AvailabilityID,
         string $ProfessorID,
         int $DayID,
         string $StartTime,
-        string $EndTime
+        string $EndTime,
+        int $academicPeriodID
     ) {
         $this->AvailabilityID = $AvailabilityID;
         $this->ProfessorID = $ProfessorID;
         $this->DayID = $DayID;
         $this->StartTime = $StartTime;
         $this->EndTime = $EndTime;
+        $this->academicPeriodID = $academicPeriodID;
     }
 
     public function getAvailabilityID(): int
@@ -52,12 +55,20 @@ class ProfessorAvailability implements JsonSerializable
     {
         return $this->EndTime;
     }
+
+    public function getAcademicPeriodID(): int
+    {
+        return $this->academicPeriodID;
+    }
+
+
     public function jsonSerialize(): array
     {
         return [
             'availabilityID' => $this->AvailabilityID,
             'professorID' => $this->ProfessorID,
             'dayID' => (string)$this->DayID,
+            'academicPeriodID' => $this->academicPeriodID,
             'startTime' => $this->StartTime,
             'endTime' => $this->EndTime
         ];

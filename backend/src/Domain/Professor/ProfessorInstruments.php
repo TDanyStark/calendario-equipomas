@@ -11,17 +11,20 @@ class ProfessorInstruments implements JsonSerializable
     private int $ProfessorInstrumentID;
     private string $ProfessorID; 
     private int $InstrumentID;
+    private int $academicPeriodID;
     private ?string $InstrumentName;
 
     public function __construct(
         int $ProfessorInstrumentID,
         string $ProfessorID, // Cambiar a string
         int $InstrumentID,
+        int $academicPeriodID,
         ?string $InstrumentName
     ) {
         $this->ProfessorInstrumentID = $ProfessorInstrumentID;
         $this->ProfessorID = $ProfessorID;
         $this->InstrumentID = $InstrumentID;
+        $this->academicPeriodID = $academicPeriodID;
         $this->InstrumentName = $InstrumentName;
     }
 
@@ -45,12 +48,18 @@ class ProfessorInstruments implements JsonSerializable
         return $this->InstrumentName;
     }
 
+    public function getAcademicPeriodID(): int
+    {
+        return $this->academicPeriodID;
+    }
+
     public function jsonSerialize(): array
     {
         return [
             'ProfessorInstrumentID' => $this->ProfessorInstrumentID,
             'id' => (string)$this->InstrumentID,
-            'name' => $this->InstrumentName
+            'name' => $this->InstrumentName,
+            'academicPeriodID' => $this->academicPeriodID
         ];
     }
 }
