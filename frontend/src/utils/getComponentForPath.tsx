@@ -18,6 +18,7 @@ import GroupClassEdit from "../pages/GroupClassEdit";
 import StudentSchedule from "../pages/StudentSchedule";
 import MyClasses from "../pages/MyClasses";
 import { Loader } from "@/components/Loader/Loader";
+import ProfessorsAssign from "@/pages/ProfessorsAssign";
 
 // 🔹 Generar rutas dinámicas con carga mixta
 export const generateRoutes = (role: RolesExisting) => {
@@ -73,11 +74,12 @@ const getComponentForPath = (path: string) => {
       return <Students />;
     case "/professors":
       return <Professors />;
+    case "/professors/assign":
+      return <ProfessorsAssign />;
       case "/group-class/create":
     return <GroupClassCreate />;
     case "/group-class/edit/:id":
       return <GroupClassEdit />;
-
     case "/student-schedule":
       return <StudentSchedule />;
     case "/my-classes":

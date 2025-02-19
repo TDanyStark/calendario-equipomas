@@ -11,6 +11,7 @@ import { NavLink, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import useFetchWithFilters from "@/hooks/useFetchWithFilters";
+import ChangeAP from "@/components/ChangeAP";
 
 const entity = "groupclass";
 // const entityName = "clases grupales";
@@ -72,6 +73,7 @@ const GroupClass = () => {
   return (
     <section className="section_page">
       <Primaryh1>Clases Grupales</Primaryh1>
+      <ChangeAP />
       <FilterGroupClass
         courseFilter={courseFilter || ""}
         instrumentFilter={instrumentFilter || ""}

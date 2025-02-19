@@ -29,6 +29,10 @@ table input[type="checkbox"]{
   @apply bg-primary-accent text-white font-semibold py-2 px-4 rounded transition-colors;
 }
 
+.btn-yellow {
+  @apply bg-secondary-accent text-primary font-semibold py-2 px-4 rounded transition-colors;
+}
+
 .btn-primary:hover {
   @apply bg-primary-accent/80;
 }
