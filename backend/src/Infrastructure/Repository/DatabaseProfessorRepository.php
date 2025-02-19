@@ -317,6 +317,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
                 (int)$row['ProfessorInstrumentID'],
                 $row['ProfessorID'],
                 (int)$row['InstrumentID'],
+                (int)$row['academic_period_id'],
                 $row['InstrumentName']
             );
         }
@@ -335,6 +336,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
             $rooms[] = new ProfessorRooms(
                 (int)$row['ProfessorRoomID'],
                 $row['ProfessorID'],
+                (int)$row['academic_period_id'],
                 (int)$row['RoomID']
             );
         }
@@ -354,6 +356,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
                 (int)$row['AvailabilityID'],
                 $row['ProfessorID'],
                 (int)$row['DayID'],
+                (int)$row['academic_period_id'],
                 $row['StartTime'],
                 $row['EndTime']
             );
