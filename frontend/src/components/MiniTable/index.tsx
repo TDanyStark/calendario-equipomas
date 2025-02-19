@@ -88,6 +88,9 @@ function MiniTable<T extends TableNode>({
     tableData,
     {
       onChange: () => {
+        if (select.state.ids.length === 0) {
+          setChecked(false);
+        }
         if (select.state.ids.includes("")) {
           select.fns.onRemoveAll();
         }
@@ -112,7 +115,7 @@ function MiniTable<T extends TableNode>({
     if (checked === true) {
       select.fns.onRemoveAll();
     } else {
-      select.fns.onAddAll(data.map((item) => item.id));
+      // select.fns.onAddAll(data.map((item) => item.id));
       try{
         setWaitGetIds(true);
         const res = await getActiveIdsForAEntity(JWT, entity);

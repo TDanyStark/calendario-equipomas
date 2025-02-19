@@ -17,7 +17,7 @@ const fetchItems = async <T>(
   const params = new URLSearchParams({
     page: page.toString(),
     query: encodeURIComponent(query),
-    onlyActive: "true",
+    // onlyActive: "true",
   });
   
   const response = await axios.get(

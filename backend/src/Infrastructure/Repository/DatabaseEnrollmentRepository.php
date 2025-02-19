@@ -304,7 +304,7 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
 
   public function findEnrollmentIdsActive(int $academic_periodID): array
   {
-    $stmt = $this->pdo->prepare("SELECT EnrollmentID FROM enrollments WHERE academic_periodID = :academic_periodID AND Status = 'activo'");
+    $stmt = $this->pdo->prepare("SELECT EnrollmentID FROM enrollments WHERE academic_periodID = :academic_periodID");
     $stmt->bindValue(':academic_periodID', $academic_periodID, PDO::PARAM_INT);
     $stmt->execute();
 
