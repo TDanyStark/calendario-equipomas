@@ -68,9 +68,6 @@ class DatabaseProfessorRepository implements ProfessorRepository
 
         while ($row = $dataStmt->fetch(PDO::FETCH_ASSOC)) {
             $user = new User($row['UserID'], $row['UserEmail'], $row['UserPassword'], (int)$row['RoleID']);
-            $instruments = $this->getProfessorInstruments($row['ProfessorID']);
-            $rooms = $this->getProfessorRooms($row['ProfessorID']);
-            $availability = $this->getProfessorAvailability($row['ProfessorID']);
             $professors[] = new Professor(
                 (string)$row['ProfessorID'],
                 $row['ProfessorFirstName'],
@@ -78,11 +75,6 @@ class DatabaseProfessorRepository implements ProfessorRepository
                 $row['ProfessorPhone'],
                 $row['ProfessorStatus'],
                 $user,
-                $row['ProfessorHasContract'],
-                (int)$row['ProfessorTimeContract'],
-                $instruments,
-                $rooms,
-                $availability
             );
         }
     
@@ -110,11 +102,6 @@ class DatabaseProfessorRepository implements ProfessorRepository
 
         $user = new User($row['UserID'], $row['UserEmail'], $row['UserPassword'], (int)$row['RoleID']);
 
-        // Obtener relaciones
-        $instruments = $this->getProfessorInstruments($id);
-        $rooms = $this->getProfessorRooms($id);
-        $availability = $this->getProfessorAvailability($id);
-
         return new Professor(
             (string)$row['ProfessorID'],
             $row['ProfessorFirstName'],
@@ -122,11 +109,6 @@ class DatabaseProfessorRepository implements ProfessorRepository
             $row['ProfessorPhone'],
             $row['ProfessorStatus'],
             $user,
-            $row['ProfessorHasContract'],
-            (int)$row['ProfessorTimeContract'],
-            $instruments,
-            $rooms,
-            $availability
         );
     }
 
@@ -148,7 +130,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
 
             // Insertar en la tabla professors
             $stmtProfessor = $this->pdo->prepare(
-                "INSERT INTO professors (ProfessorID, ProfessorFirstName, ProfessorLastName, ProfessorPhone, ProfessorStatus, ProfessorHasContract, ProfessorTimeContract) VALUES (:id, :firstName, :lastName, :phone, :status, :hasContract, :timeContract)"
+                "INSERT INTO professors (ProfessorID, ProfessorFirstName, ProfessorLastName, ProfessorPhone, ProfessorStatus) VALUES (:id, :firstName, :lastName, :phone, :status)"
             );
             $stmtProfessor->execute([
                 'id' => $professor->getProfessorID(),
@@ -156,45 +138,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
                 'lastName' => $professor->getLastName(),
                 'phone' => $professor->getPhone(),
                 'status' => $professor->getStatus(),
-                'hasContract' => $professor->getHasContract(),
-                'timeContract' => $professor->getTimeContract()
             ]);
-
-            foreach ($professor->getInstruments() as $instrument) {
-                $stmt = $this->pdo->prepare(
-                    "INSERT INTO professor_instruments (ProfessorID, InstrumentID) VALUES (:ProfessorID, :InstrumentID)"
-                );
-                $stmt->execute([
-                    'ProfessorID' => $instrument->getProfessorID(),
-                    'InstrumentID' => $instrument->getInstrumentID()
-                ]);
-            }
-
-            // Insertar salones
-            foreach ($professor->getRooms() as $room) {
-                $stmt = $this->pdo->prepare(
-                    "INSERT INTO professor_rooms (ProfessorID, RoomID) VALUES (:ProfessorID, :RoomID)"
-                );
-                $stmt->execute([
-                    'ProfessorID' => $room->getProfessorID(),
-                    'RoomID' => $room->getRoomID()
-                ]);
-            }
-
-            // Insertar disponibilidad
-            foreach ($professor->getAvailability() as $availability) {
-                $stmt = $this->pdo->prepare(
-                    "INSERT INTO professor_availability 
-                    (ProfessorID, DayID, StartTime, EndTime) 
-                    VALUES (:ProfessorID, :DayID, :StartTime, :EndTime)"
-                );
-                $stmt->execute([
-                    'ProfessorID' => $availability->getProfessorID(),
-                    'DayID' => $availability->getDayID(),
-                    'StartTime' => $availability->getStartTime(),
-                    'EndTime' => $availability->getEndTime()
-                ]);
-            }
 
             $this->pdo->commit();
 
@@ -205,7 +149,6 @@ class DatabaseProfessorRepository implements ProfessorRepository
             if ($e->getCode() === '23000') {
                 throw new \DomainException("El ID proporcionado ya existe en la base de datos.");
             }
-
             // Re-lanzar la excepción si no es del tipo esperado
             throw $e;
         }
@@ -220,11 +163,6 @@ class DatabaseProfessorRepository implements ProfessorRepository
             // Actualizar datos básicos (existente)
             $this->updateUser($professor);
             $this->updateProfessor($professor);
-
-            // Actualizar relaciones
-            $this->updateInstruments($professor);
-            $this->updateRooms($professor);
-            $this->updateAvailability($professor);
 
             $this->pdo->commit();
             return true;
@@ -259,9 +197,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
             ProfessorFirstName = :firstName, 
             ProfessorLastName = :lastName, 
             ProfessorPhone = :phone, 
-            ProfessorStatus = :status,
-            ProfessorHasContract = :hasContract,
-            ProfessorTimeContract = :timeContract 
+            ProfessorStatus = :status
         WHERE ProfessorID = :professorId
     ");
 
@@ -270,8 +206,6 @@ class DatabaseProfessorRepository implements ProfessorRepository
             'lastName' => $professor->getLastName(),
             'phone' => $professor->getPhone(),
             'status' => $professor->getStatus(),
-            'hasContract' => (int)$professor->getHasContract(), // Convertir bool a int si es necesario
-            'timeContract' => $professor->getTimeContract(),
             'professorId' => $professor->getProfessorID()
         ]);
     }
@@ -282,11 +216,11 @@ class DatabaseProfessorRepository implements ProfessorRepository
         $this->pdo->prepare("DELETE FROM professor_instruments WHERE ProfessorID = ?")
             ->execute([$professor->getProfessorID()]);
 
-        // Insertar nuevos
-        foreach ($professor->getInstruments() as $instrument) {
-            $this->pdo->prepare("INSERT INTO professor_instruments (ProfessorID, InstrumentID) VALUES (?, ?)")
-                ->execute([$professor->getProfessorID(), $instrument->getInstrumentID()]);
-        }
+        // // Insertar nuevos
+        // foreach ($professor->getInstruments() as $instrument) {
+        //     $this->pdo->prepare("INSERT INTO professor_instruments (ProfessorID, InstrumentID) VALUES (?, ?)")
+        //         ->execute([$professor->getProfessorID(), $instrument->getInstrumentID()]);
+        // }
     }
 
     private function updateRooms(Professor $professor): void
@@ -295,11 +229,11 @@ class DatabaseProfessorRepository implements ProfessorRepository
         $this->pdo->prepare("DELETE FROM professor_rooms WHERE ProfessorID = ?")
             ->execute([$professor->getProfessorID()]);
 
-        // Insertar nuevos
-        foreach ($professor->getRooms() as $room) {
-            $this->pdo->prepare("INSERT INTO professor_rooms (ProfessorID, RoomID) VALUES (?, ?)")
-                ->execute([$professor->getProfessorID(), $room->getRoomID()]);
-        }
+        // // Insertar nuevos
+        // foreach ($professor->getRooms() as $room) {
+        //     $this->pdo->prepare("INSERT INTO professor_rooms (ProfessorID, RoomID) VALUES (?, ?)")
+        //         ->execute([$professor->getProfessorID(), $room->getRoomID()]);
+        // }
     }
 
     private function updateAvailability(Professor $professor): void
@@ -308,19 +242,19 @@ class DatabaseProfessorRepository implements ProfessorRepository
         $this->pdo->prepare("DELETE FROM professor_availability WHERE ProfessorID = ?")
             ->execute([$professor->getProfessorID()]);
 
-        // Insertar nuevos
-        foreach ($professor->getAvailability() as $availability) {
-            $this->pdo->prepare(
-                "INSERT INTO professor_availability 
-                (ProfessorID, DayID, StartTime, EndTime) 
-                VALUES (?, ?, ?, ?)"
-            )->execute([
-                $professor->getProfessorID(),
-                $availability->getDayID(),
-                $availability->getStartTime(),
-                $availability->getEndTime()
-            ]);
-        }
+        // // Insertar nuevos
+        // foreach ($professor->getAvailability() as $availability) {
+        //     $this->pdo->prepare(
+        //         "INSERT INTO professor_availability 
+        //         (ProfessorID, DayID, StartTime, EndTime) 
+        //         VALUES (?, ?, ?, ?)"
+        //     )->execute([
+        //         $professor->getProfessorID(),
+        //         $availability->getDayID(),
+        //         $availability->getStartTime(),
+        //         $availability->getEndTime()
+        //     ]);
+        // }
     }
 
     public function delete(string $id): bool
