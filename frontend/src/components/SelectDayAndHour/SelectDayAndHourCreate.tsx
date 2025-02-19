@@ -3,14 +3,15 @@ import { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
 import Skeleton from "../Loader/Skeleton";
 import { AvailableSlotType } from "@/types/Api";
-import { useState } from "react";
-import { formatToHHMM, generarIntervalos, to12HourFormat } from "@/utils/timeConversionUtils";
+import { useEffect, useState } from "react";
+import { addSecondsToTime, formatToHHMM, generarIntervalos } from "@/utils/timeConversionUtils";
 
 interface Props {
   roomId: string;
+  onChange: (data: { day: number | null; startTime: string | null; endTime: string | null }) => void;
 }
 
-const SelectDayAndHourCreate = ({ roomId }: Props) => {
+const SelectDayAndHourCreate = ({ roomId, onChange }: Props) => {
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [selectedStartTime, setSelectedStartTime] = useState<string | null>(null);
   const [selectedEndTime, setSelectedEndTime] = useState<string | null>(null);
@@ -45,6 +46,15 @@ const SelectDayAndHourCreate = ({ roomId }: Props) => {
     setEndTimeOptions(endTimes);
     setSelectedEndTime(null);
   };
+
+  useEffect(() => {
+    // le pasamos al padre la hora en formado HH:MM:SS ya que actualmente en el frontend se esta manejando en 12 horas
+    onChange({
+      day: selectedDay,
+      startTime: selectedStartTime && addSecondsToTime(formatToHHMM(selectedStartTime)),
+      endTime: selectedEndTime && addSecondsToTime(formatToHHMM(selectedEndTime)),
+    });
+  }, [selectedDay, selectedStartTime, selectedEndTime, onChange]);
 
   if (isError)
     return <div>Hubo un error al intentar cargar la disponibilidad</div>;

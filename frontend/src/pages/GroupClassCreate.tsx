@@ -8,7 +8,6 @@ import {
   EnrollType,
   GroupClassType,
   ProfessorType,
-  ScheduleStateType,
 } from "@/types/Api";
 import ActivePeriod from "@/components/ChangeAP/ActivePeriod";
 import SearchSelect from "@/components/SearchSelect";
@@ -129,7 +128,15 @@ const GroupClassCreate = () => {
             />
           </div>
           {roomId && (
-            <SelectDayAndHourCreate roomId={roomId} />
+            <SelectDayAndHourCreate 
+              roomId={roomId}  
+              onChange={({ day, startTime, endTime }) => {
+                // Aquí manejas los valores seleccionados
+                console.log("Día:", day);
+                console.log("Inicio:", startTime);
+                console.log("Fin:", endTime);
+              }} 
+            />
           )}
           <div>
             <button className="btn-primary w-full">Crear</button>
