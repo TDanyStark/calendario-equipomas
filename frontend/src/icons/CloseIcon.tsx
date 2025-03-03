@@ -11,9 +11,9 @@ const CloseIcon = () => (
         id="Vector"
         d="M16 16L12 12M12 12L8 8M12 12L16 8M12 12L8 16"
         stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </g>
   </svg>

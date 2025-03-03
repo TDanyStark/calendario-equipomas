@@ -9,6 +9,7 @@ import store from "./store/store.ts";
 
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ToastContainer } from "react-toastify";
+import { createPortal } from "react-dom";
 
 // Crea una instancia de QueryClient
 const queryClient = new QueryClient();
@@ -19,7 +20,11 @@ createRoot(document.getElementById("root")!).render(
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
           <App />
-          <ToastContainer theme="dark" limit={2} />
+          {
+            createPortal(
+              <ToastContainer theme="dark" limit={2} />, document.body
+            )
+          }
         </QueryClientProvider>
       </Provider>
     </BrowserRouter>

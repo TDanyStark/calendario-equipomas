@@ -8,8 +8,13 @@ import CloseModalBtn from "../buttons/CloseModalBtn";
 import CancelModalBtn from "../buttons/CancelModalBtn";
 import SubmitModalBtn from "../buttons/SubmitModalBtn";
 import BackgroundDiv from "../modal/BackgroundDiv";
-import { ProfessorType, ScheduleType, SelectableInstrument, SelectableRoom } from "@/types/Api";
-import { useEffect, useState } from "react";
+import {
+  ProfessorType,
+  ScheduleType,
+  SelectableInstrument,
+  SelectableRoom,
+} from "@/types/Api";
+import { useEffect, useRef, useState } from "react";
 import SelectMultiple from "../SelectMultiple";
 import SelectShedulePro from "../SelectShedulePro";
 import useFetchItems from "@/hooks/useFetchItems";
@@ -20,7 +25,13 @@ interface AssignProfessorModalProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   professor: ProfessorType | null;
-  onAssign: (contract: boolean, hours: number, instrumentsProfessor: SelectableInstrument[], roomsProfessor: SelectableRoom[], schedule: ScheduleType[]) => void;
+  onAssign: (
+    contract: boolean,
+    hours: number,
+    instrumentsProfessor: SelectableInstrument[],
+    roomsProfessor: SelectableRoom[],
+    schedule: ScheduleType[]
+  ) => void;
   JWT: string | null;
 }
 
@@ -33,7 +44,10 @@ const AssignProfessorModal: React.FC<AssignProfessorModalProps> = ({
 }) => {
   const [contract, setContract] = useState(false);
   const [hours, setHours] = useState(1);
-  const [instrumentProfessor, setInstrumentProfessor] = useState<SelectableInstrument[]>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [instrumentProfessor, setInstrumentProfessor] = useState<
+    SelectableInstrument[]
+  >([]);
   const [roomsProfessor, setRoomsProfessor] = useState<SelectableRoom[]>([]);
   const [schedule, setSchedule] = useState<ScheduleType[]>([]);
 
@@ -56,7 +70,7 @@ const AssignProfessorModal: React.FC<AssignProfessorModalProps> = ({
         }))
       );
     }
-  }, [instruments, isLoadingInstruments]);
+  }, [instruments, isLoadingInstruments, isOpen]);
 
   useEffect(() => {
     if (rooms && !isLoadingRooms) {
@@ -67,21 +81,37 @@ const AssignProfessorModal: React.FC<AssignProfessorModalProps> = ({
         }))
       );
     }
-  }, [isLoadingRooms, rooms]);
+  }, [isLoadingRooms, rooms, isOpen]);
 
   // Reset form when modal opens
   useEffect(() => {
+    setContract(false);
     if (isOpen) {
-      setContract(false);
       setHours(1);
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+        inputRef.current.select();
+      }
+    }, 50);
+  }, [contract, inputRef]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // si no hay instrumentos o salones seleccionados, no se puede asignar lanzar un toast
-    if (instrumentProfessor.filter((instrument) => instrument.selected).length === 0 || roomsProfessor.filter((room) => room.selected).length === 0) {
-      toast.error("Debe seleccionar al menos un instrumento y un salón");
+    if (
+      instrumentProfessor.filter((instrument) => instrument.selected).length ===
+        0 ||
+      roomsProfessor.filter((room) => room.selected).length === 0 ||
+      schedule.filter((schedule) => schedule.isActive).length === 0
+    ) {
+      toast.error(
+        "Debe seleccionar al menos un instrumento, un salón y un dia como mínimo"
+      );
       return;
     }
     onAssign(contract, hours, instrumentProfessor, roomsProfessor, schedule);
@@ -146,9 +176,9 @@ const AssignProfessorModal: React.FC<AssignProfessorModalProps> = ({
                     type="number"
                     id="hours"
                     value={hours}
+                    ref={inputRef}
                     onChange={(e) => setHours(Number(e.target.value))}
                     className="input-primary w-full"
-                    autoFocus
                   />
                 </div>
               </Transition>
