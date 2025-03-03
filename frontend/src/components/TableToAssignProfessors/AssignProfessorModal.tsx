@@ -176,6 +176,7 @@ const AssignProfessorModal: React.FC<AssignProfessorModalProps> = ({
                     type="number"
                     id="hours"
                     value={hours}
+                    min={1}
                     ref={inputRef}
                     onChange={(e) => setHours(Number(e.target.value))}
                     className="input-primary w-full"

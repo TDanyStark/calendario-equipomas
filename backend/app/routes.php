@@ -130,6 +130,7 @@ return function (App $app) {
         $group->group('/professors', function (Group $professorGroup) {
             $professorGroup->get('', ListProfessorsAction::class);
             $professorGroup->get('/query', GetProfessorQueryAction::class);
+            $professorGroup->post('/assign', SeedProfessorsAction::class);
             // $professorGroup->get('/seed', SeedProfessorsAction::class);
             $professorGroup->get('/idsactive', ListProfessorIdsActiveAction::class);
             $professorGroup->get('/{id}', GetProfessorAction::class);

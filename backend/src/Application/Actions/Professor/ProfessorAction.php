@@ -7,17 +7,17 @@ namespace App\Application\Actions\Professor;
 use App\Application\Actions\Action;
 use App\Domain\Professor\ProfessorRepository;
 use Psr\Log\LoggerInterface;
-// use App\Domain\AcademicPeriod\AcademicPeriodRepository;
+use App\Domain\AcademicPeriod\AcademicPeriodRepository;
 
 abstract class ProfessorAction extends Action
 {
     protected ProfessorRepository $professorRepository;
-    // protected AcademicPeriodRepository $academicPeriodRepository;
+    protected AcademicPeriodRepository $academicPeriodRepository;
 
-    public function __construct(LoggerInterface $logger, ProfessorRepository $professorRepository)
+    public function __construct(LoggerInterface $logger, ProfessorRepository $professorRepository, AcademicPeriodRepository $academicPeriodRepository)
     {
         parent::__construct($logger);
         $this->professorRepository = $professorRepository;
-        // $this->academicPeriodRepository = $academicPeriodRepository;
+        $this->academicPeriodRepository = $academicPeriodRepository;
     }
 }

@@ -21,4 +21,5 @@ interface ProfessorRepository
     public function findProfessorByQuery(string $query): array;
     public function findProfessorIdsActive(): array;
     public function seedProfessors(): void;
+    public function assignProfessor(string $ID, array $professorInstrumentsArray, array $professorRoomsArray, array $professorAvailabilityArray): void;
 }
