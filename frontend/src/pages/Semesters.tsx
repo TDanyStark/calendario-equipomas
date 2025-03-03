@@ -176,8 +176,6 @@ const Semesters = () => {
           </div>
         </Dialog>
       )}
-
-      <ToastContainer theme="dark" limit={1} />
     </section>
   );
 };

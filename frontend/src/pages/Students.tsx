@@ -253,8 +253,6 @@ const Students = () => {
           </div>
         </Dialog>
       )}
-
-      <ToastContainer theme="dark" limit={2} />
     </section>
   );
 };

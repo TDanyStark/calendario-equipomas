@@ -13,6 +13,8 @@ use App\Domain\Professor\ProfessorInstruments;
 use App\Domain\Professor\ProfessorRooms;
 use App\Domain\Professor\ProfessorAvailability;
 use App\Domain\Services\PasswordService;
+use Exception;
+use PDOException;
 
 class DatabaseProfessorRepository implements ProfessorRepository
 {
@@ -26,7 +28,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
     public function findAll(int $limit, int $offset, string $query, bool $offPagination, bool $onlyActive): array
     {
         $searchQuery = "%$query%";
-    
+
         // Condición WHERE reutilizable
         $whereClause = '(:query = "" OR p.ProfessorID LIKE :query 
         OR p.ProfessorFirstName LIKE :query 
@@ -38,17 +40,17 @@ class DatabaseProfessorRepository implements ProfessorRepository
         if ($onlyActive) {
             $whereClause .= ' AND p.ProfessorStatus = "activo"';
         }
-    
+
         // Obtener cantidad total de registros
         $countStmt = $this->pdo->prepare("SELECT COUNT(*) as total FROM professors p 
         JOIN users u ON p.ProfessorID = u.UserID WHERE $whereClause");
         $countStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
         $countStmt->execute();
         $totalRecords = (int) $countStmt->fetchColumn();
-    
+
         // Calcular número de páginas
         $totalPages = $limit > 0 ? ceil($totalRecords / $limit) : 1;
-    
+
         // Obtener datos paginados
         $dataStmt = $this->pdo->prepare("SELECT p.*, u.UserID, u.UserEmail, u.UserPassword, u.RoleID 
         FROM professors p 
@@ -56,15 +58,15 @@ class DatabaseProfessorRepository implements ProfessorRepository
         WHERE $whereClause 
         ORDER BY p.Update_at DESC, p.ProfessorFirstName ASC 
         LIMIT :limit OFFSET :offset");
-    
+
         $dataStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
         $dataStmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $dataStmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $dataStmt->execute();
-    
+
         $professors = [];
         // obtener los instrumentos, los salones, y la disponibilidad de los profesores
-        
+
 
         while ($row = $dataStmt->fetch(PDO::FETCH_ASSOC)) {
             $user = new User($row['UserID'], $row['UserEmail'], $row['UserPassword'], (int)$row['RoleID']);
@@ -77,14 +79,14 @@ class DatabaseProfessorRepository implements ProfessorRepository
                 $user,
             );
         }
-    
+
         if ($offPagination) {
             return $professors;
         }
-    
+
         return ['data' => $professors, 'pages' => $totalPages];
     }
-    
+
 
     public function findProfessorById(string $id): ?Professor
     {
@@ -180,7 +182,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
             UserEmail = :email, 
             RoleID = :roleId 
         WHERE UserID = :userId
-    ");
+        ");
 
         $stmt->execute([
             'email' => $professor->getUser()->getEmail(),
@@ -199,7 +201,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
             ProfessorPhone = :phone, 
             ProfessorStatus = :status
         WHERE ProfessorID = :professorId
-    ");
+        ");
 
         $stmt->execute([
             'firstName' => $professor->getFirstName(),
@@ -308,7 +310,8 @@ class DatabaseProfessorRepository implements ProfessorRepository
             FROM professor_instruments pi
             JOIN instruments i ON pi.InstrumentID = i.InstrumentID
             WHERE ProfessorID = :id
-            ");
+            "
+        );
         $stmt->execute(['id' => $professorId]);
 
         $instruments = [];
@@ -411,5 +414,34 @@ class DatabaseProfessorRepository implements ProfessorRepository
             $professorIds[] = (string)$row['ProfessorID'];
         }
         return $professorIds;
+    }
+
+    public function seedProfessors(): void
+    {
+        try {
+            $this->pdo->beginTransaction();
+
+            for ($i = 1; $i <= 20; $i++) {
+                // Generamos un UserID de 10 dígitos: "22" + ceros intermedios + número del profesor
+                $userID = sprintf("22%07d", $i);
+                $email = "profesor{$i}@example.com";
+                $password = password_hash($userID, PASSWORD_DEFAULT);
+                $roleID = 2; // Asignamos el rol de profesor
+
+                // Insertar en la tabla users
+                $stmtUser = $this->pdo->prepare("INSERT INTO users (UserID, UserEmail, UserPassword, RoleID) VALUES (?, ?, ?, ?)");
+                $stmtUser->execute([$userID, $email, $password, $roleID]);
+
+                // Insertar en la tabla professors
+                $stmtProf = $this->pdo->prepare("INSERT INTO professors (ProfessorID, ProfessorFirstName, ProfessorLastName, ProfessorPhone, ProfessorStatus) VALUES (?, ?, ?, ?, ?)");
+                $stmtProf->execute([$userID, "Profesor {$i}", "Apellido {$i}", "555-100{$i}", "activo"]);
+            }
+
+            $this->pdo->commit();
+            echo json_encode(["success" => "20 profesores insertados correctamente"]);
+        } catch (PDOException $e) {
+            $this->pdo->rollBack();
+            echo json_encode(["error" => "Error insertando profesores: " . $e->getMessage()]);
+        }
     }
 }

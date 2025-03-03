@@ -21,9 +21,6 @@ const GroupClassEdit = () => {
   return (
     <section className="section_page">
       <Primaryh1>Editar Clase Grupal: {id}</Primaryh1>
-
-
-      <ToastContainer theme="dark" limit={2} />
     </section>
   );
 };

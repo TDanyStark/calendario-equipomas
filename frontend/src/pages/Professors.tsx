@@ -140,8 +140,6 @@ const Professors = () => {
         onFormSubmit={onSubmit}
         isLoading={isCreateLoading || isUpdateLoading}
       />
-
-      <ToastContainer theme="dark" limit={2} />
     </section>
   );
 };

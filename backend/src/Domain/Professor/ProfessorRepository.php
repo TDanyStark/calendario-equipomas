@@ -20,4 +20,5 @@ interface ProfessorRepository
     public function deleteMultiple(array $ids): int;
     public function findProfessorByQuery(string $query): array;
     public function findProfessorIdsActive(): array;
+    public function seedProfessors(): void;
 }

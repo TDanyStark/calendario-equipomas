@@ -184,7 +184,6 @@ const Instruments = () => {
         </Dialog>
       )}
 
-      <ToastContainer theme="dark" limit={1} />
     </section>
   );
 };

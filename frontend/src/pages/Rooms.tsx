@@ -189,8 +189,6 @@ const Rooms = () => {
           </div>
         </Dialog>
       )}
-
-      <ToastContainer theme="dark" limit={1} />
     </section>
   );
 };

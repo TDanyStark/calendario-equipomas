@@ -1,4 +1,4 @@
-import DeleteSvg from "../../icons/DeleteSvg.tsx";
+import CloseIcon from "@/icons/CloseIcon.tsx";
 import type { Selectable } from "../../types/Api.d.ts";
 import type { ReactNode } from "react";
 
@@ -36,7 +36,7 @@ const SelectMultiple = <T extends Selectable>({
         return item;
       })
     );
-  }
+  };
 
   return (
     <div>
@@ -50,9 +50,9 @@ const SelectMultiple = <T extends Selectable>({
           Elige {title}
         </option>
         {items.map((item) => (
-          <option 
-            key={String(item[propName])} 
-            value={String(item[propName])} 
+          <option
+            key={String(item[propName])}
+            value={String(item[propName])}
             disabled={item.selected}
           >
             {item[propName] as ReactNode}
@@ -60,17 +60,18 @@ const SelectMultiple = <T extends Selectable>({
         ))}
       </select>
 
-      <div className="px-2 py-4 space-y-2">
+      <div className="flex gap-1 flex-wrap py-2 font-light text-sm">
         {items.map(
           (item) =>
             item.selected && (
-              <div key={String(item[propName])} className="flex gap-2 items-center">
+              <div
+                key={String(item[propName])}
+                className="flex items-center bg-gray-800 pl-2 rounded-full cursor-pointer"
+                onClick={() => handleDelete(String(item.id))}
+              >
                 <span>{item[propName] as React.ReactNode}</span>
-                <span 
-                  className="text-red-500 p-1 cursor-pointer" 
-                  onClick={() => handleDelete(String(item.id))}
-                >
-                  <DeleteSvg />
+                <span className="text-gray-400 p-1">
+                  <CloseIcon />
                 </span>
               </div>
             )

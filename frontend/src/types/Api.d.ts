@@ -96,6 +96,12 @@ type ProfessorAvailabilityType = {
   endTime: string;
 }
 
+type AvailabilityForScheduleProType = {
+  dayID: string;
+  startTime: string;
+  endTime: string;
+}
+
 type ProfessorInstrumentType = {
   ProfessorInstrumentID: number;
   id: string;
@@ -108,6 +114,8 @@ type ProfessorRoomType = {
 }
 
 type ProfessorType ={
+  map(arg0: (item: ProfessorType) => import("react/jsx-runtime").JSX.Element): import("react").ReactNode;
+  length: number;
   id: string;
   name: string;
   firstName: string;

@@ -11,9 +11,8 @@ import {
   ScheduleStateType, 
   ScheduleType, 
   ScheduleDayType, 
-  Availability, 
-  ProfessorAvailabilityType,
-  ProfessorType
+  Availability,
+  AvailabilityForScheduleProType, 
 } from "../../types/Api";
 import TimeRangeRow from "./TimeRangeRow";
 import CheckBoxToggle from "../selectSchedule/CheckBoxToggle";
@@ -22,10 +21,10 @@ interface Props<T,>{
   schedule: ScheduleType[];
   setSchedule: (schedule: ScheduleType[]) => void;
   canBeAdded: boolean;
-  editProfessor: T | null;
+  editItem: T | null;
 }
 
-const SelectShedulePro = <T,>({schedule, setSchedule, canBeAdded = true, editProfessor}: Props<T>) => {
+const SelectShedulePro = <T,>({schedule, setSchedule, canBeAdded = true, editItem}: Props<T>) => {
   const scheduleWeek = useSelector(
     (state: { schedule: ScheduleStateType }) => state.schedule
   );
@@ -36,8 +35,8 @@ const SelectShedulePro = <T,>({schedule, setSchedule, canBeAdded = true, editPro
       const updatedSchedule = scheduleWeek.scheduleDays.map((day: ScheduleDayType) => {
 
         let willActive = true;
-        if (editProfessor && isProfessorType(editProfessor)) {
-          willActive = ((editProfessor as { availability: ProfessorAvailabilityType[] }).availability.some((d: ProfessorAvailabilityType) => d.dayID === day.id));
+        if (editItem && isItemType(editItem)) {
+          willActive = ((editItem as unknown as { availability: AvailabilityForScheduleProType[] }).availability.some((d) => d.dayID === day.id));
         }
         
         return {
@@ -54,10 +53,10 @@ const SelectShedulePro = <T,>({schedule, setSchedule, canBeAdded = true, editPro
         };
       });
 
-      if (editProfessor && isProfessorType(editProfessor)) {
+      if (editItem && isItemType(editItem)) {
         // borrar el horario que se coloco por el estado global y colocar los guardados en la base de datos solo de los dias que se encuentran en la informacion del profesor
         const daysFound = new Set();
-        (editProfessor as { availability: ProfessorAvailabilityType[] }).availability.forEach((day: ProfessorAvailabilityType) => {
+        (editItem as unknown as { availability: AvailabilityForScheduleProType[] }).availability.forEach((day: AvailabilityForScheduleProType) => {
           const dayIndex = updatedSchedule.findIndex((d) => d.id === day.dayID);
           if (dayIndex !== -1) {
             if (!daysFound.has(dayIndex)){
@@ -73,7 +72,7 @@ const SelectShedulePro = <T,>({schedule, setSchedule, canBeAdded = true, editPro
       }
       setSchedule(updatedSchedule);
     }
-  }, [editProfessor, scheduleWeek, setSchedule]);
+  }, [editItem, scheduleWeek, setSchedule]);
 
 
   if (!scheduleWeek?.scheduleDays || !scheduleWeek?.recurrence) {
@@ -83,10 +82,7 @@ const SelectShedulePro = <T,>({schedule, setSchedule, canBeAdded = true, editPro
   const recurrence = scheduleWeek.recurrence;
 
   // Cambia el estado (on/off) de un día
-  interface HandleToggleDay {
-    (index: number): void;
-  }
-  const handleToggleDay: HandleToggleDay = (index) => {
+  const handleToggleDay = (index: number) => {
     const updated = [...schedule];
     updated[index].isActive = !updated[index].isActive;
     setSchedule(updated);
@@ -220,8 +216,7 @@ const SelectShedulePro = <T,>({schedule, setSchedule, canBeAdded = true, editPro
   );
 };
 
-// Type guard para ProfessorType
-function  isProfessorType<T>(obj: T): obj is T & ProfessorType {
+function  isItemType<T>(obj: T): obj is T {
   return !!obj && typeof obj === 'object' && 'availability' in obj;
 }
 

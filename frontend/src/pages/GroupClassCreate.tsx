@@ -191,8 +191,6 @@ const GroupClassCreate = () => {
           )}
         </div>
       </div>
-
-      <ToastContainer theme="dark" limit={2} />
     </section>
   );
 };
