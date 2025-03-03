@@ -212,53 +212,6 @@ class DatabaseProfessorRepository implements ProfessorRepository
         ]);
     }
 
-    private function updateInstruments(Professor $professor): void
-    {
-        // Eliminar existentes
-        $this->pdo->prepare("DELETE FROM professor_instruments WHERE ProfessorID = ?")
-            ->execute([$professor->getProfessorID()]);
-
-        // // Insertar nuevos
-        // foreach ($professor->getInstruments() as $instrument) {
-        //     $this->pdo->prepare("INSERT INTO professor_instruments (ProfessorID, InstrumentID) VALUES (?, ?)")
-        //         ->execute([$professor->getProfessorID(), $instrument->getInstrumentID()]);
-        // }
-    }
-
-    private function updateRooms(Professor $professor): void
-    {
-        // Eliminar existentes
-        $this->pdo->prepare("DELETE FROM professor_rooms WHERE ProfessorID = ?")
-            ->execute([$professor->getProfessorID()]);
-
-        // // Insertar nuevos
-        // foreach ($professor->getRooms() as $room) {
-        //     $this->pdo->prepare("INSERT INTO professor_rooms (ProfessorID, RoomID) VALUES (?, ?)")
-        //         ->execute([$professor->getProfessorID(), $room->getRoomID()]);
-        // }
-    }
-
-    private function updateAvailability(Professor $professor): void
-    {
-        // Eliminar existentes
-        $this->pdo->prepare("DELETE FROM professor_availability WHERE ProfessorID = ?")
-            ->execute([$professor->getProfessorID()]);
-
-        // // Insertar nuevos
-        // foreach ($professor->getAvailability() as $availability) {
-        //     $this->pdo->prepare(
-        //         "INSERT INTO professor_availability 
-        //         (ProfessorID, DayID, StartTime, EndTime) 
-        //         VALUES (?, ?, ?, ?)"
-        //     )->execute([
-        //         $professor->getProfessorID(),
-        //         $availability->getDayID(),
-        //         $availability->getStartTime(),
-        //         $availability->getEndTime()
-        //     ]);
-        // }
-    }
-
     public function delete(string $id): bool
     {
         try {
@@ -442,6 +395,58 @@ class DatabaseProfessorRepository implements ProfessorRepository
         } catch (PDOException $e) {
             $this->pdo->rollBack();
             echo json_encode(["error" => "Error insertando profesores: " . $e->getMessage()]);
+        }
+    }
+
+    private function AddInstrumentsProfessor(string $ID, array $professorInstrumentsArray): void
+    {
+        $stmt = $this->pdo->prepare("INSERT INTO professor_instruments (ProfessorID, InstrumentID, academic_period_id) VALUES (:professorID, :instrumentID, :academicPeriodID)");
+        foreach ($professorInstrumentsArray as $professorInstrument) {
+            $stmt->execute([
+                'professorID' => $ID,
+                'instrumentID' => $professorInstrument->getInstrumentID(),
+                'academicPeriodID' => $professorInstrument->getAcademicPeriodID()
+            ]);
+        }
+    }
+
+    private function AddRoomsProfessor(string $ID, array $professorRoomsArray): void
+    {
+        $stmt = $this->pdo->prepare("INSERT INTO professor_rooms (ProfessorID, RoomID, academic_period_id) VALUES (:professorID, :roomID, :academicPeriodID)");
+        foreach ($professorRoomsArray as $professorRoom) {
+            $stmt->execute([
+                'professorID' => $ID,
+                'roomID' => $professorRoom->getRoomID(),
+                'academicPeriodID' => $professorRoom->getAcademicPeriodID()
+            ]);
+        }
+    }
+
+    private function AddAvailabilityProfessor(string $ID, array $professorAvailabilityArray): void
+    {
+        $stmt = $this->pdo->prepare("INSERT INTO professor_availability (ProfessorID, DayID, academic_period_id, StartTime, EndTime) VALUES (:professorID, :dayID, :academicPeriodID, :startTime, :endTime)");
+        foreach ($professorAvailabilityArray as $professorAvailability) {
+            $stmt->execute([
+                'professorID' => $ID,
+                'dayID' => $professorAvailability->getDayID(),
+                'academicPeriodID' => $professorAvailability->getAcademicPeriodID(),
+                'startTime' => $professorAvailability->getStartTime(),
+                'endTime' => $professorAvailability->getEndTime()
+            ]);
+        }
+    }
+
+    public function assignProfessor(string $ID, array $professorInstrumentsArray, array $professorRoomsArray, array $professorAvailabilityArray): void
+    {
+        try {
+            $this->pdo->beginTransaction();
+            $this->AddInstrumentsProfessor($ID, $professorInstrumentsArray);
+            $this->AddRoomsProfessor($ID, $professorRoomsArray);
+            $this->AddAvailabilityProfessor($ID, $professorAvailabilityArray);
+            $this->pdo->commit();
+        } catch (Exception $e) {
+            $this->pdo->rollBack();
+            throw $e;
         }
     }
 }
