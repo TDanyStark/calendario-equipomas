@@ -100,6 +100,14 @@ const AssignProfessorModal: React.FC<AssignProfessorModalProps> = ({
       setContract(false);
       setHours(1);
     }
+
+    if (!isOpen){
+      setContract(false);
+      setHours(1);
+      setInstrumentProfessor([]);
+      setRoomsProfessor([]);
+      setSchedule([]);
+    }
   }, [isOpen, professor]);
 
 

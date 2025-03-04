@@ -23,17 +23,21 @@ import { useDebounce } from "use-debounce";
 import Theme from "@/lib/Theme";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { ProfessorAssignType, ProfessorType, ScheduleType, SelectableInstrument, SelectableRoom } from "@/types/Api";
+import {
+  ProfessorAssignType,
+  ProfessorType,
+  ScheduleType,
+  SelectableInstrument,
+  SelectableRoom,
+} from "@/types/Api";
 import PlusSvg from "@/icons/PlusSvg";
 import AssignProfessorModal from "./AssignProfessorModal";
 import useItemMutations from "@/hooks/useItemsMutation";
-
 
 const entity = "professors/assign";
 const entityName = "profesores";
 const heightRow = 52;
 const gridTemplateColumns = "180px 1fr 1fr 1fr 120px 130px";
-
 
 function TableToAssignProfessors() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -45,8 +49,9 @@ function TableToAssignProfessors() {
 
   // Estado para manejar el modal
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedProfessor, setSelectedProfessor] =
-    useState<ProfessorType & ProfessorAssignType | null>(null);
+  const [selectedProfessor, setSelectedProfessor] = useState<
+    (ProfessorType & ProfessorAssignType) | null
+  >(null);
 
   const [debouncedQuery] = useDebounce(query, 500);
 
@@ -102,19 +107,29 @@ function TableToAssignProfessors() {
   );
 
   // Manejador para abrir el modal
-  const handleOpenAssignModal = (professor: ProfessorType & ProfessorAssignType) => {
+  const handleOpenAssignModal = (
+    professor: ProfessorType & ProfessorAssignType
+  ) => {
     console.log(professor);
     setSelectedProfessor(professor);
     setIsModalOpen(true);
   };
 
   // Manejador para asignar el profesor
-  const handleAssignProfessor = async (contract: boolean, hours: number, instrumentsProfessor: SelectableInstrument[], roomsProfessor: SelectableRoom[], schedule: ScheduleType[]) => {
+  const handleAssignProfessor = async (
+    contract: boolean,
+    hours: number,
+    instrumentsProfessor: SelectableInstrument[],
+    roomsProfessor: SelectableRoom[],
+    schedule: ScheduleType[]
+  ) => {
     // Aquí implementarías la lógica para guardar los datos
     // pasar solo los de selected = trueinstrumentsProfessor y roomsProfessor
-    instrumentsProfessor = instrumentsProfessor.filter((instrument) => instrument.selected);
+    instrumentsProfessor = instrumentsProfessor.filter(
+      (instrument) => instrument.selected
+    );
     roomsProfessor = roomsProfessor.filter((room) => room.selected);
-    
+
     if (!selectedProfessor) return;
     const res = await createItem.mutateAsync({
       id: selectedProfessor?.id,
@@ -130,35 +145,46 @@ function TableToAssignProfessors() {
     }
   };
 
-  const {createItem} = useItemMutations<ProfessorAssignType>("professors/assign", JWT);
+  const { createItem } = useItemMutations<ProfessorAssignType>(
+    "professors/assign",
+    JWT
+  );
 
   const columns = useMemo(
     () => [
       {
         label: "ID",
         sortKey: "id",
-        renderCell: (item: unknown) => (item as ProfessorType & ProfessorAssignType).id,
+        renderCell: (item: unknown) =>
+          (item as ProfessorType & ProfessorAssignType).id,
       },
       {
         label: "Nombre",
         sortKey: "firstName",
-        renderCell: (item: unknown) => (item as ProfessorType & ProfessorAssignType).firstName,
+        renderCell: (item: unknown) =>
+          (item as ProfessorType & ProfessorAssignType).firstName,
       },
       {
         label: "Apellido",
         sortKey: "lastName",
-        renderCell: (item: unknown) => (item as ProfessorType & ProfessorAssignType).lastName,
+        renderCell: (item: unknown) =>
+          (item as ProfessorType & ProfessorAssignType).lastName,
       },
       {
         label: "Teléfono",
         sortKey: "phone",
         renderCell: (item: unknown) =>
-          (item as ProfessorType & ProfessorAssignType).phone || "No disponible",
+          (item as ProfessorType & ProfessorAssignType).phone ||
+          "No disponible",
       },
       {
         label: "Estado",
         sortKey: "status",
-        renderCell: (item: unknown) => (item as ProfessorType & ProfessorAssignType).status,
+        renderCell: (item: unknown) => {
+          const status = (item as ProfessorType & ProfessorAssignType).status;
+
+          return status;
+        },
       },
     ],
     []
@@ -198,7 +224,7 @@ function TableToAssignProfessors() {
           theme={theme}
           layout={{ fixedHeader: true, horizontalScroll: true, custom: true }}
         >
-          {(tableList: ( ProfessorType & ProfessorAssignType)[]) => (
+          {(tableList: (ProfessorType & ProfessorAssignType)[]) => (
             <>
               <Header>
                 <HeaderRow>
@@ -223,7 +249,14 @@ function TableToAssignProfessors() {
                             className="flex gap-1 px-2 py-1 rounded-md bg-gray-800"
                             onClick={() => handleOpenAssignModal(item)}
                           >
-                            <PlusSvg /> Asignar
+                            <PlusSvg />
+                            {
+                            item.instruments.length === 0 &&
+                            item.availability.length === 0 &&
+                            item.rooms.length === 0
+                              ? "Asignar"
+                              : "Editar"
+                            }
                           </button>
                         </div>
                       </Cell>
