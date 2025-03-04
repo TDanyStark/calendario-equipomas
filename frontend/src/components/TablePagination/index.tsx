@@ -1,5 +1,3 @@
-// components/DataTablePagination.tsx
-
 import React, { useCallback, useEffect, useState } from "react";
 import {
   Table,
@@ -35,6 +33,12 @@ import CellItem from "../CellItem";
 import { useDebounce } from "use-debounce";
 import Theme from "@/lib/Theme";
 import FilterEnrolls from "../Filters/FilterEnrolls";
+import { useQueryClient } from "react-query";
+
+// Skeleton Loader Component
+const SkeletonCell = () => (
+  <div className="animate-pulse bg-gray-200 h-8 w-full rounded"></div>
+);
 
 interface Column<T> {
   label: string;
@@ -98,7 +102,10 @@ function DataTablePagination<T extends TableNode>({
     data: fetchedData,
     isLoading,
     isError,
+    isFetching,
   } = useFetchItemsWithPagination(entity, JWT, page, debouncedQuery, filters);
+  const queryClient = useQueryClient();
+  const cachedData = queryClient.getQueryData([entity, page, debouncedQuery, filters]);
 
   const data: TableNode[] = (fetchedData?.data as TableNode[]) || [];
   const totalPages = fetchedData?.pages || 1;
@@ -158,8 +165,6 @@ function DataTablePagination<T extends TableNode>({
     setSearchParams(newParams);
   };
 
-  
-
   const tableData = { nodes: data };
 
   const THEME = Theme({ gridTemplateColumns, heightRow });
@@ -193,21 +198,19 @@ function DataTablePagination<T extends TableNode>({
   return (
     <>
       {filtersProps === "enrolls" && (
-        <>
-          <FilterEnrolls
-            courseFilter={courseFilter || ""}
-            instrumentFilter={instrumentFilter || ""}
-            semesterFilter={semesterFilter || ""}
-            filterActive={filterActive || ""}
-            onShow={onShow}
-            onSelect={onSelect}
-            handleClearFilters={handleClearFilters}
-            setFilterActive={setFilterActive}
-            debouncedQuery={debouncedQuery}
-          />
-        </>
+        <FilterEnrolls
+          courseFilter={courseFilter || ""}
+          instrumentFilter={instrumentFilter || ""}
+          semesterFilter={semesterFilter || ""}
+          filterActive={filterActive || ""}
+          onShow={onShow}
+          onSelect={onSelect}
+          handleClearFilters={handleClearFilters}
+          setFilterActive={setFilterActive}
+          debouncedQuery={debouncedQuery}
+        />
       )}
-      <div className={`${filtersProps ? '':'pt-6' } flex flex-col gap-3 md:flex-row items-center justify-between select-none`}>
+      <div className={`${filtersProps ? '' : 'pt-6'} flex flex-col gap-3 md:flex-row items-center justify-between select-none`}>
         <div className="flex gap-2">
           <input
             type="text"
@@ -222,14 +225,12 @@ function DataTablePagination<T extends TableNode>({
               handleClick={handleDeleteItems}
             />
           ) : null}
-          
         </div>
         <PrimaryButton handleClick={onCreate}>
           Crear nuevo {TextButtonCreate}
         </PrimaryButton>
       </div>
 
-      {/* Tabla */}
       <div
         style={{
           minHeight: `${(heightRow * 11) + 18.4}px`,
@@ -259,7 +260,7 @@ function DataTablePagination<T extends TableNode>({
                       <CellSelect item={item} />
                       {columns.map((column) => (
                         <Cell key={column.label} className="text-lg">
-                          <CellItem item={item} column={column} />
+                          <CellItem item={item} column={column} isLoading={isFetching && !cachedData} />
                         </Cell>
                       ))}
                       <Cell>
@@ -292,7 +293,6 @@ function DataTablePagination<T extends TableNode>({
         </Table>
       </div>
 
-      {/* Paginación */}
       <div className="flex justify-between">
         <PageInfo page={page} totalPage={totalPages} />
         <div className="flex gap-2">

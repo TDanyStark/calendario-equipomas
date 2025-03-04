@@ -75,10 +75,7 @@ function TableToAssignProfessors() {
     isFetching,
   } = useFetchItemsWithPagination(entity, JWT, page, debouncedQuery, filters);
   const queryClient = useQueryClient();
-
   const cachedData = queryClient.getQueryData([entity, page, debouncedQuery, filters]);
-
-
 
   const data: TableNode[] = (fetchedData?.data as TableNode[]) || [];
   const totalPages = fetchedData?.pages || 1;
