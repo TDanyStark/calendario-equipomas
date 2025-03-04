@@ -494,24 +494,16 @@ class DatabaseProfessorRepository implements ProfessorRepository
                     'AvailabilityID', pa.AvailabilityID,
                     'DayID', pa.DayID,
                     'StartTime', pa.StartTime,
-                    'EndTime', pa.EndTime,
-                    'academic_period_id', pa.academic_period_id
+                    'EndTime', pa.EndTime
                 )) AS availabilities,
                 JSON_ARRAYAGG(DISTINCT JSON_OBJECT(
-                    'id', pc.id,
-                    'professor_id', pc.professor_id,
-                    'academic_period_id', pc.academic_period_id,
                     'hours', pc.hours
                 )) AS contracts,
                 JSON_ARRAYAGG(DISTINCT JSON_OBJECT(
-                    'ProfessorInstrumentID', pi.ProfessorInstrumentID,
-                    'InstrumentID', pi.InstrumentID,
-                    'academic_period_id', pi.academic_period_id
+                    'InstrumentID', pi.InstrumentID
                 )) AS instruments,
                 JSON_ARRAYAGG(DISTINCT JSON_OBJECT(
-                    'ProfessorRoomID', pr.ProfessorRoomID,
-                    'RoomID', pr.RoomID,
-                    'academic_period_id', pr.academic_period_id
+                    'RoomID', pr.RoomID
                 )) AS rooms
             FROM professors p
             LEFT JOIN users u ON p.ProfessorID = u.userID
@@ -542,10 +534,10 @@ class DatabaseProfessorRepository implements ProfessorRepository
                 (int) $row['RoleID']
             );
 
-            $instrumentsIsNull = json_decode($row['instruments'], true)[0]['ProfessorInstrumentID'] === null;
-            $roomsIsNull = json_decode($row['rooms'], true)[0]['ProfessorRoomID'] === null;
+            $instrumentsIsNull = json_decode($row['instruments'], true)[0]['InstrumentID'] === null;
+            $roomsIsNull = json_decode($row['rooms'], true)[0]['RoomID'] === null;
             $availabilitiesIsNull = json_decode($row['availabilities'], true)[0]['AvailabilityID'] === null;
-            $contractsIsNull = json_decode($row['contracts'], true)[0]['id'] === null;
+            $contractsIsNull = json_decode($row['contracts'], true)[0]['hours'] === null;
     
             $professors[] = new Professor(
                 $row['ProfessorID'],
