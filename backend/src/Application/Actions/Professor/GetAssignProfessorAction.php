@@ -18,13 +18,14 @@ class GetAssignProfessorAction extends ProfessorAction
         $page = isset($params['page']) ? (int) $params['page'] : 1;
         $query = isset($params['query']) ? (string)$params['query'] : '';
         $offPagination = isset($params['offPagination']) ? filter_var($params['offPagination'], FILTER_VALIDATE_BOOLEAN) : false;
-        // $onlyWithAssignments = isset($params['onlyWithAssignments']) ? filter_var($params['onlyWithAssignments'], FILTER_VALIDATE_BOOLEAN) : false;
-        $onlyWithAssignments = false;
+        $onlyWithAssignments = isset($params['onlyWithAssignments']) ? filter_var($params['onlyWithAssignments'], FILTER_VALIDATE_BOOLEAN) : false;
+        $orderDir = isset($params['order']) ? (string)$params['order'] : 'ASC';
+
         // Calcula el offset y el límite
         $limit = 10;
         $offset = ($page - 1) * $limit;
 
-        $professorWithAssign = $this->professorRepository->getProfessorsWithAssign($academic_periodID, $limit, $offset, $query, $offPagination, $onlyWithAssignments);
+        $professorWithAssign = $this->professorRepository->getProfessorsWithAssign($academic_periodID, $limit, $offset, $orderDir, $query, $offPagination, $onlyWithAssignments);
         return $this->respondWithData($professorWithAssign);
     }
 }

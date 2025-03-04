@@ -22,5 +22,5 @@ interface ProfessorRepository
     public function findProfessorIdsActive(): array;
     public function seedProfessors(): void;
     public function assignProfessor(string $ID, array $professorInstrumentsArray, array $professorRoomsArray, array $professorAvailabilityArray, ?ProfessorContracts $professorContract = null): void;
-    public function getProfessorsWithAssign(int $academicPeriodID, int $limit, int $offset, string $query, bool $offPagination, bool $onlyWithAssignments): array;
+    public function getProfessorsWithAssign(int $academicPeriodID, int $limit, int $offset, string $orderDir, string $query, bool $offPagination, bool $onlyWithAssignments): array;
 }

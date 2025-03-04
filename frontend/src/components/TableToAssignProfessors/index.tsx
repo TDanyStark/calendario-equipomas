@@ -33,6 +33,8 @@ import {
 import PlusSvg from "@/icons/PlusSvg";
 import AssignProfessorModal from "./AssignProfessorModal";
 import useItemMutations from "@/hooks/useItemsMutation";
+import Skeleton from "../Loader/Skeleton";
+import { useQueryClient } from "react-query";
 
 const entity = "professors/assign";
 const entityName = "profesores";
@@ -43,9 +45,8 @@ function TableToAssignProfessors() {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("query") || "";
   const page = Number(searchParams.get("page") || "1");
-  const courseFilter = searchParams.get("course");
   const instrumentFilter = searchParams.get("instrument");
-  const semesterFilter = searchParams.get("semester");
+  const order = searchParams.get("order");
 
   // Estado para manejar el modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -58,11 +59,10 @@ function TableToAssignProfessors() {
   // Memoizar los filtros para optimizar
   const filters = React.useMemo(
     () => ({
-      course: courseFilter || "",
       instrument: instrumentFilter || "",
-      semester: semesterFilter || "",
+      order: order || "",
     }),
-    [courseFilter, instrumentFilter, semesterFilter]
+    [instrumentFilter, order]
   );
 
   const JWT = useSelector((state: RootState) => state.auth.JWT);
@@ -72,7 +72,13 @@ function TableToAssignProfessors() {
     data: fetchedData,
     isLoading,
     isError,
+    isFetching,
   } = useFetchItemsWithPagination(entity, JWT, page, debouncedQuery, filters);
+  const queryClient = useQueryClient();
+
+  const cachedData = queryClient.getQueryData([entity, page, debouncedQuery, filters]);
+
+
 
   const data: TableNode[] = (fetchedData?.data as TableNode[]) || [];
   const totalPages = fetchedData?.pages || 1;
@@ -110,7 +116,6 @@ function TableToAssignProfessors() {
   const handleOpenAssignModal = (
     professor: ProfessorType & ProfessorAssignType
   ) => {
-    console.log(professor);
     setSelectedProfessor(professor);
     setIsModalOpen(true);
   };
@@ -164,38 +169,34 @@ function TableToAssignProfessors() {
         label: "ID",
         sortKey: "id",
         renderCell: (item: unknown) =>
-          (item as ProfessorType & ProfessorAssignType).id,
+          isFetching && !cachedData ? <Skeleton className="w-full h-4" /> : (item as ProfessorType & ProfessorAssignType).id,
       },
       {
         label: "Nombre",
         sortKey: "firstName",
         renderCell: (item: unknown) =>
-          (item as ProfessorType & ProfessorAssignType).firstName,
+          isFetching && !cachedData  ? <Skeleton className="skeleton w-full h-4" /> : (item as ProfessorType & ProfessorAssignType).firstName,
       },
       {
         label: "Apellido",
         sortKey: "lastName",
         renderCell: (item: unknown) =>
-          (item as ProfessorType & ProfessorAssignType).lastName,
+          isFetching && !cachedData  ? <Skeleton className="skeleton w-full h-4" /> : (item as ProfessorType & ProfessorAssignType).lastName,
       },
       {
         label: "Teléfono",
         sortKey: "phone",
         renderCell: (item: unknown) =>
-          (item as ProfessorType & ProfessorAssignType).phone ||
-          "No disponible",
+          isFetching && !cachedData ? <Skeleton className="skeleton w-full h-4" /> : (item as ProfessorType & ProfessorAssignType).phone || "No disponible",
       },
       {
         label: "Estado",
         sortKey: "status",
-        renderCell: (item: unknown) => {
-          const status = (item as ProfessorType & ProfessorAssignType).status;
-
-          return status;
-        },
+        renderCell: (item: unknown) =>
+          isFetching && !cachedData  ? <Skeleton className="skeleton w-full h-4" /> : (item as ProfessorType & ProfessorAssignType).status,
       },
     ],
-    []
+    [cachedData, isFetching]
   );
 
   const tableData = { nodes: data };
@@ -218,6 +219,21 @@ function TableToAssignProfessors() {
             onChange={handleSearch}
             className="input-primary w-full max-w-60"
           />
+          <button
+            className="btn-primary"
+            onClick={() => {
+              const newParams = new URLSearchParams(searchParams);
+              newParams.set("page", "1");
+              newParams.set("order", order === "ASC" || order === null ? "DESC" : "ASC");
+              setSearchParams(newParams);
+            }}
+          >
+            {
+              order === "ASC" || order === null
+              ? "Asignados"
+              : "Sin asignar"
+            }
+          </button>
         </div>
       </div>
 

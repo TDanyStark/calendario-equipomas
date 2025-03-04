@@ -2,7 +2,7 @@ interface Props<T,>{
   item: T;
   column: {
     label: string;
-    renderCell: (item: T) => string | number;
+    renderCell: (item: T) => string | number | JSX.Element;
   };
 }
 

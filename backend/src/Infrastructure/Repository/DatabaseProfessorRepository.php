@@ -426,8 +426,10 @@ class DatabaseProfessorRepository implements ProfessorRepository
         }
     }
 
-    public function getProfessorsWithAssign(int $academicPeriodID, int $limit, int $offset, string $query = '', bool $offPagination = false, bool $onlyWithAssignments = false): array 
+    public function getProfessorsWithAssign(int $academicPeriodID, int $limit, int $offset, string $orderDir, string $query = '', bool $offPagination = false, bool $onlyWithAssignments = false): array 
     {
+        //         "description": "ERROR: Optional parameter $onlyWithAssignments declared before required parameter $orderDir is implicitly treated as a required parameter on line 429 in file C:\\xampp\\htdocs\\agenda.equipomas.test\\backend\\src\\Infrastructure\\Repository\\DatabaseProfessorRepository.php."
+
         $searchQuery = "%$query%";
         
         $whereClause = 'p.ProfessorIsDelete = 0 AND (:query = "" OR 
@@ -484,7 +486,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
             LEFT JOIN professor_rooms pr ON p.ProfessorID = pr.ProfessorID AND pr.academic_period_id = :academicPeriodID
             WHERE $whereClause
             GROUP BY p.ProfessorID
-            ORDER BY pc.date_assign DESC
+            ORDER BY pc.date_assign $orderDir
             LIMIT :limit OFFSET :offset"
         );
         
