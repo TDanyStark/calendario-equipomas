@@ -33,6 +33,7 @@ interface AssignProfessorModalProps {
     schedule: ScheduleType[]
   ) => void;
   JWT: string | null;
+  isLoading: boolean;
 }
 
 const AssignProfessorModal: React.FC<AssignProfessorModalProps> = ({
@@ -41,6 +42,7 @@ const AssignProfessorModal: React.FC<AssignProfessorModalProps> = ({
   professor,
   onAssign,
   JWT,
+  isLoading,
 }) => {
   const [contract, setContract] = useState(false);
   const [hours, setHours] = useState(1);
@@ -212,7 +214,7 @@ const AssignProfessorModal: React.FC<AssignProfessorModalProps> = ({
 
           <div className="modal_footer">
             <CancelModalBtn onClick={() => setIsOpen(false)} />
-            <SubmitModalBtn text="Asignar" form="form-assign-professor" />
+            <SubmitModalBtn text="Asignar" form="form-assign-professor" isLoading={isLoading} />
           </div>
         </DialogPanel>
       </div>

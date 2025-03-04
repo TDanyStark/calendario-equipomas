@@ -35,7 +35,6 @@ const heightRow = 52;
 const gridTemplateColumns = "180px 1fr 1fr 1fr 120px 130px";
 
 
-
 function TableToAssignProfessors() {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("query") || "";
@@ -109,14 +108,14 @@ function TableToAssignProfessors() {
   };
 
   // Manejador para asignar el profesor
-  const handleAssignProfessor = (contract: boolean, hours: number, instrumentsProfessor: SelectableInstrument[], roomsProfessor: SelectableRoom[], schedule: ScheduleType[]) => {
+  const handleAssignProfessor = async (contract: boolean, hours: number, instrumentsProfessor: SelectableInstrument[], roomsProfessor: SelectableRoom[], schedule: ScheduleType[]) => {
     // Aquí implementarías la lógica para guardar los datos
     // pasar solo los de selected = trueinstrumentsProfessor y roomsProfessor
     instrumentsProfessor = instrumentsProfessor.filter((instrument) => instrument.selected);
     roomsProfessor = roomsProfessor.filter((room) => room.selected);
     
     if (!selectedProfessor) return;
-    createItem.mutate({
+    const res = await createItem.mutateAsync({
       id: selectedProfessor?.id,
       contract,
       hours,
@@ -124,9 +123,10 @@ function TableToAssignProfessors() {
       rooms: roomsProfessor,
       availability: schedule,
     });
-
-    // Cerrar el modal después de asignar
-    setSelectedProfessor(null);
+    if (res.data.statusCode === 201) {
+      setIsModalOpen(false);
+      setSelectedProfessor(null);
+    }
   };
 
   const {createItem} = useItemMutations<ProfessorAssignType>("professors/assign", JWT);
@@ -220,7 +220,7 @@ function TableToAssignProfessors() {
                       <Cell>
                         <div className="flex gap-1 justify-center">
                           <button
-                            className="flex gap-1 px-2 py-1 border rounded-md"
+                            className="flex gap-1 px-2 py-1 rounded-md bg-gray-800"
                             onClick={() => handleOpenAssignModal(item)}
                           >
                             <PlusSvg /> Asignar
@@ -271,6 +271,7 @@ function TableToAssignProfessors() {
         professor={selectedProfessor}
         onAssign={handleAssignProfessor}
         JWT={JWT}
+        isLoading={createItem.isLoading}
       />
 
       {/* Estilos adicionales para animaciones */}

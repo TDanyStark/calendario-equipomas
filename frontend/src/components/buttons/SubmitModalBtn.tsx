@@ -8,7 +8,7 @@ const SubmitModalBtn = ({ text, form, isLoading = false }: Props) => {
   return (
     <button
       type="submit"
-      className="btn-primary"
+      className={`btn-primary ${isLoading ? "cursor-not-allowed bg-primary/20" : ""}`}
       form={form}
       disabled={isLoading}
     >
