@@ -10,6 +10,7 @@ use App\Domain\User\User;
 use PDO;
 use App\Infrastructure\Database;
 use App\Domain\Professor\ProfessorInstruments;
+use App\Domain\Professor\ProfessorContracts;
 use App\Domain\Professor\ProfessorRooms;
 use App\Domain\Professor\ProfessorAvailability;
 use App\Domain\Services\PasswordService;
@@ -436,13 +437,26 @@ class DatabaseProfessorRepository implements ProfessorRepository
         }
     }
 
-    public function assignProfessor(string $ID, array $professorInstrumentsArray, array $professorRoomsArray, array $professorAvailabilityArray): void
+    private function AddContractProfessor(string $ID, ProfessorContracts $professorContract): void
+    {
+        $stmt = $this->pdo->prepare("INSERT INTO professor_contracts (professor_id, academic_period_id, Hours) VALUES (:professor_id, :academicPeriodID, :hours)");
+        $stmt->execute([
+            'professor_id' => $ID,
+            'academicPeriodID' => $professorContract->getAcademicPeriodID(),
+            'hours' => $professorContract->getHours()
+        ]);
+    }
+
+    public function assignProfessor(string $ID, array $professorInstrumentsArray, array $professorRoomsArray, array $professorAvailabilityArray, ?ProfessorContracts $professorContract = null): void
     {
         try {
             $this->pdo->beginTransaction();
             $this->AddInstrumentsProfessor($ID, $professorInstrumentsArray);
             $this->AddRoomsProfessor($ID, $professorRoomsArray);
             $this->AddAvailabilityProfessor($ID, $professorAvailabilityArray);
+            if ($professorContract) {
+                $this->AddContractProfessor($ID, $professorContract);
+            }
             $this->pdo->commit();
         } catch (Exception $e) {
             $this->pdo->rollBack();

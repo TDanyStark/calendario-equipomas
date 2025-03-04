@@ -23,9 +23,10 @@ import { useDebounce } from "use-debounce";
 import Theme from "@/lib/Theme";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { ProfessorType, ScheduleType, SelectableInstrument, SelectableRoom } from "@/types/Api";
+import { ProfessorAssignType, ProfessorType, ScheduleType, SelectableInstrument, SelectableRoom } from "@/types/Api";
 import PlusSvg from "@/icons/PlusSvg";
 import AssignProfessorModal from "./AssignProfessorModal";
+import useItemMutations from "@/hooks/useItemsMutation";
 
 
 const entity = "professors";
@@ -110,25 +111,25 @@ function TableToAssignProfessors() {
   // Manejador para asignar el profesor
   const handleAssignProfessor = (contract: boolean, hours: number, instrumentsProfessor: SelectableInstrument[], roomsProfessor: SelectableRoom[], schedule: ScheduleType[]) => {
     // Aquí implementarías la lógica para guardar los datos
-    console.log(
-      "Asignando profesor:",
-      selectedProfessor?.id,
-      "Contrato:",
+    // pasar solo los de selected = trueinstrumentsProfessor y roomsProfessor
+    instrumentsProfessor = instrumentsProfessor.filter((instrument) => instrument.selected);
+    roomsProfessor = roomsProfessor.filter((room) => room.selected);
+    
+    if (!selectedProfessor) return;
+    createItem.mutate({
+      id: selectedProfessor?.id,
       contract,
-      "Horas:",
       hours,
-      "Instrumentos:",
-      instrumentsProfessor,
-      "Salones:",
-      roomsProfessor,
-      "Horario:",
-      schedule
-    );
+      instruments: instrumentsProfessor,
+      rooms: roomsProfessor,
+      availability: schedule,
+    });
 
     // Cerrar el modal después de asignar
-    setIsModalOpen(false);
     setSelectedProfessor(null);
   };
+
+  const {createItem} = useItemMutations<ProfessorAssignType>("professors/assign", JWT);
 
   const columns = useMemo(
     () => [
@@ -208,7 +209,7 @@ function TableToAssignProfessors() {
                 </HeaderRow>
               </Header>
               <Body>
-                {tableList.length > 0 ? (
+                {tableList?.length > 0 ? (
                   tableList.map((item: ProfessorType) => (
                     <Row key={item.id} item={item}>
                       {columns.map((column) => (

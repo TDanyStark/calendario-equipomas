@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Actions\Professor;
 
 use App\Domain\Professor\ProfessorAvailability;
+use App\Domain\Professor\ProfessorContracts;
 use App\Domain\Professor\ProfessorInstruments;
 use App\Domain\Professor\ProfessorRooms;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -46,7 +47,12 @@ class AssignProfessorAction extends ProfessorAction
             }
         }
 
-        $this->professorRepository->assignProfessor($ID, $professorInstrumentsArray, $professorRoomsArray, $professorAvailabilityArray);
+        $contract = filter_var($data['contract'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $hours = (int)$data['hours'];
+
+        $professorContract = $contract ? new ProfessorContracts(0, $ID, $academic_periodID, $hours) : null;
+
+        $this->professorRepository->assignProfessor($ID, $professorInstrumentsArray, $professorRoomsArray, $professorAvailabilityArray, $professorContract);
 
         return $this->respondWithData(['id' => $ID], 201);
     }
