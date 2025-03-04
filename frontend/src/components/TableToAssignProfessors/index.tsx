@@ -254,7 +254,7 @@ function TableToAssignProfessors() {
                       <Cell>
                         <div className="flex gap-1 justify-center">
                           <button
-                            className={`flex gap-1 px-2 py-1 rounded-md bg-gray-800 ${validateIfProfessorIsAssigned(item) ? "bg-green-600" : "bg-blue-600"}`}
+                            className={`flex gap-1 px-2 py-1 rounded-md bg-gray-800 ${validateIfProfessorIsAssigned(item) ? "bg-green-600" : "bg-gray-800"}`}
                             onClick={() => handleOpenAssignModal(item)}
                           >
                             <PlusSvg />

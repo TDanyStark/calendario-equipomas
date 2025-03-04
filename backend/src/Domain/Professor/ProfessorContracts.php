@@ -11,18 +11,24 @@ class ProfessorContracts implements JsonSerializable
     private int $id;
     private string $professorID;
     private int $academicPeriodID;
+    private bool $with_contract;
     private int $hours;
+    private ?string $date_assign;
 
     public function __construct(
         int $id,
         string $professorID,
         int $academicPeriodID,
-        int $hours
+        bool $with_contract,
+        int $hours,
+        ?string $date_assign
     ) {
         $this->id = $id;
         $this->professorID = $professorID;
         $this->academicPeriodID = $academicPeriodID;
+        $this->with_contract = $with_contract;
         $this->hours = $hours;
+        $this->date_assign = $date_assign;
     }
 
     public function getId(): int
@@ -40,9 +46,19 @@ class ProfessorContracts implements JsonSerializable
         return $this->academicPeriodID;
     }
 
+    public function getWithContract(): bool
+    {
+        return $this->with_contract;
+    }
+
     public function getHours(): int
     {
         return $this->hours;
+    }
+
+    public function getDateAssign(): ?string
+    {
+        return $this->date_assign;
     }
 
     public function jsonSerialize(): array
@@ -51,7 +67,9 @@ class ProfessorContracts implements JsonSerializable
             'id' => $this->id,
             'professorID' => $this->professorID,
             'academicPeriodID' => $this->academicPeriodID,
-            'hours' => $this->hours
+            'with_contract' => $this->with_contract,
+            'hours' => $this->hours,
+            'date_assign' => $this->date_assign
         ];
     }
 }

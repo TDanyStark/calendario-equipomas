@@ -389,11 +389,12 @@ class DatabaseProfessorRepository implements ProfessorRepository
 
     private function AddContractProfessor(string $ID, ProfessorContracts $professorContract): void
     {
-        $stmt = $this->pdo->prepare("INSERT INTO professor_contracts (professor_id, academic_period_id, Hours) VALUES (:professor_id, :academicPeriodID, :hours)");
+        $stmt = $this->pdo->prepare("INSERT INTO professor_contracts (professor_id, academic_period_id, with_contract, Hours) VALUES (:professor_id, :academicPeriodID, :with_contract, :hours)");
         $stmt->execute([
             'professor_id' => $ID,
             'academicPeriodID' => $professorContract->getAcademicPeriodID(),
-            'hours' => $professorContract->getHours()
+            'with_contract' => $professorContract->getWithContract(),
+            'hours' => $professorContract->getWithContract() === 1 ? $professorContract->getHours() : 0
         ]);
     }
 
@@ -416,10 +417,8 @@ class DatabaseProfessorRepository implements ProfessorRepository
             $this->AddRoomsProfessor($ID, $professorRoomsArray);
             $this->DeleteAvailabilityProfessor($ID, $professorAvailabilityArray);
             $this->AddAvailabilityProfessor($ID, $professorAvailabilityArray);
-            if ($professorContract) {
-                $this->DeleteContractProfessor($ID, $professorContract);
-                $this->AddContractProfessor($ID, $professorContract);
-            }
+            $this->DeleteContractProfessor($ID, $professorContract);
+            $this->AddContractProfessor($ID, $professorContract);
             $this->pdo->commit();
         } catch (Exception $e) {
             $this->pdo->rollBack();
@@ -427,14 +426,8 @@ class DatabaseProfessorRepository implements ProfessorRepository
         }
     }
 
-    public function getProfessorsWithAssign(
-        int $academicPeriodID, 
-        int $limit, 
-        int $offset, 
-        string $query = '', 
-        bool $offPagination = false, 
-        bool $onlyWithAssignments = false
-    ): array {
+    public function getProfessorsWithAssign(int $academicPeriodID, int $limit, int $offset, string $query = '', bool $offPagination = false, bool $onlyWithAssignments = false): array 
+    {
         $searchQuery = "%$query%";
         
         $whereClause = 'p.ProfessorIsDelete = 0 AND (:query = "" OR 
@@ -445,30 +438,20 @@ class DatabaseProfessorRepository implements ProfessorRepository
             p.ProfessorStatus = :queryStatus OR 
             u.UserEmail LIKE :query)';
         
-        // Add additional where clause for filtering professors with assignments if needed
-        if ($onlyWithAssignments) {
-            $whereClause .= ' AND (
-                JSON_LENGTH(JSON_ARRAYAGG(DISTINCT pi.InstrumentID)) > 0 AND 
-                JSON_LENGTH(JSON_ARRAYAGG(DISTINCT pr.RoomID)) > 0 AND 
-                JSON_LENGTH(JSON_ARRAYAGG(DISTINCT pa.AvailabilityID)) > 0
-            )';
+        if($onlyWithAssignments){
+            $whereClause .= ' AND (pc.professor_id IS NOT NULL)';
         }
         
         // Obtener cantidad total de registros
-        $countQuery = "SELECT COUNT(DISTINCT p.ProfessorID) as total FROM professors p 
+        $countStmt = $this->pdo->prepare("SELECT COUNT(DISTINCT p.ProfessorID) as total FROM professors p 
             LEFT JOIN users u ON p.ProfessorID = u.userID 
-            LEFT JOIN professor_instruments pi ON p.ProfessorID = pi.ProfessorID AND pi.academic_period_id = :academicPeriodID
-            LEFT JOIN professor_rooms pr ON p.ProfessorID = pr.ProfessorID AND pr.academic_period_id = :academicPeriodID
-            LEFT JOIN professor_availability pa ON p.ProfessorID = pa.ProfessorID AND pa.academic_period_id = :academicPeriodID
-            WHERE $whereClause";
+            LEFT JOIN professor_contracts pc ON p.ProfessorID = pc.professor_id AND pc.academic_period_id = :academicPeriodID
+            WHERE $whereClause");
         
-        $countStmt = $this->pdo->prepare($countQuery);
-        
-        $countStmt->bindValue(':academicPeriodID', $academicPeriodID, PDO::PARAM_INT);
         $countStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
         $countStmt->bindValue(':queryStatus', $query, PDO::PARAM_STR);
+        $countStmt->bindParam(':academicPeriodID', $academicPeriodID, PDO::PARAM_INT);
         $countStmt->execute();
-        
         $totalRecords = (int) $countStmt->fetchColumn();
         $totalPages = $limit > 0 ? ceil($totalRecords / $limit) : 1;
         
@@ -477,21 +460,22 @@ class DatabaseProfessorRepository implements ProfessorRepository
             "SELECT 
                 p.ProfessorID, p.ProfessorFirstName, p.ProfessorLastName, p.ProfessorPhone, p.ProfessorStatus,
                 u.UserID, u.UserEmail, u.RoleID,
-                JSON_ARRAYAGG(DISTINCT JSON_OBJECT(
+                COALESCE(JSON_ARRAYAGG(DISTINCT JSON_OBJECT(
                     'AvailabilityID', pa.AvailabilityID,
                     'dayID', pa.DayID,
                     'startTime', pa.StartTime,
                     'endTime', pa.EndTime
-                )) AS availabilities,
-                JSON_ARRAYAGG(DISTINCT JSON_OBJECT(
-                    'hours', pc.hours
-                )) AS contracts,
-                JSON_ARRAYAGG(DISTINCT JSON_OBJECT(
+                )), '[]') AS availabilities,
+                COALESCE(JSON_ARRAYAGG(DISTINCT JSON_OBJECT(
+                    'hours', pc.hours,
+                    'with_contract', pc.with_contract
+                )), '[]') AS contracts,
+                COALESCE(JSON_ARRAYAGG(DISTINCT JSON_OBJECT(
                     'InstrumentID', pi.InstrumentID
-                )) AS instruments,
-                JSON_ARRAYAGG(DISTINCT JSON_OBJECT(
+                )), '[]') AS instruments,
+                COALESCE(JSON_ARRAYAGG(DISTINCT JSON_OBJECT(
                     'RoomID', pr.RoomID
-                )) AS rooms
+                )), '[]') AS rooms
             FROM professors p
             LEFT JOIN users u ON p.ProfessorID = u.userID
             LEFT JOIN professor_availability pa ON p.ProfessorID = pa.ProfessorID AND pa.academic_period_id = :academicPeriodID
@@ -500,7 +484,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
             LEFT JOIN professor_rooms pr ON p.ProfessorID = pr.ProfessorID AND pr.academic_period_id = :academicPeriodID
             WHERE $whereClause
             GROUP BY p.ProfessorID
-            ORDER BY p.ProfessorFirstName ASC
+            ORDER BY pc.date_assign DESC
             LIMIT :limit OFFSET :offset"
         );
         
@@ -521,31 +505,33 @@ class DatabaseProfessorRepository implements ProfessorRepository
                 null,
                 (int) $row['RoleID']
             );
-    
-            $instrumentsIsNull = json_decode($row['instruments'], true)[0]['InstrumentID'] === null;
-            $roomsIsNull = json_decode($row['rooms'], true)[0]['RoomID'] === null;
-            $availabilitiesIsNull = json_decode($row['availabilities'], true)[0]['AvailabilityID'] === null;
-            $contractsIsNull = json_decode($row['contracts'], true)[0]['hours'] === null;
-    
-            $professor = new Professor(
+
+            $instruments = json_decode($row['instruments'], true);
+            $rooms = json_decode($row['rooms'], true);
+            $availabilities = json_decode($row['availabilities'], true);
+            $contracts = json_decode($row['contracts'], true);
+            
+            $instruments = array_filter($instruments, fn($i) => !is_null($i['InstrumentID']));
+            $rooms = array_filter($rooms, fn($r) => !is_null($r['RoomID']));
+            $availabilities = array_filter($availabilities, fn($a) => !is_null($a['AvailabilityID']));
+            $contracts = array_filter($contracts, fn($c) => !is_null($c['with_contract']));
+
+            $with_contract = count($contracts) > 0 ? $contracts[0]['with_contract'] : 0;
+            $hours = count($contracts) > 0 ? $contracts[0]['hours'] : 0;
+
+            $professors[] = new Professor(
                 $row['ProfessorID'],
                 $row['ProfessorFirstName'],
                 $row['ProfessorLastName'],
                 $row['ProfessorPhone'],
                 $row['ProfessorStatus'],
                 $user,
-                $instrumentsIsNull ? [] : json_decode($row['instruments'], true),
-                $roomsIsNull ? [] : json_decode($row['rooms'], true),
-                $availabilitiesIsNull ? [] : json_decode($row['availabilities'], true),
-                $contractsIsNull ? false : true,
-                $contractsIsNull ? 0 : json_decode($row['contracts'], true)[0]['hours']
+                $instruments,
+                $rooms,
+                $availabilities,
+                (bool)$with_contract,
+                (int)$hours
             );
-    
-            // Additional filter for $onlyWithAssignments
-            if (!$onlyWithAssignments || 
-                (!$instrumentsIsNull && !$roomsIsNull && !$availabilitiesIsNull)) {
-                $professors[] = $professor;
-            }
         }
         
         if ($offPagination) {
@@ -554,4 +540,5 @@ class DatabaseProfessorRepository implements ProfessorRepository
         
         return ['data' => $professors, 'pages' => $totalPages];
     }
+
 }

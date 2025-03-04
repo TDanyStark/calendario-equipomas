@@ -46,7 +46,7 @@ const AssignProfessorModal: React.FC<AssignProfessorModalProps> = ({
   isLoading,
 }) => {
   const [contract, setContract] = useState(false);
-  const [hours, setHours] = useState(1);
+  const [hours, setHours] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const [instrumentProfessor, setInstrumentProfessor] = useState<
     SelectableInstrument[]
@@ -93,17 +93,17 @@ const AssignProfessorModal: React.FC<AssignProfessorModalProps> = ({
   }, [isLoadingRooms, rooms, isOpen, professor]);
 
   useEffect(() => {
-    if (professor) {
+    if (professor && professor.contract) {
       setContract(professor.contract);
       setHours(professor.hours);
     } else {
       setContract(false);
-      setHours(1);
+      setHours(0);
     }
 
     if (!isOpen){
       setContract(false);
-      setHours(1);
+      setHours(0);
       setInstrumentProfessor([]);
       setRoomsProfessor([]);
       setSchedule([]);
@@ -132,6 +132,10 @@ const AssignProfessorModal: React.FC<AssignProfessorModalProps> = ({
       toast.error(
         "Debe seleccionar al menos un instrumento, un salón y un dia como mínimo"
       );
+      return;
+    }
+    if (contract && hours === 0) {
+      toast.error("Debe ingresar un número de horas");
       return;
     }
     onAssign(contract, hours, instrumentProfessor, roomsProfessor, schedule);

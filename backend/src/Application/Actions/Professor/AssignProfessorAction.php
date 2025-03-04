@@ -50,7 +50,7 @@ class AssignProfessorAction extends ProfessorAction
         $contract = filter_var($data['contract'] ?? false, FILTER_VALIDATE_BOOLEAN);
         $hours = (int)$data['hours'];
 
-        $professorContract = $contract ? new ProfessorContracts(0, $ID, $academic_periodID, $hours) : null;
+        $professorContract = new ProfessorContracts(0, $ID, $academic_periodID, $contract, $hours, null);
 
         $this->professorRepository->assignProfessor($ID, $professorInstrumentsArray, $professorRoomsArray, $professorAvailabilityArray, $professorContract);
 
