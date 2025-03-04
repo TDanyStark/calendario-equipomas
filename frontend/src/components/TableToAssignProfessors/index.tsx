@@ -145,6 +145,14 @@ function TableToAssignProfessors() {
     }
   };
 
+  const validateIfProfessorIsAssigned = (professor: ProfessorAssignType) => {
+    return (
+      professor.instruments.length === 0 &&
+      professor.availability.length === 0 &&
+      professor.rooms.length === 0
+    );
+  }
+
   const { createItem } = useItemMutations<ProfessorAssignType>(
     "professors/assign",
     JWT
@@ -246,14 +254,12 @@ function TableToAssignProfessors() {
                       <Cell>
                         <div className="flex gap-1 justify-center">
                           <button
-                            className="flex gap-1 px-2 py-1 rounded-md bg-gray-800"
+                            className={`flex gap-1 px-2 py-1 rounded-md bg-gray-800 ${validateIfProfessorIsAssigned(item) ? "bg-green-600" : "bg-blue-600"}`}
                             onClick={() => handleOpenAssignModal(item)}
                           >
                             <PlusSvg />
                             {
-                            item.instruments.length === 0 &&
-                            item.availability.length === 0 &&
-                            item.rooms.length === 0
+                              validateIfProfessorIsAssigned(item)
                               ? "Asignar"
                               : "Editar"
                             }

@@ -71,7 +71,7 @@ const SelectShedulePro = <T,>({
             availability: AvailabilityForScheduleProType[];
           }
         ).availability.forEach((day: AvailabilityForScheduleProType) => {
-          const dayIndex = updatedSchedule.findIndex((d) => d.id === day.dayID);
+          const dayIndex = updatedSchedule.findIndex((d) => String(d.id) === String(day.dayID));
           if (dayIndex !== -1) {
             if (!daysFound.has(dayIndex)) {
               daysFound.add(dayIndex);
@@ -110,7 +110,7 @@ const SelectShedulePro = <T,>({
     const dayAvailability = updated[dayIndex].hours;
 
     const selectDayWeek = scheduleWeek?.scheduleDays?.find(
-      (day: ScheduleDayType) => day.id === id
+      (day: ScheduleDayType) => String(day.id) === String(id)
     );
 
     const lastEnd = dayAvailability[dayAvailability.length - 1].endTime;
