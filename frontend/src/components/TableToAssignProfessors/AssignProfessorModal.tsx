@@ -9,6 +9,7 @@ import CancelModalBtn from "../buttons/CancelModalBtn";
 import SubmitModalBtn from "../buttons/SubmitModalBtn";
 import BackgroundDiv from "../modal/BackgroundDiv";
 import {
+  ProfessorAssignType,
   ProfessorType,
   ScheduleType,
   SelectableInstrument,
@@ -24,7 +25,7 @@ import { toast } from "react-toastify";
 interface AssignProfessorModalProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  professor: ProfessorType | null;
+  professor:  ProfessorType & ProfessorAssignType | null;
   onAssign: (
     contract: boolean,
     hours: number,
@@ -62,36 +63,45 @@ const AssignProfessorModal: React.FC<AssignProfessorModalProps> = ({
     JWT
   );
 
-  // llenar los instrumentos y salones con el campo selected = false
   useEffect(() => {
     if (instruments && !isLoadingInstruments) {
-      setInstrumentProfessor(
-        instruments.map((instrument: SelectableInstrument) => ({
-          ...instrument,
-          selected: false,
-        }))
-      );
+      const updatedInstruments = instruments.map((instrument: SelectableInstrument) => ({
+        ...instrument,
+        selected: professor 
+          ? professor.instruments.some(
+              (profInstrument) => String(profInstrument.InstrumentID) === String(instrument.id)
+            )
+          : false
+      }));
+      setInstrumentProfessor(updatedInstruments);
     }
-  }, [instruments, isLoadingInstruments, isOpen]);
+  }, [instruments, isLoadingInstruments, isOpen, professor]);
 
+  // Prepare rooms with selection based on professor's data
   useEffect(() => {
     if (rooms && !isLoadingRooms) {
-      setRoomsProfessor(
-        rooms.map((room: SelectableRoom) => ({
-          ...room,
-          selected: false,
-        }))
-      );
+      const updatedRooms = rooms.map((room: SelectableRoom) => ({
+        ...room,
+        selected: professor
+          ? professor.rooms.some(
+              (profRoom) => String(profRoom.RoomID) === String(room.id)
+            )
+          : false
+      }));
+      setRoomsProfessor(updatedRooms);
     }
-  }, [isLoadingRooms, rooms, isOpen]);
+  }, [isLoadingRooms, rooms, isOpen, professor]);
 
-  // Reset form when modal opens
   useEffect(() => {
-    setContract(false);
-    if (isOpen) {
+    if (professor) {
+      setContract(professor.contract);
+      setHours(professor.hours);
+    } else {
+      setContract(false);
       setHours(1);
     }
-  }, [isOpen]);
+  }, [isOpen, professor]);
+
 
   useEffect(() => {
     setTimeout(() => {

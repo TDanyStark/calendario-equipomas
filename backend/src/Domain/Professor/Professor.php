@@ -18,7 +18,8 @@ class Professor implements PersonInterface
     private ?array $instruments = [];
     private ?array $rooms = [];
     private ?array $availability = [];
-    private ?array $contract = null;
+    private ?bool $contract = false;
+    private ?int $hours = 0;
 
     public function __construct(
         string $professorID,
@@ -30,7 +31,8 @@ class Professor implements PersonInterface
         ?array $instruments = [],
         ?array $rooms = [],
         ?array $availability = [],
-        ?array $contract = null
+        ?bool $contract = false,
+        ?int $hours = 0
     ) {
         $this->professorID = $professorID;
         $this->firstName = ucfirst($firstName);
@@ -42,6 +44,7 @@ class Professor implements PersonInterface
         $this->rooms = $rooms;
         $this->availability = $availability;
         $this->contract = $contract;
+        $this->hours = $hours;
     }
 
     public function getProfessorID(): string
@@ -89,9 +92,14 @@ class Professor implements PersonInterface
         return $this->availability;
     }
 
-    public function getContract(): ?ProfessorContracts
+    public function getContract(): ?bool
     {
         return $this->contract;
+    }
+
+    public function getHours(): ?int
+    {
+        return $this->hours;
     }
     
     public function jsonSerialize(): array
@@ -107,7 +115,8 @@ class Professor implements PersonInterface
             'instruments' => $this->instruments,
             'rooms' => $this->rooms,
             'availability' => $this->availability,
-            'contract' => $this->contract
+            'contract' => $this->contract,
+            'hours' => $this->hours
         ];
     }
 }

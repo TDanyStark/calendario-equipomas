@@ -46,7 +46,7 @@ function TableToAssignProfessors() {
   // Estado para manejar el modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProfessor, setSelectedProfessor] =
-    useState<ProfessorType | null>(null);
+    useState<ProfessorType & ProfessorAssignType | null>(null);
 
   const [debouncedQuery] = useDebounce(query, 500);
 
@@ -102,7 +102,7 @@ function TableToAssignProfessors() {
   );
 
   // Manejador para abrir el modal
-  const handleOpenAssignModal = (professor: ProfessorType) => {
+  const handleOpenAssignModal = (professor: ProfessorType & ProfessorAssignType) => {
     console.log(professor);
     setSelectedProfessor(professor);
     setIsModalOpen(true);
@@ -137,28 +137,28 @@ function TableToAssignProfessors() {
       {
         label: "ID",
         sortKey: "id",
-        renderCell: (item: unknown) => (item as ProfessorType).id,
+        renderCell: (item: unknown) => (item as ProfessorType & ProfessorAssignType).id,
       },
       {
         label: "Nombre",
         sortKey: "firstName",
-        renderCell: (item: unknown) => (item as ProfessorType).firstName,
+        renderCell: (item: unknown) => (item as ProfessorType & ProfessorAssignType).firstName,
       },
       {
         label: "Apellido",
         sortKey: "lastName",
-        renderCell: (item: unknown) => (item as ProfessorType).lastName,
+        renderCell: (item: unknown) => (item as ProfessorType & ProfessorAssignType).lastName,
       },
       {
         label: "Teléfono",
         sortKey: "phone",
         renderCell: (item: unknown) =>
-          (item as ProfessorType).phone || "No disponible",
+          (item as ProfessorType & ProfessorAssignType).phone || "No disponible",
       },
       {
         label: "Estado",
         sortKey: "status",
-        renderCell: (item: unknown) => (item as ProfessorType).status,
+        renderCell: (item: unknown) => (item as ProfessorType & ProfessorAssignType).status,
       },
     ],
     []
@@ -198,7 +198,7 @@ function TableToAssignProfessors() {
           theme={theme}
           layout={{ fixedHeader: true, horizontalScroll: true, custom: true }}
         >
-          {(tableList: ProfessorType) => (
+          {(tableList: ( ProfessorType & ProfessorAssignType)[]) => (
             <>
               <Header>
                 <HeaderRow>
@@ -210,7 +210,7 @@ function TableToAssignProfessors() {
               </Header>
               <Body>
                 {tableList?.length > 0 ? (
-                  tableList.map((item: ProfessorType) => (
+                  tableList.map((item: ProfessorType & ProfessorAssignType) => (
                     <Row key={item.id} item={item}>
                       {columns.map((column) => (
                         <Cell key={column.label} className="text-lg">

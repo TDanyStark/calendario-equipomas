@@ -549,7 +549,8 @@ class DatabaseProfessorRepository implements ProfessorRepository
                 $instrumentsIsNull ? [] : json_decode($row['instruments'], true),
                 $roomsIsNull ? [] : json_decode($row['rooms'], true),
                 $availabilitiesIsNull ? [] : json_decode($row['availabilities'], true),
-                $contractsIsNull ? null : json_decode($row['contracts'], true)
+                $contractsIsNull ? false : true,
+                $contractsIsNull ? 0 : json_decode($row['contracts'], true)[0]['hours']
             );
         }
         
