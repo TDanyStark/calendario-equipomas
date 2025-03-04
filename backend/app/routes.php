@@ -47,6 +47,7 @@ use App\Application\Actions\Professor\DeleteProfessorAction;
 use App\Application\Actions\Professor\DeleteMultipleProfessorsAction;
 use App\Application\Actions\Professor\SeedProfessorsAction;
 use App\Application\Actions\Professor\AssignProfessorAction;
+use App\Application\Actions\Professor\GetAssignProfessorAction;
 
 use App\Application\Actions\Student\ListStudentsAction;
 use App\Application\Actions\Student\CreateStudentAction;
@@ -132,6 +133,7 @@ return function (App $app) {
             $professorGroup->get('', ListProfessorsAction::class);
             $professorGroup->get('/query', GetProfessorQueryAction::class);
             $professorGroup->post('/assign', AssignProfessorAction::class);
+            $professorGroup->get('/assign', GetAssignProfessorAction::class);
             // $professorGroup->get('/seed', SeedProfessorsAction::class);
             $professorGroup->get('/idsactive', ListProfessorIdsActiveAction::class);
             $professorGroup->get('/{id}', GetProfessorAction::class);

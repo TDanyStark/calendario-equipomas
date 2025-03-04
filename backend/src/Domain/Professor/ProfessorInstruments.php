@@ -19,7 +19,7 @@ class ProfessorInstruments implements JsonSerializable
         string $ProfessorID, // Cambiar a string
         int $InstrumentID,
         int $academicPeriodID,
-        ?string $InstrumentName
+        ?string $InstrumentName = null
     ) {
         $this->ProfessorInstrumentID = $ProfessorInstrumentID;
         $this->ProfessorID = $ProfessorID;

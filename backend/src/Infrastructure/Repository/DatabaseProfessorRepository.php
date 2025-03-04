@@ -463,4 +463,108 @@ class DatabaseProfessorRepository implements ProfessorRepository
             throw $e;
         }
     }
+
+    public function getProfessorsWithAssign(int $academicPeriodID, int $limit, int $offset, string $query = '', bool $offPagination = false): array {
+        $searchQuery = "%$query%";
+        
+        $whereClause = 'p.ProfessorIsDelete = 0 AND (:query = "" OR 
+            p.ProfessorID LIKE :query OR 
+            p.ProfessorFirstName LIKE :query OR 
+            p.ProfessorLastName LIKE :query OR 
+            p.ProfessorPhone LIKE :query OR 
+            p.ProfessorStatus LIKE :query OR 
+            u.UserEmail LIKE :query)';
+        
+        // Obtener cantidad total de registros
+        $countStmt = $this->pdo->prepare("SELECT COUNT(DISTINCT p.ProfessorID) as total FROM professors p 
+            LEFT JOIN users u ON p.ProfessorID = u.userID 
+            WHERE $whereClause");
+        
+        $countStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
+        $countStmt->execute();
+        $totalRecords = (int) $countStmt->fetchColumn();
+        $totalPages = $limit > 0 ? ceil($totalRecords / $limit) : 1;
+        
+        // Obtener datos paginados
+        $stmt = $this->pdo->prepare(
+            "SELECT 
+                p.ProfessorID, p.ProfessorFirstName, p.ProfessorLastName, p.ProfessorPhone, p.ProfessorStatus,
+                u.UserID, u.UserEmail, u.RoleID,
+                JSON_ARRAYAGG(DISTINCT JSON_OBJECT(
+                    'AvailabilityID', pa.AvailabilityID,
+                    'DayID', pa.DayID,
+                    'StartTime', pa.StartTime,
+                    'EndTime', pa.EndTime,
+                    'academic_period_id', pa.academic_period_id
+                )) AS availabilities,
+                JSON_ARRAYAGG(DISTINCT JSON_OBJECT(
+                    'id', pc.id,
+                    'professor_id', pc.professor_id,
+                    'academic_period_id', pc.academic_period_id,
+                    'hours', pc.hours
+                )) AS contracts,
+                JSON_ARRAYAGG(DISTINCT JSON_OBJECT(
+                    'ProfessorInstrumentID', pi.ProfessorInstrumentID,
+                    'InstrumentID', pi.InstrumentID,
+                    'academic_period_id', pi.academic_period_id
+                )) AS instruments,
+                JSON_ARRAYAGG(DISTINCT JSON_OBJECT(
+                    'ProfessorRoomID', pr.ProfessorRoomID,
+                    'RoomID', pr.RoomID,
+                    'academic_period_id', pr.academic_period_id
+                )) AS rooms
+            FROM professors p
+            LEFT JOIN users u ON p.ProfessorID = u.userID
+            LEFT JOIN professor_availability pa ON p.ProfessorID = pa.ProfessorID AND pa.academic_period_id = :academicPeriodID
+            LEFT JOIN professor_contracts pc ON p.ProfessorID = pc.professor_id AND pc.academic_period_id = :academicPeriodID
+            LEFT JOIN professor_instruments pi ON p.ProfessorID = pi.ProfessorID AND pi.academic_period_id = :academicPeriodID
+            LEFT JOIN professor_rooms pr ON p.ProfessorID = pr.ProfessorID AND pr.academic_period_id = :academicPeriodID
+            WHERE $whereClause
+            GROUP BY p.ProfessorID
+            ORDER BY p.ProfessorFirstName ASC
+            LIMIT :limit OFFSET :offset"
+        );
+        
+        $stmt->bindParam(':academicPeriodID', $academicPeriodID, PDO::PARAM_INT);
+        $stmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $professors = [];
+        foreach ($rows as $row) {
+            $user = new User(
+                $row['UserID'],
+                $row['UserEmail'],
+                null,
+                (int) $row['RoleID']
+            );
+
+            $instrumentsIsNull = json_decode($row['instruments'], true)[0]['ProfessorInstrumentID'] === null;
+            $roomsIsNull = json_decode($row['rooms'], true)[0]['ProfessorRoomID'] === null;
+            $availabilitiesIsNull = json_decode($row['availabilities'], true)[0]['AvailabilityID'] === null;
+            $contractsIsNull = json_decode($row['contracts'], true)[0]['id'] === null;
+    
+            $professors[] = new Professor(
+                $row['ProfessorID'],
+                $row['ProfessorFirstName'],
+                $row['ProfessorLastName'],
+                $row['ProfessorPhone'],
+                $row['ProfessorStatus'],
+                $user,
+                $instrumentsIsNull ? [] : json_decode($row['instruments'], true),
+                $roomsIsNull ? [] : json_decode($row['rooms'], true),
+                $availabilitiesIsNull ? [] : json_decode($row['availabilities'], true),
+                $contractsIsNull ? null : json_decode($row['contracts'], true)
+            );
+        }
+        
+        if ($offPagination) {
+            return $professors;
+        }
+        
+        return ['data' => $professors, 'pages' => $totalPages];
+    }
 }

@@ -15,6 +15,10 @@ class Professor implements PersonInterface
     private ?string $phone;
     private string $status;
     private User $user; // Relación con la clase User
+    private ?array $instruments = [];
+    private ?array $rooms = [];
+    private ?array $availability = [];
+    private ?array $contract = null;
 
     public function __construct(
         string $professorID,
@@ -23,6 +27,10 @@ class Professor implements PersonInterface
         ?string $phone,
         string $status,
         User $user, // Pasar el objeto User
+        ?array $instruments = [],
+        ?array $rooms = [],
+        ?array $availability = [],
+        ?array $contract = null
     ) {
         $this->professorID = $professorID;
         $this->firstName = ucfirst($firstName);
@@ -30,6 +38,10 @@ class Professor implements PersonInterface
         $this->phone = $phone;
         $this->status = $status;
         $this->user = $user; // Asignar el objeto User
+        $this->instruments = $instruments;
+        $this->rooms = $rooms;
+        $this->availability = $availability;
+        $this->contract = $contract;
     }
 
     public function getProfessorID(): string
@@ -61,6 +73,26 @@ class Professor implements PersonInterface
     {
         return $this->user; 
     }
+
+    public function getInstruments(): ?array
+    {
+        return $this->instruments;
+    }
+
+    public function getRooms(): ?array
+    {
+        return $this->rooms;
+    }
+
+    public function getAvailability(): ?array
+    {
+        return $this->availability;
+    }
+
+    public function getContract(): ?ProfessorContracts
+    {
+        return $this->contract;
+    }
     
     public function jsonSerialize(): array
     {
@@ -72,6 +104,10 @@ class Professor implements PersonInterface
             'phone' => $this->phone,
             'status' => $this->status,
             'user' => $this->user, // Incluir información del usuario
+            'instruments' => $this->instruments,
+            'rooms' => $this->rooms,
+            'availability' => $this->availability,
+            'contract' => $this->contract
         ];
     }
 }

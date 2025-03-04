@@ -29,7 +29,7 @@ import AssignProfessorModal from "./AssignProfessorModal";
 import useItemMutations from "@/hooks/useItemsMutation";
 
 
-const entity = "professors";
+const entity = "professors/assign";
 const entityName = "profesores";
 const heightRow = 52;
 const gridTemplateColumns = "180px 1fr 1fr 1fr 120px 130px";
@@ -103,6 +103,7 @@ function TableToAssignProfessors() {
 
   // Manejador para abrir el modal
   const handleOpenAssignModal = (professor: ProfessorType) => {
+    console.log(professor);
     setSelectedProfessor(professor);
     setIsModalOpen(true);
   };
@@ -170,7 +171,6 @@ function TableToAssignProfessors() {
 
   if (isLoading) return <Loader />;
   if (isError) return <ErrorLoadingResourse resourse={entityName} />;
-
   return (
     <>
       <div
