@@ -33,10 +33,9 @@ const SelectShedulePro = <T,>({schedule, setSchedule, canBeAdded = true, editIte
   useEffect(() => {
     if (scheduleWeek && scheduleWeek.scheduleDays) {
       const updatedSchedule = scheduleWeek.scheduleDays.map((day: ScheduleDayType) => {
-
         let willActive = true;
         if (editItem && isItemType(editItem)) {
-          willActive = ((editItem as unknown as { availability: AvailabilityForScheduleProType[] }).availability.some((d) => d.dayID === day.id));
+          willActive = ((editItem as unknown as { availability: AvailabilityForScheduleProType[] }).availability.some((d) => String(d.dayID) === String(day.id)));
         }
         
         return {
@@ -217,7 +216,7 @@ const SelectShedulePro = <T,>({schedule, setSchedule, canBeAdded = true, editIte
 };
 
 function  isItemType<T>(obj: T): obj is T {
-  return !!obj && typeof obj === 'object' && 'availability' in obj;
+  return !!obj && typeof obj === 'object' && 'availability' in obj && Array.isArray(obj.availability) && obj.availability.length > 0;
 }
 
 export default SelectShedulePro;

@@ -411,6 +411,12 @@ class DatabaseProfessorRepository implements ProfessorRepository
         }
     }
 
+    private function DeleteInstrumentsProfessor(string $ID, array $professorInstrumentsArray): void
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM professor_instruments WHERE ProfessorID = :professorID AND academic_period_id = :academicPeriodID");
+        $stmt->execute(['professorID' => $ID, 'academicPeriodID' => $professorInstrumentsArray[0]->getAcademicPeriodID()]);
+    }
+
     private function AddRoomsProfessor(string $ID, array $professorRoomsArray): void
     {
         $stmt = $this->pdo->prepare("INSERT INTO professor_rooms (ProfessorID, RoomID, academic_period_id) VALUES (:professorID, :roomID, :academicPeriodID)");
@@ -421,6 +427,12 @@ class DatabaseProfessorRepository implements ProfessorRepository
                 'academicPeriodID' => $professorRoom->getAcademicPeriodID()
             ]);
         }
+    }
+
+    private function DeleteRoomsProfessor(string $ID, array $professorRoomsArray): void
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM professor_rooms WHERE ProfessorID = :professorID AND academic_period_id = :academicPeriodID");
+        $stmt->execute(['professorID' => $ID, 'academicPeriodID' => $professorRoomsArray[0]->getAcademicPeriodID()]);
     }
 
     private function AddAvailabilityProfessor(string $ID, array $professorAvailabilityArray): void
@@ -437,6 +449,12 @@ class DatabaseProfessorRepository implements ProfessorRepository
         }
     }
 
+    private function DeleteAvailabilityProfessor(string $ID, array $professorAvailabilityArray): void
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM professor_availability WHERE ProfessorID = :professorID AND academic_period_id = :academicPeriodID");
+        $stmt->execute(['professorID' => $ID, 'academicPeriodID' => $professorAvailabilityArray[0]->getAcademicPeriodID()]);
+    }
+
     private function AddContractProfessor(string $ID, ProfessorContracts $professorContract): void
     {
         $stmt = $this->pdo->prepare("INSERT INTO professor_contracts (professor_id, academic_period_id, Hours) VALUES (:professor_id, :academicPeriodID, :hours)");
@@ -447,14 +465,27 @@ class DatabaseProfessorRepository implements ProfessorRepository
         ]);
     }
 
+    private function DeleteContractProfessor(string $ID, ProfessorContracts $professorContract): void
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM professor_contracts WHERE professor_id = :professorID AND academic_period_id = :academicPeriodID");
+        $stmt->execute([
+            'professorID' => $ID,
+            'academicPeriodID' => $professorContract->getAcademicPeriodID()
+        ]); 
+    }
+
     public function assignProfessor(string $ID, array $professorInstrumentsArray, array $professorRoomsArray, array $professorAvailabilityArray, ?ProfessorContracts $professorContract = null): void
     {
         try {
             $this->pdo->beginTransaction();
+            $this->DeleteInstrumentsProfessor($ID, $professorInstrumentsArray);
             $this->AddInstrumentsProfessor($ID, $professorInstrumentsArray);
+            $this->DeleteRoomsProfessor($ID, $professorRoomsArray);
             $this->AddRoomsProfessor($ID, $professorRoomsArray);
+            $this->DeleteAvailabilityProfessor($ID, $professorAvailabilityArray);
             $this->AddAvailabilityProfessor($ID, $professorAvailabilityArray);
             if ($professorContract) {
+                $this->DeleteContractProfessor($ID, $professorContract);
                 $this->AddContractProfessor($ID, $professorContract);
             }
             $this->pdo->commit();
@@ -472,7 +503,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
             p.ProfessorFirstName LIKE :query OR 
             p.ProfessorLastName LIKE :query OR 
             p.ProfessorPhone LIKE :query OR 
-            p.ProfessorStatus LIKE :query OR 
+            p.ProfessorStatus = :queryStatus OR 
             u.UserEmail LIKE :query)';
         
         // Obtener cantidad total de registros
@@ -481,6 +512,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
             WHERE $whereClause");
         
         $countStmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
+        $countStmt->bindValue(':queryStatus', $query, PDO::PARAM_STR);
         $countStmt->execute();
         $totalRecords = (int) $countStmt->fetchColumn();
         $totalPages = $limit > 0 ? ceil($totalRecords / $limit) : 1;
@@ -492,9 +524,9 @@ class DatabaseProfessorRepository implements ProfessorRepository
                 u.UserID, u.UserEmail, u.RoleID,
                 JSON_ARRAYAGG(DISTINCT JSON_OBJECT(
                     'AvailabilityID', pa.AvailabilityID,
-                    'DayID', pa.DayID,
-                    'StartTime', pa.StartTime,
-                    'EndTime', pa.EndTime
+                    'dayID', pa.DayID,
+                    'startTime', pa.StartTime,
+                    'endTime', pa.EndTime
                 )) AS availabilities,
                 JSON_ARRAYAGG(DISTINCT JSON_OBJECT(
                     'hours', pc.hours
@@ -519,6 +551,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
         
         $stmt->bindParam(':academicPeriodID', $academicPeriodID, PDO::PARAM_INT);
         $stmt->bindValue(':query', $searchQuery, PDO::PARAM_STR);
+        $stmt->bindValue(':queryStatus', $query, PDO::PARAM_STR);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         

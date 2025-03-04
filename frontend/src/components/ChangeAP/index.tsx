@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ArrowSvg from "@/icons/ArrowSvg";
@@ -12,17 +11,18 @@ import useClickOutside from "@/hooks/useClickOutside";
 import AddIcon from "@/icons/AddIcon";
 import PopupCreate from "./PopupCreate";
 import { setPeriod } from "@/store/academicPeriodSlice";
+import useCleanQuerysWithAP from "@/hooks/useCleanQuerysWithAP";
 
 const entity = "academic-periods";
 
 const ChangeAP = () => {
   const [isActive, setIsActive] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const queryClient = useQueryClient();
   const JWT = useSelector((state: RootState) => state.auth.JWT);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
+  const cleanQuerys = useCleanQuerysWithAP();
 
   const { data, isLoading, isError } = useFetchForSelect(
     entity,
@@ -47,8 +47,7 @@ const ChangeAP = () => {
       setIsSaving(true);
       try {
         await optionsSelectAC(Number(id), JWT);
-        queryClient.invalidateQueries(entity);
-        queryClient.invalidateQueries("enrolls");
+        cleanQuerys();
         toast.success("Período académico actualizado con éxito!");
       } catch (error) {
         toast.error("Error al actualizar el período académico");
