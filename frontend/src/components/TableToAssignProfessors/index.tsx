@@ -33,7 +33,6 @@ import {
 import PlusSvg from "@/icons/PlusSvg";
 import AssignProfessorModal from "./AssignProfessorModal";
 import useItemMutations from "@/hooks/useItemsMutation";
-import Skeleton from "../Loader/Skeleton";
 import { useQueryClient } from "react-query";
 
 const entity = "professors/assign";
@@ -165,35 +164,30 @@ function TableToAssignProfessors() {
       {
         label: "ID",
         sortKey: "id",
-        renderCell: (item: unknown) =>
-          isFetching && !cachedData ? <Skeleton className="w-full h-4" /> : (item as ProfessorType & ProfessorAssignType).id,
+        renderCell: (item: unknown) => (item as ProfessorType & ProfessorAssignType).id,
       },
       {
         label: "Nombre",
         sortKey: "firstName",
-        renderCell: (item: unknown) =>
-          isFetching && !cachedData  ? <Skeleton className="skeleton w-full h-4" /> : (item as ProfessorType & ProfessorAssignType).firstName,
+        renderCell: (item: unknown) => (item as ProfessorType & ProfessorAssignType).firstName,
       },
       {
         label: "Apellido",
         sortKey: "lastName",
-        renderCell: (item: unknown) =>
-          isFetching && !cachedData  ? <Skeleton className="skeleton w-full h-4" /> : (item as ProfessorType & ProfessorAssignType).lastName,
+        renderCell: (item: unknown) => (item as ProfessorType & ProfessorAssignType).lastName,
       },
       {
         label: "Teléfono",
         sortKey: "phone",
-        renderCell: (item: unknown) =>
-          isFetching && !cachedData ? <Skeleton className="skeleton w-full h-4" /> : (item as ProfessorType & ProfessorAssignType).phone || "No disponible",
+        renderCell: (item: unknown) => (item as ProfessorType & ProfessorAssignType).phone || "No disponible",
       },
       {
         label: "Estado",
         sortKey: "status",
-        renderCell: (item: unknown) =>
-          isFetching && !cachedData  ? <Skeleton className="skeleton w-full h-4" /> : (item as ProfessorType & ProfessorAssignType).status,
+        renderCell: (item: unknown) => (item as ProfessorType & ProfessorAssignType).status,
       },
     ],
-    [cachedData, isFetching]
+    []
   );
 
   const tableData = { nodes: data };
@@ -261,7 +255,7 @@ function TableToAssignProfessors() {
                     <Row key={item.id} item={item}>
                       {columns.map((column) => (
                         <Cell key={column.label} className="text-lg">
-                          <CellItem item={item} column={column} />
+                          <CellItem item={item} column={column} isLoading={isFetching && !cachedData} />
                         </Cell>
                       ))}
                       <Cell>

@@ -35,11 +35,6 @@ import Theme from "@/lib/Theme";
 import FilterEnrolls from "../Filters/FilterEnrolls";
 import { useQueryClient } from "react-query";
 
-// Skeleton Loader Component
-const SkeletonCell = () => (
-  <div className="animate-pulse bg-gray-200 h-8 w-full rounded"></div>
-);
-
 interface Column<T> {
   label: string;
   renderCell: (item: T) => string | number;
