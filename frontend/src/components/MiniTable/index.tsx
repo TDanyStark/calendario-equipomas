@@ -31,6 +31,7 @@ import useGetDataForMiniTable from "@/hooks/useGetDataForMiniTable";
 import Skeleton from "../Loader/Skeleton";
 import { getActiveIdsForAEntity } from "@/utils/getActiveIdsForAEntity";
 import { toast } from "react-toastify";
+import { useQueryClient } from "react-query";
 
 interface Column<T> {
   label: string;
@@ -70,7 +71,10 @@ function MiniTable<T extends TableNode>({
     data: fetchedData,
     isLoading,
     isError,
+    isFetching,
   } = useGetDataForMiniTable(entity, JWT, page, debouncedQuery);
+  const queryClient = useQueryClient();
+  const dataCache = queryClient.getQueryData([entity, page, debouncedQuery]);
 
   const data: TableNode[] = (fetchedData?.data as TableNode[]) || [];
   const totalPages = fetchedData?.pages || 1;
@@ -116,22 +120,22 @@ function MiniTable<T extends TableNode>({
       select.fns.onRemoveAll();
     } else {
       // select.fns.onAddAll(data.map((item) => item.id));
-      try{
+      try {
         setWaitGetIds(true);
         const res = await getActiveIdsForAEntity(JWT, entity);
-        if(res && res.statusCode === 200){
+        if (res && res.statusCode === 200) {
           select.fns.onRemoveAll();
           // pasar a string los ids de res.data
           const ids = res.data.map((id: number) => id.toString());
           select.fns.onAddAll(ids);
           setWaitGetIds(false);
         }
-      }catch(e){
+      } catch (e) {
         toast.error("Error al obtener las inscripciones activas");
         select.fns.onRemoveAll();
         setChecked(false);
         console.error(e);
-      }finally{
+      } finally {
         setWaitGetIds(false);
       }
     }
@@ -185,7 +189,21 @@ function MiniTable<T extends TableNode>({
             <>
               <Header>
                 <HeaderRow>
-                  <HeaderCellSelect />
+                  {waitGetIds ? (
+                    <th
+                      role="columnheader"
+                      data-table-library_th=""
+                      data-hide="false"
+                      data-resize-min-width="75"
+                      className="th stiff css-w84skr-HEADER_CELL_CONTAINER_STYLE-HeaderCell"
+                    >
+                      <div>
+                        <Skeleton className="w-5 h-5 mt-[5px]" />
+                      </div>
+                    </th>
+                  ) : (
+                    <HeaderCellSelect />
+                  )}
                   {columns.map((column) => (
                     <HeaderCell key={column.label}>{column.label}</HeaderCell>
                   ))}
@@ -195,10 +213,26 @@ function MiniTable<T extends TableNode>({
                 {tableList.length > 0 ? (
                   tableList.map((item: T) => (
                     <Row key={item.id} item={item}>
-                      <CellSelect item={item} />
+                      {waitGetIds ? (
+                        <td
+                          role="gridcell"
+                          data-table-library_td=""
+                          className="td stiff css-1rqbzwa-CELL_CONTAINER_STYLE-Cell"
+                        >
+                          <div>
+                            <Skeleton className="w-5 h-5 mt-[5px]" />
+                          </div>
+                        </td>
+                      ) : (
+                        <CellSelect item={item} />
+                      )}
                       {columns.map((column) => (
                         <Cell key={column.label} className="text-lg">
-                          <CellItem item={item} column={column} />
+                          <CellItem
+                            item={item}
+                            column={column}
+                            isLoading={isFetching && !dataCache}
+                          />
                         </Cell>
                       ))}
                     </Row>

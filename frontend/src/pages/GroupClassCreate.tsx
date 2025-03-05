@@ -1,19 +1,15 @@
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Primaryh1 from "../components/titles/Primaryh1";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import useItemMutations from "@/hooks/useItemsMutation";
-import {
-  EnrollType,
-  GroupClassType,
-  ProfessorType,
-} from "@/types/Api";
+import { EnrollType, GroupClassType, ProfessorType } from "@/types/Api";
 import ActivePeriod from "@/components/ChangeAP/ActivePeriod";
 import SearchSelect from "@/components/SearchSelect";
 import { useMemo, useState } from "react";
 import MiniTable from "@/components/MiniTable";
 import SelectDayAndHourCreate from "@/components/SelectDayAndHour/SelectDayAndHourCreate";
+import { useCallback } from "react";
 
 const entity = "groupclass";
 // const entityName = "clases grupales";
@@ -23,6 +19,9 @@ const GroupClassCreate = () => {
   const [filterActive, setFilterActive] = useState<string | null>(null);
 
   const [roomId, setRoomId] = useState<string>("");
+  const [day, setDay] = useState<number | null>(null);
+  const [startTime, setStartTime] = useState<string | null>(null);
+  const [endTime, setEndTime] = useState<string | null>(null);
 
   const [tabActive, setTabActive] = useState<string>("students");
   const [idsStudents, setIdsStudents] = useState<string[]>([]);
@@ -33,16 +32,50 @@ const GroupClassCreate = () => {
     JWT
   );
 
-  
-
   const handleSelectedIds = (ids: string[], entity: string) => {
-    if (entity === "enrolls") {
-      setIdsStudents(ids);
-    }
-    if (entity === "professors") {
-      setIdsProfessors(ids);
+    switch (entity) {
+      case "enrolls":
+        setIdsStudents(ids);
+        break;
+      case "professors":
+        setIdsProfessors(ids);
+        break;
+      default:
+        break;
     }
   };
+
+  const handleCreate = () => {
+    // if (roomId && idsStudents.length > 0 && idsProfessors.length > 0) {
+    const data = {
+      name: "",
+      roomId,
+      day,
+      startTime,
+      endTime,
+      students: idsStudents,
+      professors: idsProfessors,
+    };
+    console.log(data);
+  };
+  // };
+
+  const onSelectHour = useCallback(
+    ({
+      day,
+      startTime,
+      endTime,
+    }: {
+      day: number | null;
+      startTime: string | null;
+      endTime: string | null;
+    }) => {
+      setDay(day);
+      setStartTime(startTime);
+      setEndTime(endTime);
+    },
+    []
+  );
 
   const columnsStudents = useMemo(
     () => [
@@ -128,18 +161,12 @@ const GroupClassCreate = () => {
             />
           </div>
           {roomId && (
-            <SelectDayAndHourCreate 
-              roomId={roomId}  
-              onChange={({ day, startTime, endTime }) => {
-                // Aquí manejas los valores seleccionados
-                console.log("Día:", day);
-                console.log("Inicio:", startTime);
-                console.log("Fin:", endTime);
-              }} 
-            />
+            <SelectDayAndHourCreate roomId={roomId} onChange={onSelectHour} />
           )}
           <div>
-            <button className="btn-primary w-full">Crear</button>
+            <button className="btn-primary w-full" onClick={handleCreate}>
+              Crear
+            </button>
           </div>
         </div>
         <div className="p-6 border rounded-lg flex-1 overflow-hidden">
