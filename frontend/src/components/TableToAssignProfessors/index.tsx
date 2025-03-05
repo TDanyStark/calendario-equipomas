@@ -34,6 +34,7 @@ import PlusSvg from "@/icons/PlusSvg";
 import AssignProfessorModal from "./AssignProfessorModal";
 import useItemMutations from "@/hooks/useItemsMutation";
 import { useQueryClient } from "react-query";
+import Skeleton from "../Loader/Skeleton";
 
 const entity = "professors/assign";
 const entityName = "profesores";
@@ -74,7 +75,12 @@ function TableToAssignProfessors() {
     isFetching,
   } = useFetchItemsWithPagination(entity, JWT, page, debouncedQuery, filters);
   const queryClient = useQueryClient();
-  const cachedData = queryClient.getQueryData([entity, page, debouncedQuery, filters]);
+  const cachedData = queryClient.getQueryData([
+    entity,
+    page,
+    debouncedQuery,
+    filters,
+  ]);
 
   const data: TableNode[] = (fetchedData?.data as TableNode[]) || [];
   const totalPages = fetchedData?.pages || 1;
@@ -146,13 +152,13 @@ function TableToAssignProfessors() {
     }
   };
 
-  const validateIfProfessorIsAssigned = (professor: ProfessorAssignType) => {
+  const validateIfProfessorIsNotAssigned = (professor: ProfessorAssignType) => {
     return (
       professor.instruments.length === 0 &&
       professor.availability.length === 0 &&
       professor.rooms.length === 0
     );
-  }
+  };
 
   const { createItem } = useItemMutations<ProfessorAssignType>(
     "professors/assign",
@@ -164,27 +170,33 @@ function TableToAssignProfessors() {
       {
         label: "ID",
         sortKey: "id",
-        renderCell: (item: unknown) => (item as ProfessorType & ProfessorAssignType).id,
+        renderCell: (item: unknown) =>
+          (item as ProfessorType & ProfessorAssignType).id,
       },
       {
         label: "Nombre",
         sortKey: "firstName",
-        renderCell: (item: unknown) => (item as ProfessorType & ProfessorAssignType).firstName,
+        renderCell: (item: unknown) =>
+          (item as ProfessorType & ProfessorAssignType).firstName,
       },
       {
         label: "Apellido",
         sortKey: "lastName",
-        renderCell: (item: unknown) => (item as ProfessorType & ProfessorAssignType).lastName,
+        renderCell: (item: unknown) =>
+          (item as ProfessorType & ProfessorAssignType).lastName,
       },
       {
         label: "Teléfono",
         sortKey: "phone",
-        renderCell: (item: unknown) => (item as ProfessorType & ProfessorAssignType).phone || "No disponible",
+        renderCell: (item: unknown) =>
+          (item as ProfessorType & ProfessorAssignType).phone ||
+          "No disponible",
       },
       {
         label: "Estado",
         sortKey: "status",
-        renderCell: (item: unknown) => (item as ProfessorType & ProfessorAssignType).status,
+        renderCell: (item: unknown) =>
+          (item as ProfessorType & ProfessorAssignType).status,
       },
     ],
     []
@@ -215,15 +227,14 @@ function TableToAssignProfessors() {
             onClick={() => {
               const newParams = new URLSearchParams(searchParams);
               newParams.set("page", "1");
-              newParams.set("order", order === "ASC" || order === null ? "DESC" : "ASC");
+              newParams.set(
+                "order",
+                order === "ASC" || order === null ? "DESC" : "ASC"
+              );
               setSearchParams(newParams);
             }}
           >
-            {
-              order === "ASC" || order === null
-              ? "Asignados"
-              : "Sin asignar"
-            }
+            {order === "ASC" || order === null ? "Asignados" : "Sin asignar"}
           </button>
         </div>
       </div>
@@ -255,23 +266,31 @@ function TableToAssignProfessors() {
                     <Row key={item.id} item={item}>
                       {columns.map((column) => (
                         <Cell key={column.label} className="text-lg">
-                          <CellItem item={item} column={column} isLoading={isFetching && !cachedData} />
+                          <CellItem
+                            item={item}
+                            column={column}
+                            isLoading={isFetching && !cachedData}
+                          />
                         </Cell>
                       ))}
                       <Cell>
-                        <div className="flex gap-1 justify-center">
-                          <button
-                            className={`flex gap-1 px-2 py-1 rounded-md bg-gray-800 ${validateIfProfessorIsAssigned(item) ? "bg-green-600" : "bg-gray-800"}`}
-                            onClick={() => handleOpenAssignModal(item)}
-                          >
-                            <PlusSvg />
-                            {
-                              validateIfProfessorIsAssigned(item)
-                              ? "Asignar"
-                              : "Editar"
-                            }
-                          </button>
-                        </div>
+                        {isFetching && !cachedData ? (
+                          <Skeleton className="w-full h-4" />
+                        ) : (
+                          <div className="flex gap-1 justify-center">
+                            <button
+                              className={`flex gap-1 px-2 py-1 rounded-md ${
+                                validateIfProfessorIsNotAssigned(item)
+                                  ? "bg-green-600"
+                                  : "bg-gray-800"
+                              }`}
+                              onClick={() => handleOpenAssignModal(item)}
+                            >
+                              <PlusSvg />
+                              {validateIfProfessorIsNotAssigned(item) ? "asignar" : "editar"}
+                            </button>
+                          </div>
+                        )}
                       </Cell>
                     </Row>
                   ))
