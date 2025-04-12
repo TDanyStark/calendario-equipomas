@@ -116,9 +116,7 @@ const GroupClassCreate = () => {
       {
         label: "Instrumentos",
         renderCell: (item: unknown) =>
-          (item as ProfessorType).instruments
-            .map((instrument) => instrument.name)
-            .join(", "),
+          (item as ProfessorType).instruments?.map((instrument) => instrument.name).join(", ") ?? "",
       },
     ],
     []
@@ -207,7 +205,7 @@ const GroupClassCreate = () => {
           )}
           {tabActive === "professors" && (
             <MiniTable
-              entity="professors"
+              entity="professors/only/assign"
               entityName="profesores"
               JWT={JWT || ""}
               columns={columnsProfessors}

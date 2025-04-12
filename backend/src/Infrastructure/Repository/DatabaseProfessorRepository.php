@@ -393,8 +393,8 @@ class DatabaseProfessorRepository implements ProfessorRepository
         $stmt->execute([
             'professor_id' => $ID,
             'academicPeriodID' => $professorContract->getAcademicPeriodID(),
-            'with_contract' => $professorContract->getWithContract(),
-            'hours' => $professorContract->getWithContract() === 1 ? $professorContract->getHours() : 0
+            'with_contract' => $professorContract->getWithContract() ? 1 : 0,
+            'hours' => $professorContract->getWithContract() ? $professorContract->getHours() : 0
         ]);
     }
 
@@ -428,8 +428,6 @@ class DatabaseProfessorRepository implements ProfessorRepository
 
     public function getProfessorsWithAssign(int $academicPeriodID, int $limit, int $offset, string $orderDir, string $query = '', bool $offPagination = false, bool $onlyWithAssignments = false): array 
     {
-        //         "description": "ERROR: Optional parameter $onlyWithAssignments declared before required parameter $orderDir is implicitly treated as a required parameter on line 429 in file C:\\xampp\\htdocs\\agenda.equipomas.test\\backend\\src\\Infrastructure\\Repository\\DatabaseProfessorRepository.php."
-
         $searchQuery = "%$query%";
         
         $whereClause = 'p.ProfessorIsDelete = 0 AND (:query = "" OR 

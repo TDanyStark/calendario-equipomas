@@ -35,6 +35,7 @@ import AssignProfessorModal from "./AssignProfessorModal";
 import useItemMutations from "@/hooks/useItemsMutation";
 import { useQueryClient } from "react-query";
 import Skeleton from "../Loader/Skeleton";
+import { validateIfProfessorIsNotAssigned } from "@/utils/validations";
 
 const entity = "professors/assign";
 const entityName = "profesores";
@@ -150,14 +151,6 @@ function TableToAssignProfessors() {
       setIsModalOpen(false);
       setSelectedProfessor(null);
     }
-  };
-
-  const validateIfProfessorIsNotAssigned = (professor: ProfessorAssignType) => {
-    return (
-      professor.instruments.length === 0 &&
-      professor.availability.length === 0 &&
-      professor.rooms.length === 0
-    );
   };
 
   const { createItem } = useItemMutations<ProfessorAssignType>(

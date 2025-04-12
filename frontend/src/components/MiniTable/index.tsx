@@ -122,6 +122,7 @@ function MiniTable<T extends TableNode>({
       // select.fns.onAddAll(data.map((item) => item.id));
       try {
         setWaitGetIds(true);
+        console.log("getActiveIdsForAEntity", entity);
         const res = await getActiveIdsForAEntity(JWT, entity);
         if (res && res.statusCode === 200) {
           select.fns.onRemoveAll();

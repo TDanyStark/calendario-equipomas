@@ -1,6 +1,6 @@
 // types/Api.d.ts
 export type DayOfWeekNameType = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
-export type ResourceType = 'instruments' | 'rooms' | 'courses' | 'semesters' | 'professors' | 'students' | 'enrolls' | 'academic-periods' | 'groupclass' | 'professors/assign';
+export type ResourceType = 'instruments' | 'rooms' | 'courses' | 'semesters' | 'professors' | 'students' | 'enrolls' | 'academic-periods' | 'groupclass' | 'professors/assign' | 'professors/only/assign';
 
 interface Availability {
   startTime: string;
@@ -126,6 +126,7 @@ type ProfessorType ={
     email: string;
     roleID: string;
   };
+  instruments?: ProfessorInstrumentType[];
 }
 
 type ProfessorAssignType = {
