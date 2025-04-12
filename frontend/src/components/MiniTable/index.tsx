@@ -47,6 +47,7 @@ interface MiniTableProps<T> {
   gridTemplateColumns: string;
   JWT: string;
   handleSelectedIds?: (ids: string[], entity: string) => void;
+  idsSelected?: string[];
 }
 
 function MiniTable<T extends TableNode>({
@@ -58,6 +59,7 @@ function MiniTable<T extends TableNode>({
   gridTemplateColumns,
   JWT,
   handleSelectedIds,
+  idsSelected = [],
 }: MiniTableProps<T>) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
@@ -91,6 +93,9 @@ function MiniTable<T extends TableNode>({
   const select = useRowSelect(
     tableData,
     {
+      state: {
+        ids: idsSelected,
+      },
       onChange: () => {
         if (select.state.ids.length === 0) {
           setChecked(false);

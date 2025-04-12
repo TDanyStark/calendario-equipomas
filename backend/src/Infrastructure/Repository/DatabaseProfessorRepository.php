@@ -302,6 +302,23 @@ class DatabaseProfessorRepository implements ProfessorRepository
         return $professorIds;
     }
 
+    public function findOnlyAssignIdsActive(int $academic_periodID): array
+    {
+        $stmt = $this->pdo->prepare('
+            SELECT DISTINCT pc.professor_id AS ProfessorID
+            FROM professor_contracts pc
+            WHERE pc.academic_period_id = :academic_periodID
+        ');
+        $stmt->bindParam(':academic_periodID', $academic_periodID, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $professorIds = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $professorIds[] = (string)$row['ProfessorID'];
+        }
+        return $professorIds;
+    }
+
     public function seedProfessors(): void
     {
         try {

@@ -19,7 +19,6 @@ const fetchItems = async <T>(
     query: encodeURIComponent(query),
     // onlyActive: "true",
   });
-  console.log(`${URL_BACKEND}${resource}?${params.toString()}`);
   const response = await axios.get(
     `${URL_BACKEND}${resource}?${params.toString()}`,
     {

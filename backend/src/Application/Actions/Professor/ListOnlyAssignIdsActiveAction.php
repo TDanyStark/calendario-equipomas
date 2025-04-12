@@ -13,20 +13,8 @@ class ListOnlyAssignIdsActiveAction extends ProfessorAction
    */
   protected function action(): Response
   {
-    $academic_periodID = (int)$this->academicPeriodRepository->getActivePeriodID();
-    $params = $this->request->getQueryParams();
-    $page = isset($params['page']) ? (int) $params['page'] : 1;
-    $query = isset($params['query']) ? (string)$params['query'] : '';
-    $offPagination = isset($params['offPagination']) ? filter_var($params['offPagination'], FILTER_VALIDATE_BOOLEAN) : false;
-    $onlyWithAssignments = true;
-    $orderDir = isset($params['order']) ? (string)$params['order'] : 'ASC';
-
-    // Calcula el offset y el límite
-    $limit = 10;
-    $offset = ($page - 1) * $limit;
-
-    $professorWithAssign = $this->professorRepository->getProfessorsWithAssign($academic_periodID, $limit, $offset, $orderDir, $query, $offPagination, $onlyWithAssignments);
-    
-    return $this->respondWithData($professorWithAssign);
+    $academic_periodID = $this->academicPeriodRepository->getActivePeriodID();
+    $professorIds = $this->professorRepository->findOnlyAssignIdsActive($academic_periodID);
+    return $this->respondWithData($professorIds);
   }
 }

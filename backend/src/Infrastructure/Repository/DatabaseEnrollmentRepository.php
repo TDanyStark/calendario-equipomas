@@ -197,8 +197,10 @@ class DatabaseEnrollmentRepository implements EnrollmentRepository
         $this->pdo->commit();
         return (int) $this->pdo->lastInsertId();
       }
+      return 0;
     } catch (Exception $e) {
       throw new Exception("Error al obtener el período académico activo");
+      return 0;
     }
   }
 

@@ -37,13 +37,16 @@ const GroupClassCreate = () => {
       case "enrolls":
         setIdsStudents(ids);
         break;
-      case "professors":
+      case "professors/only/assign":
         setIdsProfessors(ids);
         break;
       default:
         break;
     }
   };
+
+  console.log("idsStudents", idsStudents);
+  console.log("idsProfessors", idsProfessors);  
 
   const handleCreate = () => {
     // if (roomId && idsStudents.length > 0 && idsProfessors.length > 0) {
@@ -177,7 +180,7 @@ const GroupClassCreate = () => {
               }`}
               onClick={() => setTabActive("students")}
             >
-              Estudiantes{" "}
+              Matriculas{" "}
               {idsStudents.length === 0 ? "" : `(${idsStudents.length})`}
             </button>
             <button
@@ -195,12 +198,13 @@ const GroupClassCreate = () => {
           {tabActive === "students" && (
             <MiniTable
               entity="enrolls"
-              entityName="estudiantes"
+              entityName="matriculas"
               JWT={JWT || ""}
               columns={columnsStudents}
-              searchPlaceholder="Buscar estudiante..."
+              searchPlaceholder="Buscar matricula..."
               gridTemplateColumns="50px 1fr 2fr 2fr 1fr 1fr"
               handleSelectedIds={handleSelectedIds}
+              idsSelected={idsStudents}
             />
           )}
           {tabActive === "professors" && (
@@ -212,8 +216,31 @@ const GroupClassCreate = () => {
               searchPlaceholder="Buscar profesor..."
               gridTemplateColumns="50px 150px 1fr 1fr"
               handleSelectedIds={handleSelectedIds}
+              idsSelected={idsProfessors}
             />
           )}
+          {/* <div className={`${tabActive === "students" ? "" : "hidden"}`}>
+          <MiniTable
+              entity="enrolls"
+              entityName="matriculas"
+              JWT={JWT || ""}
+              columns={columnsStudents}
+              searchPlaceholder="Buscar matricula..."
+              gridTemplateColumns="50px 1fr 2fr 2fr 1fr 1fr"
+              handleSelectedIds={handleSelectedIds}
+            />
+          </div>
+          <div className={`${tabActive === "professors" ? "" : "hidden"}`}>
+            <MiniTable
+              entity="professors/only/assign"
+              entityName="profesores"
+              JWT={JWT || ""}
+              columns={columnsProfessors}
+              searchPlaceholder="Buscar profesor..."
+              gridTemplateColumns="50px 150px 1fr 1fr"
+              handleSelectedIds={handleSelectedIds}
+            />
+          </div> */}
         </div>
       </div>
     </section>
