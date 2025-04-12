@@ -6,7 +6,7 @@ namespace App\Application\Actions\Professor;
 
 use Psr\Http\Message\ResponseInterface as Response;
 
-class GetOnlyAssignProfessorAction extends ProfessorAction
+class ListOnlyAssignIdsActiveAction extends ProfessorAction
 {
   /**
    * {@inheritdoc}

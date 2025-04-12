@@ -49,6 +49,7 @@ use App\Application\Actions\Professor\SeedProfessorsAction;
 use App\Application\Actions\Professor\AssignProfessorAction;
 use App\Application\Actions\Professor\GetAssignProfessorAction;
 use App\Application\Actions\Professor\GetOnlyAssignProfessorAction;
+use App\Application\Actions\Professor\ListOnlyAssignIdsActiveAction;
 
 use App\Application\Actions\Student\ListStudentsAction;
 use App\Application\Actions\Student\CreateStudentAction;
@@ -136,13 +137,14 @@ return function (App $app) {
             $professorGroup->post('/assign', AssignProfessorAction::class);
             $professorGroup->get('/assign', GetAssignProfessorAction::class);
             $professorGroup->get('/only/assign', GetOnlyAssignProfessorAction::class);
-            // $professorGroup->get('/seed', SeedProfessorsAction::class);
+            $professorGroup->get('/only/assign/idsactive', ListOnlyAssignIdsActiveAction::class);
             $professorGroup->get('/idsactive', ListProfessorIdsActiveAction::class);
             $professorGroup->get('/{id}', GetProfessorAction::class);
             $professorGroup->post('', CreateProfessorAction::class);
             $professorGroup->put('/{id}', UpdateProfessorAction::class);
             $professorGroup->delete('/{id}', DeleteProfessorAction::class);
             $professorGroup->delete('', DeleteMultipleProfessorsAction::class);
+            // $professorGroup->get('/seed', SeedProfessorsAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
 
         $group->group('/students', function (Group $studentGroup) {

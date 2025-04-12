@@ -471,7 +471,8 @@ class DatabaseProfessorRepository implements ProfessorRepository
                     'with_contract', pc.with_contract
                 )), '[]') AS contracts,
                 COALESCE(JSON_ARRAYAGG(DISTINCT JSON_OBJECT(
-                    'InstrumentID', pi.InstrumentID
+                    'InstrumentID', pi.InstrumentID,
+                    'name', i.InstrumentName
                 )), '[]') AS instruments,
                 COALESCE(JSON_ARRAYAGG(DISTINCT JSON_OBJECT(
                     'RoomID', pr.RoomID
@@ -482,6 +483,7 @@ class DatabaseProfessorRepository implements ProfessorRepository
             LEFT JOIN professor_contracts pc ON p.ProfessorID = pc.professor_id AND pc.academic_period_id = :academicPeriodID
             LEFT JOIN professor_instruments pi ON p.ProfessorID = pi.ProfessorID AND pi.academic_period_id = :academicPeriodID
             LEFT JOIN professor_rooms pr ON p.ProfessorID = pr.ProfessorID AND pr.academic_period_id = :academicPeriodID
+            LEFT JOIN instruments i ON pi.InstrumentID = i.InstrumentID
             WHERE $whereClause
             GROUP BY p.ProfessorID
             ORDER BY pc.date_assign $orderDir
