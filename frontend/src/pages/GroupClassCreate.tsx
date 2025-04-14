@@ -12,6 +12,7 @@ import SelectDayAndHourCreate from "@/components/SelectDayAndHour/SelectDayAndHo
 import { useCallback } from "react";
 import TableGroupClassProfessor from "@/components/professors/TableGroupClassProfessor";
 import { toast } from "react-toastify";
+import { Spinner } from "@/components/Loader/Spinner";
 
 const entity = "groupclass";
 // const entityName = "clases grupales";
@@ -184,7 +185,16 @@ const GroupClassCreate = () => {
           )}
           <div>
             <button className="btn-primary w-full" onClick={handleCreate}>
-              Crear
+              {
+                isCreateLoading ? (
+                  <div className="flex items-center justify-center">
+                    <Spinner size={1.2} />
+                    <span className="ml-2">Creando...</span>
+                  </div>
+                ) : (
+                  "Crear"
+                )
+              }
             </button>
           </div>
         </div>

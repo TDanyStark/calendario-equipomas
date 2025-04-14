@@ -1,9 +1,14 @@
-export const Spinner = () => {
+interface Props{
+  size?: number;
+}
+
+export const Spinner = ({size = 3}: Props) => {
   return (
       <div role="status">
         <svg
           aria-hidden="true"
-          className="inline w-12 h-12 animate-spin text-white fill-primary"
+          className="inline animate-spin text-white fill-primary"
+          style={{width: `${size}rem`, height: `${size}rem`}}
           viewBox="0 0 100 101"
           xmlns="http://www.w3.org/2000/svg"
         >
