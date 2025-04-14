@@ -12,12 +12,11 @@ class ListEnrollmentAction extends EnrollmentAction
     {
         // Obtiene los parámetros de la URL
         $page = (int) ($this->request->getQueryParams()['page'] ?? 1);
-        $query = $this->request->getQueryParams()['query'] ?? '';
+        $query = urldecode($this->request->getQueryParams()['query'] ?? '');
         $courseID = $this->request->getQueryParams()['course'] ?? '';
         $instrumentID = $this->request->getQueryParams()['instrument'] ?? '';
         $semesterID = $this->request->getQueryParams()['semester'] ?? '';
         $onlyActive = filter_var($this->request->getQueryParams()['onlyActive'] ?? false, FILTER_VALIDATE_BOOLEAN);
-        
         
         // Calcula el offset y el límite
         $limit = 10;

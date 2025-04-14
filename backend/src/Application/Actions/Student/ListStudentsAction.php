@@ -16,7 +16,7 @@ class ListStudentsAction extends StudentAction
         // Obtiene los parámetros de la URL
         $params = $this->request->getQueryParams();
         $page = isset($params['page']) ? (int) $params['page'] : 1;
-        $query = isset($params['query']) ? (string)$params['query'] : '';
+        $query = isset($params['query']) ? urldecode((string)$params['query']) : '';
         $offPagination = isset($params['offPagination']) ? filter_var($params['offPagination'], FILTER_VALIDATE_BOOLEAN) : false;
 
 
