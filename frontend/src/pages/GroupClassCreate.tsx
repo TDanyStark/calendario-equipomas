@@ -71,9 +71,19 @@ const GroupClassCreate = () => {
     };
     console.log("data", data);
     // crear mutacion
-    createItem.mutate(data);
+    createItem.mutate(data, {
+      onSuccess: () => {
+        // Reset states after successful creation
+        setName("");
+        setRoomId(null);
+        setDayId(null);
+        setStartTime(null);
+        setEndTime(null);
+        setidsEnrolls([]);
+        setIdsProfessors([]);
+      },
+    });
   };
-  // };
 
   const onSelectHour = useCallback(
     ({
@@ -139,6 +149,8 @@ const GroupClassCreate = () => {
     []
   );
 
+  console.log(roomId);
+
   return (
     <section className="section_page">
       <Primaryh1>
@@ -163,13 +175,13 @@ const GroupClassCreate = () => {
           </div>
           <div>
             <span className="block text-sm font-medium mb-1">
-              Salón {roomId}
+              Salón
             </span>
             <SearchSelect
               entity="rooms"
               defaultValue=""
-              onSelect={(id) => {
-                setRoomId(Number(id));
+              onSelect={(id: number | null) => {
+                setRoomId(id);
               }}
               isActive={filterActive === "rooms"}
               onFocus={() => {
@@ -180,7 +192,7 @@ const GroupClassCreate = () => {
               }}
             />
           </div>
-          {roomId && (
+          {roomId !== null && (
             <SelectDayAndHourCreate roomId={roomId} onChange={onSelectHour} />
           )}
           <div>

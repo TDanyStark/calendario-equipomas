@@ -12,7 +12,7 @@ type ItemType = {
 interface Props {
   entity: ResourceType;
   defaultValue?: string;
-  onSelect: (id: string, name: string) => void;
+  onSelect: (id: number | null) => void;
   isActive: boolean; // Nueva prop
   onFocus: () => void; // Nueva prop
   onClose: () => void; // Nueva prop
@@ -60,21 +60,36 @@ const SearchSelect = ({
 
   return (
     <div className="w-full relative">
-      <input
-        ref={inputRef}
-        type="text"
-        placeholder="Buscar..."
-        className="w-full px-3 py-2 border rounded-t"
-        value={selected || search}
-        onChange={(e) => {
-          if(e.target.value === "") onSelect("", "");
-          setSearch(e.target.value);
-          setSelected(null);
-        }}
-        onFocus={onFocus}
-        onClick={onFocus}
-        onBlur={handleBlur}
-      />
+      <div className="relative w-full">
+        <input
+          ref={inputRef}
+          type="text"
+          placeholder="Buscar..."
+          className="w-full px-3 py-2 border rounded-t"
+          value={selected || search}
+          onChange={(e) => {
+            if (e.target.value === "") onSelect(null);
+            setSearch(e.target.value);
+            setSelected(null);
+          }}
+          onFocus={onFocus}
+          onClick={onFocus}
+          onBlur={handleBlur}
+        />
+        {search !== "" || selected !== null && (
+          <button
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-200 hover:text-gray-500"
+            onClick={() => {
+              setSearch("");
+              setSelected(null);
+              onSelect(null);
+              inputRef.current?.focus();
+            }}
+          >
+            ✕
+          </button>
+        )}
+      </div>
 
       {selected === null && isActive && (
         <div
@@ -88,7 +103,7 @@ const SearchSelect = ({
                 key={item.id}
                 className="px-3 py-2 cursor-pointer hover:bg-gray-800"
                 onClick={() => {
-                  onSelect(item.id, item.name);
+                  onSelect(Number(item.id));
                   setSelected(item.name);
                   onClose(); // Cierra al seleccionar
                   inputRef.current?.focus();

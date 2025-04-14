@@ -20,7 +20,9 @@ class CreateGroupClassAction extends GroupClassAction
         $academic_periodID,
         $data['dayId'],
         $data['startTime'],
-        $data['endTime']
+        $data['endTime'],
+        $data['professors'] ?? null,
+        $data['enrollments'] ?? null
       );
 
       $this->groupClassRepository->create($groupClass);

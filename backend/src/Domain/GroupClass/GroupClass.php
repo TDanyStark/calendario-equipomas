@@ -19,7 +19,7 @@ class GroupClass implements JsonSerializable
     private ?array $professors = [];
     private ?array $enrollments = [];
 
-    public function __construct(int $id, string $name, int $roomId, ?int $academicPeriodId, int $day_id, string $startTime, string $endTime)
+    public function __construct(int $id, string $name, int $roomId, ?int $academicPeriodId, int $day_id, string $startTime, string $endTime, ?array $professors = null, ?array $enrollments = null)
     {
         $this->id = $id;
         $this->name = $name;
@@ -28,6 +28,8 @@ class GroupClass implements JsonSerializable
         $this->day_id = $day_id;
         $this->startTime = $this->validateTimeFormat($startTime);
         $this->endTime = $this->validateTimeFormat($endTime);
+        $this->professors = $professors ?? [];
+        $this->enrollments = $enrollments ?? [];
 
         if (strtotime($this->startTime) >= strtotime($this->endTime)) {
             throw new InvalidArgumentException('El startTime no puede ser mayor o igual que el endTime.');
