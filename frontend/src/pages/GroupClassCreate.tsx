@@ -141,7 +141,7 @@ const GroupClassCreate = () => {
         Crear Clase Grupal: <ActivePeriod />
       </Primaryh1>
       <div className="mt-8 flex gap-8 flex-col lg:flex-row items-start">
-        <div className="p-6 border rounded-lg w-1/4 max-w-96 flex flex-col gap-6">
+        <div className="p-6 border rounded-lg w-1/4 min-w-80 max-w-96 flex flex-col gap-6">
           <div>
             <label htmlFor="name" className="block text-sm font-medium mb-1">
               Nombre de la clase

@@ -48,7 +48,6 @@ const SelectDayAndHourCreate = ({ roomId, onChange }: Props) => {
   };
 
   useEffect(() => {
-    console.log("change", selectedDay, selectedStartTime, selectedEndTime);
     // le pasamos al padre la hora en formado HH:MM:SS ya que actualmente en el frontend se esta manejando en 12 horas
     onChange({
       day: selectedDay,
