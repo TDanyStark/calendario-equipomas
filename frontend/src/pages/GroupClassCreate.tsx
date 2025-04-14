@@ -10,6 +10,8 @@ import { useMemo, useState } from "react";
 import MiniTable from "@/components/MiniTable";
 import SelectDayAndHourCreate from "@/components/SelectDayAndHour/SelectDayAndHourCreate";
 import { useCallback } from "react";
+import TableGroupClassProfessor from "@/components/professors/TableGroupClassProfessor";
+import { toast } from "react-toastify";
 
 const entity = "groupclass";
 // const entityName = "clases grupales";
@@ -17,6 +19,8 @@ const entity = "groupclass";
 const GroupClassCreate = () => {
   const JWT = useSelector((state: RootState) => state.auth.JWT);
   const [filterActive, setFilterActive] = useState<string | null>(null);
+
+  const [name, setName] = useState<string>("");
 
   const [roomId, setRoomId] = useState<string>("");
   const [day, setDay] = useState<number | null>(null);
@@ -45,13 +49,17 @@ const GroupClassCreate = () => {
     }
   };
 
-  console.log("idsStudents", idsStudents);
-  console.log("idsProfessors", idsProfessors);  
-
   const handleCreate = () => {
-    // if (roomId && idsStudents.length > 0 && idsProfessors.length > 0) {
+    if (name === "" || roomId === "" || day === null || startTime === null || endTime === null) {
+      toast.error("Debes de completar todos los campos.");
+      return;
+    }
+    if (idsStudents.length === 0 || idsProfessors.length === 0) {
+      toast.error("Debes seleccionar al menos un profesor y un estudiante.");
+      return;
+    }
     const data = {
-      name: "",
+      name,
       roomId,
       day,
       startTime,
@@ -59,7 +67,7 @@ const GroupClassCreate = () => {
       students: idsStudents,
       professors: idsProfessors,
     };
-    console.log(data);
+    console.log("data", data);
   };
   // };
 
@@ -119,7 +127,9 @@ const GroupClassCreate = () => {
       {
         label: "Instrumentos",
         renderCell: (item: unknown) =>
-          (item as ProfessorType).instruments?.map((instrument) => instrument.name).join(", ") ?? "",
+          (item as ProfessorType).instruments
+            ?.map((instrument) => instrument.name)
+            .join(", ") ?? "",
       },
     ],
     []
@@ -140,6 +150,11 @@ const GroupClassCreate = () => {
               id="name"
               className="px-3 py-2 border rounded w-full"
               type="text"
+              placeholder="Nombre de la clase"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+              }}
             />
           </div>
           <div>
@@ -208,7 +223,7 @@ const GroupClassCreate = () => {
             />
           )}
           {tabActive === "professors" && (
-            <MiniTable
+            <TableGroupClassProfessor
               entity="professors/only/assign"
               entityName="profesores"
               JWT={JWT || ""}

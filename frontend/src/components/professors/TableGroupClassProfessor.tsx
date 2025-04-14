@@ -50,7 +50,7 @@ interface MiniTableProps<T> {
   idsSelected?: string[];
 }
 
-function MiniTable<T extends TableNode>({
+function TableGroupClassProfessor<T extends TableNode>({
   entity,
   entityName,
   columns,
@@ -121,7 +121,7 @@ function MiniTable<T extends TableNode>({
   const handleSelectAll = async () => {
     setChecked(!checked);
     // tener en cuenta que aqui revisamos el antiguo estado de checked
-    if (checked) {
+    if (checked === true) {
       select.fns.onRemoveAll();
     } else {
       // select.fns.onAddAll(data.map((item) => item.id));
@@ -282,4 +282,4 @@ function MiniTable<T extends TableNode>({
   );
 }
 
-export default React.memo(MiniTable);
+export default React.memo(TableGroupClassProfessor);
