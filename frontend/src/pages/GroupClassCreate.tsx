@@ -149,8 +149,6 @@ const GroupClassCreate = () => {
     []
   );
 
-  console.log(roomId);
-
   return (
     <section className="section_page">
       <Primaryh1>

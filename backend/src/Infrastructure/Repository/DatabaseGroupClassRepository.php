@@ -71,21 +71,54 @@ class DatabaseGroupClassRepository implements GroupClassRepository
 
   public function create(GroupClass $groupClass): int
   {
-    $stmt = $this->pdo->prepare("
-        INSERT INTO {$this->table} (name, room_id, academic_period_id, day_id, start_time, end_time) 
-        VALUES (:name, :room_id, :academic_period_id, :day_id, :start_time, :end_time)
-    ");
+    try {
+      $this->pdo->beginTransaction();
 
-    $stmt->execute([
-      'name' => $groupClass->getName(),
-      'room_id' => $groupClass->getRoomId(),
-      'academic_period_id' => $groupClass->getAcademicPeriodId(),
-      'day_id' => $groupClass->getDayId(),
-      'start_time' => $groupClass->getStartTime(),
-      'end_time' => $groupClass->getEndTime()
-    ]);
+      // Insert into group_classes table
+      $stmt = $this->pdo->prepare("INSERT INTO {$this->table} (name, room_id, academic_period_id, day_id, start_time, end_time) 
+        VALUES (:name, :room_id, :academic_period_id, :day_id, :start_time, :end_time)");
 
-    return (int)$this->pdo->lastInsertId();
+      $stmt->execute([
+        'name' => $groupClass->getName(),
+        'room_id' => $groupClass->getRoomId(),
+        'academic_period_id' => $groupClass->getAcademicPeriodId(),
+        'day_id' => $groupClass->getDayId(),
+        'start_time' => $groupClass->getStartTime(),
+        'end_time' => $groupClass->getEndTime()
+      ]);
+
+      $groupClassId = (int)$this->pdo->lastInsertId();
+
+      // Insert into group_class_enrollments table
+      $enrollments = $groupClass->getEnrollments();
+      if ($enrollments) {
+        $stmtEnrollments = $this->pdo->prepare("INSERT INTO group_class_enrollments (group_class_id, enrollment_id) VALUES (:group_class_id, :enrollment_id)");
+        foreach ($enrollments as $enrollmentId) {
+          $stmtEnrollments->execute([
+            'group_class_id' => $groupClassId,
+            'enrollment_id' => $enrollmentId
+          ]);
+        }
+      }
+
+      // Insert into group_class_professors table
+      $professors = $groupClass->getProfessors();
+      if ($professors) {
+        $stmtProfessors = $this->pdo->prepare("INSERT INTO group_class_professors (group_class_id, professor_id) VALUES (:group_class_id, :professor_id)");
+        foreach ($professors as $professorId) {
+          $stmtProfessors->execute([
+            'group_class_id' => $groupClassId,
+            'professor_id' => $professorId
+          ]);
+        }
+      }
+
+      $this->pdo->commit();
+      return $groupClassId;
+    } catch (\Exception $e) {
+      $this->pdo->rollBack();
+      throw $e;
+    }
   }
 
 }
