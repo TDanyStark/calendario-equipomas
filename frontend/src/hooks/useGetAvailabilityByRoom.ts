@@ -3,7 +3,7 @@ import { URL_BACKEND } from "../variables";
 import axios from "axios";
 
 
-const fetchItem = async (entity: string, endpoint: string, roomId: string | null,  JWT: string | null) => {
+const fetchItem = async (entity: string, endpoint: string, roomId: number | null,  JWT: string | null) => {
   const response = await axios.get(`${URL_BACKEND}${entity}${endpoint}?roomId=${roomId}`, {
     headers: {
       Authorization: `Bearer ${JWT}`,
@@ -12,7 +12,7 @@ const fetchItem = async (entity: string, endpoint: string, roomId: string | null
   return response.data.data
 };
 
-const useGetAvailabilityByRoom = (entity: string, endpoint: string, roomId: string | null, JWT: string | null) => {
+const useGetAvailabilityByRoom = (entity: string, endpoint: string, roomId: number | null, JWT: string | null) => {
   return useQuery([entity, endpoint, roomId], () => fetchItem(entity, endpoint, roomId, JWT), {
     enabled: !!JWT && roomId !== null,
   });

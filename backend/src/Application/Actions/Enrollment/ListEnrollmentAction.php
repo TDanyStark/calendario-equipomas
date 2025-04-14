@@ -17,7 +17,8 @@ class ListEnrollmentAction extends EnrollmentAction
         $instrumentID = $this->request->getQueryParams()['instrument'] ?? '';
         $semesterID = $this->request->getQueryParams()['semester'] ?? '';
         $onlyActive = filter_var($this->request->getQueryParams()['onlyActive'] ?? false, FILTER_VALIDATE_BOOLEAN);
-
+        
+        
         // Calcula el offset y el límite
         $limit = 10;
         $offset = ($page - 1) * $limit;

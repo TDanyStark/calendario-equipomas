@@ -189,6 +189,7 @@ const Enrolls = () => {
     <section className="section_page">
       <Primaryh1>Matriculas</Primaryh1>
       <ChangeAP />
+      
       <DataTablePagination<EnrollType>
         entity={entity}
         entityName={entityName}

@@ -22,13 +22,13 @@ const GroupClassCreate = () => {
 
   const [name, setName] = useState<string>("");
 
-  const [roomId, setRoomId] = useState<string>("");
-  const [day, setDay] = useState<number | null>(null);
+  const [roomId, setRoomId] = useState<number  | null>(null);
+  const [dayId, setDayId] = useState<number | null>(null);
   const [startTime, setStartTime] = useState<string | null>(null);
   const [endTime, setEndTime] = useState<string | null>(null);
 
   const [tabActive, setTabActive] = useState<string>("students");
-  const [idsStudents, setIdsStudents] = useState<string[]>([]);
+  const [idsEnrolls, setidsEnrolls] = useState<string[]>([]);
   const [idsProfessors, setIdsProfessors] = useState<string[]>([]);
   // Mutaciones
   const { createItem, isCreateLoading } = useItemMutations<GroupClassType>(
@@ -39,7 +39,7 @@ const GroupClassCreate = () => {
   const handleSelectedIds = (ids: string[], entity: string) => {
     switch (entity) {
       case "enrolls":
-        setIdsStudents(ids);
+        setidsEnrolls(ids);
         break;
       case "professors/only/assign":
         setIdsProfessors(ids);
@@ -50,24 +50,27 @@ const GroupClassCreate = () => {
   };
 
   const handleCreate = () => {
-    if (name === "" || roomId === "" || day === null || startTime === null || endTime === null) {
+    if (name === "" || roomId === null || dayId === null || startTime === null || endTime === null) {
       toast.error("Debes de completar todos los campos.");
       return;
     }
-    if (idsStudents.length === 0 || idsProfessors.length === 0) {
+    if (idsEnrolls.length === 0 || idsProfessors.length === 0) {
       toast.error("Debes seleccionar al menos un profesor y un estudiante.");
       return;
     }
     const data = {
+      id: "",
       name,
       roomId,
-      day,
+      dayId,
       startTime,
       endTime,
-      students: idsStudents,
+      enrollments: idsEnrolls,
       professors: idsProfessors,
     };
     console.log("data", data);
+    // crear mutacion
+    createItem.mutate(data);
   };
   // };
 
@@ -81,7 +84,7 @@ const GroupClassCreate = () => {
       startTime: string | null;
       endTime: string | null;
     }) => {
-      setDay(day);
+      setDayId(day);
       setStartTime(startTime);
       setEndTime(endTime);
     },
@@ -165,7 +168,7 @@ const GroupClassCreate = () => {
               entity="rooms"
               defaultValue=""
               onSelect={(id) => {
-                setRoomId(id);
+                setRoomId(Number(id));
               }}
               isActive={filterActive === "rooms"}
               onFocus={() => {
@@ -196,7 +199,7 @@ const GroupClassCreate = () => {
               onClick={() => setTabActive("students")}
             >
               Matriculas{" "}
-              {idsStudents.length === 0 ? "" : `(${idsStudents.length})`}
+              {idsEnrolls.length === 0 ? "" : `(${idsEnrolls.length})`}
             </button>
             <button
               className={`block text-xl py-1 px-3 rounded mb-1 ${
@@ -219,7 +222,7 @@ const GroupClassCreate = () => {
               searchPlaceholder="Buscar matricula..."
               gridTemplateColumns="50px 1fr 2fr 2fr 1fr 1fr"
               handleSelectedIds={handleSelectedIds}
-              idsSelected={idsStudents}
+              idsSelected={idsEnrolls}
             />
           )}
           {tabActive === "professors" && (

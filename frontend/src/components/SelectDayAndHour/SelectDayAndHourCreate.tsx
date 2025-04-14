@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { addSecondsToTime, formatToHHMM, generarIntervalos } from "@/utils/timeConversionUtils";
 
 interface Props {
-  roomId: string;
+  roomId: number | null;
   onChange: (data: { day: number | null; startTime: string | null; endTime: string | null }) => void;
 }
 

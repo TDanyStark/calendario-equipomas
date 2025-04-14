@@ -168,12 +168,12 @@ type EnrollType = {
 type GroupClassType = {
   id: string;
   name: string;
-  roomId: int;
-  day_id: int;
+  roomId: number;
+  dayId: number;
   startTime: string;
   endTime: string;
-  professors: [];
-  enrollments: [];
+  professors: string[];
+  enrollments: string[];
 }
 
 

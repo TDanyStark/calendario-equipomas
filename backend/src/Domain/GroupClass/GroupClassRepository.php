@@ -16,11 +16,12 @@ interface GroupClassRepository
     //  */
     // public function findById(int $id): ?GroupClass;
 
-    // public function create(GroupClass $groupClass): int;
+    public function create(GroupClass $groupClass): int;
 
     // public function update(GroupClass $groupClass): bool;
 
     // public function delete(int $id): bool;
 
     public function findAvailabilityByRoom(int $roomId, int $academicPeriodId): array;
+
 }
