@@ -23,7 +23,7 @@ const GroupClassCreate = () => {
 
   const [name, setName] = useState<string>("");
 
-  const [roomId, setRoomId] = useState<number  | null>(null);
+  const [roomId, setRoomId] = useState<number | null>(null);
   const [dayId, setDayId] = useState<number | null>(null);
   const [startTime, setStartTime] = useState<string | null>(null);
   const [endTime, setEndTime] = useState<string | null>(null);
@@ -62,14 +62,13 @@ const GroupClassCreate = () => {
     const data = {
       id: "",
       name,
-      roomId,
+      roomId: typeof roomId === "string" ? parseInt(roomId, 10) : roomId,
       dayId,
       startTime,
       endTime,
       enrollments: idsEnrolls,
       professors: idsProfessors,
     };
-    console.log("data", data);
     // crear mutacion
     createItem.mutate(data, {
       onSuccess: () => {

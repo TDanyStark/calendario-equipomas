@@ -1,17 +1,17 @@
 import { useMemo, useState } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Primaryh1 from "../components/titles/Primaryh1";
 import CloseModalBtn from "../components/buttons/CloseModalBtn";
 import BackgroundDiv from "../components/modal/BackgroundDiv";
 import CancelModalBtn from "../components/buttons/CancelModalBtn";
 import FilterGroupClass from "@/components/Filters/FilterGroupClass";
-import { NavLink, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import useFetchWithFilters from "@/hooks/useFetchWithFilters";
 import ChangeAP from "@/components/ChangeAP";
+import DataTablePagination from "@/components/TablePagination";
+import { GroupClassType } from "@/types/Api";
 
 const entity = "groupclass";
 // const entityName = "clases grupales";
@@ -19,6 +19,7 @@ const entity = "groupclass";
 const GroupClass = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate(); // Add useNavigate hook
   const courseFilter = searchParams.get("course");
   const instrumentFilter = searchParams.get("instrument");
   const semesterFilter = searchParams.get("semester");
@@ -56,42 +57,92 @@ const GroupClass = () => {
   };
 
   
-  const filters = useMemo( () => ({
-    course: courseFilter || "",
-    instrument: instrumentFilter || "",
-    semester: semesterFilter || "",
-    professor: professorFilter || "",
-    student: studentFilter || "",
-  }), [courseFilter, instrumentFilter, professorFilter, semesterFilter, studentFilter]);
-
   const JWT = useSelector((state: RootState) => state.auth.JWT);
-  const {data, isLoading, isError} = useFetchWithFilters(entity, JWT, filters);
 
-  console.log(data, isLoading, isError);
+  const columns = useMemo(() => [
+    {
+      label: "ID",
+      renderCell: (item: GroupClassType) => item.id,
+    },
+    {
+      label: "Clase",
+      renderCell: (item: GroupClassType) => item.name,
+    },
+    {
+      label: "Salón",
+      renderCell: (item: GroupClassType) => item.roomName || "-",
+    },
+    {
+      label: "Día",
+      renderCell: (item: GroupClassType) => item.dayDisplayName || "-",
+    },
+    {
+      label: "Inicio",
+      renderCell: (item: GroupClassType) => item.startTime,
+    },
+    {
+      label: "Fin",
+      renderCell: (item: GroupClassType) => item.endTime,
+    },
+  ], []);
 
+  // Create the custom filter component
+  const filterComponent = (
+    <FilterGroupClass
+      courseFilter={courseFilter || ""}
+      instrumentFilter={instrumentFilter || ""}
+      semesterFilter={semesterFilter || ""}
+      studentFilter={studentFilter || ""}
+      professorFilter={professorFilter || ""}
+      filterActive={filterActive || ""}
+      onShow={onShow}
+      onShowSearchInput={onShowSearchInput}
+      onSelect={onSelect}
+      handleClearFilters={handleClearFilters}
+      setFilterActive={setFilterActive}
+    />
+  );
+
+  const handleCreate = () => {
+    navigate('/group-class/create');
+  };
+
+  const handleEdit = (item: GroupClassType) => {
+    console.log("Edit item", item);
+    // Implement edit functionality
+  };
+
+  const handleDelete = (item: GroupClassType) => {
+    console.log("Delete item", item);
+    // Implement delete functionality
+  };
+
+  const handleDeleteSelected = (selectedIds: React.Key[]) => {
+    console.log("Delete selected items", selectedIds);
+    // Implement delete selected functionality
+  };
 
   return (
     <section className="section_page">
       <Primaryh1>Clases Grupales</Primaryh1>
       <ChangeAP />
-      <FilterGroupClass
-        courseFilter={courseFilter || ""}
-        instrumentFilter={instrumentFilter || ""}
-        semesterFilter={semesterFilter || ""}
-        studentFilter={studentFilter || ""}
-        professorFilter={professorFilter || ""}
-        filterActive={filterActive || ""}
-        onShow={onShow}
-        onShowSearchInput={onShowSearchInput}
-        onSelect={onSelect}
-        handleClearFilters={handleClearFilters}
-        setFilterActive={setFilterActive}
+      
+      {/* Use DataTablePagination instead of custom implementation */}
+      <DataTablePagination<GroupClassType>
+        entity={entity}
+        entityName="clases grupales"
+        JWT={JWT}
+        columns={columns}
+        onCreate={handleCreate}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onDeleteSelected={handleDeleteSelected}
+        searchPlaceholder="Buscar clases grupales"
+        TextButtonCreate="clase grupal"
+        gridTemplateColumns="50px 70px 1fr 1fr 1fr 1fr 1fr 130px"
+        filterComponent={filterComponent}
+        showSearchBar={false} // Hide search bar as we're managing search in the filter
       />
-      <div className="flex justify-end">
-        <NavLink to="/group-class/create" className="btn-primary">
-          Crear Clase Grupal
-        </NavLink>
-      </div>
 
       {isOpen && (
         <Dialog

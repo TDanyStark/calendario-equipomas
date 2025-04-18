@@ -54,7 +54,7 @@ class DatabaseGroupClassRepository implements GroupClassRepository
     
     // Filtro por semestre
     if (!empty($semesterId)) {
-      $whereClause .= ' AND e.semester_id = :semester_id';
+      $whereClause .= ' AND e.SemesterID = :semester_id';
       $params[':semester_id'] = $semesterId;
     }
     
@@ -99,8 +99,12 @@ class DatabaseGroupClassRepository implements GroupClassRepository
     
     // Obtener datos paginados con toda la información necesaria
     $dataSql = "
-      SELECT DISTINCT gc.* 
+      SELECT DISTINCT gc.*,
+        r.RoomName as room_name,
+        sd.DayDisplayName as day_display_name 
       FROM {$this->table} gc
+      LEFT JOIN rooms r ON gc.room_id = r.RoomID
+      LEFT JOIN schedule_days sd ON gc.day_id = sd.DayID
       LEFT JOIN group_class_enrollments gce ON gc.id = gce.group_class_id
       LEFT JOIN group_class_professors gcp ON gc.id = gcp.group_class_id
       LEFT JOIN enrollments e ON gce.enrollment_id = e.EnrollmentID
@@ -127,7 +131,7 @@ class DatabaseGroupClassRepository implements GroupClassRepository
     $results = $dataStmt->fetchAll(PDO::FETCH_ASSOC);
     
     $groupClasses = array_map(function ($result) {
-      return new GroupClass(
+      $groupClass = new GroupClass(
         $result['id'],
         $result['name'],
         $result['room_id'],
@@ -136,6 +140,17 @@ class DatabaseGroupClassRepository implements GroupClassRepository
         $result['start_time'],
         $result['end_time']
       );
+      
+      // Agregar propiedades adicionales no obligatorias
+      if (isset($result['room_name'])) {
+        $groupClass->setRoomName($result['room_name']);
+      }
+      
+      if (isset($result['day_display_name'])) {
+        $groupClass->setDayDisplayName($result['day_display_name']);
+      }
+      
+      return $groupClass;
     }, $results);
     
     return [

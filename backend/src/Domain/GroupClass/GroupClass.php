@@ -18,6 +18,8 @@ class GroupClass implements JsonSerializable
     private string $endTime;
     private ?array $professors = [];
     private ?array $enrollments = [];
+    private ?string $roomName = null;
+    private ?string $dayDisplayName = null;
 
     public function __construct(int $id, string $name, int $roomId, ?int $academicPeriodId, int $day_id, string $startTime, string $endTime, ?array $professors = null, ?array $enrollments = null)
     {
@@ -106,6 +108,26 @@ class GroupClass implements JsonSerializable
         $this->enrollments[] = $enrollmentId;
     }
 
+    public function getRoomName(): ?string
+    {
+        return $this->roomName;
+    }
+
+    public function setRoomName(?string $roomName): void
+    {
+        $this->roomName = $roomName;
+    }
+
+    public function getDayDisplayName(): ?string
+    {
+        return $this->dayDisplayName;
+    }
+
+    public function setDayDisplayName(?string $dayDisplayName): void
+    {
+        $this->dayDisplayName = $dayDisplayName;
+    }
+
     public function jsonSerialize(): array
     {
         return [
@@ -117,7 +139,9 @@ class GroupClass implements JsonSerializable
             'startTime' => $this->startTime,
             'endTime' => $this->endTime,
             'professors' => $this->professors,
-            'enrollments' => $this->enrollments
+            'enrollments' => $this->enrollments,
+            'roomName' => $this->roomName,
+            'dayDisplayName' => $this->dayDisplayName
         ];
     }
 }

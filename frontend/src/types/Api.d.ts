@@ -151,16 +151,16 @@ type StudentType = {
 }
 
 type EnrollType = {
-  id: string;
-  studentID: string;
-  studentName: string;
-  courseID: string;
-  courseName: string;
-  semesterID: string;
-  semesterName: string;
-  instrumentID: string;
-  instrumentName: string;
-  academicPeriodID: string;
+  id:  string;
+  studentID: number | null;
+  studentName: string | null | undefined;
+  courseID: number | null;
+  courseName: string | null | undefined;
+  semesterID: number | null;
+  semesterName: string | null | undefined;
+  instrumentID: number | null;
+  instrumentName: string | null | undefined;
+  academicPeriodID: number;
   academicPeriodName: string;
   status: string;
 }
@@ -174,6 +174,8 @@ type GroupClassType = {
   endTime: string;
   professors: string[];
   enrollments: string[];
+  roomName?: string;
+  dayDisplayName?: string;
 }
 
 

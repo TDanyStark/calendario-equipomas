@@ -11,8 +11,8 @@ type ItemType = {
 
 interface Props {
   entity: ResourceType;
-  defaultValue?: string;
-  onSelect: (id: number | null) => void;
+  defaultValue?: string | null;
+  onSelect: (id: number | null, name?: string | null) => void;
   isActive: boolean; // Nueva prop
   onFocus: () => void; // Nueva prop
   onClose: () => void; // Nueva prop
@@ -68,7 +68,7 @@ const SearchSelect = ({
           className="w-full px-3 py-2 border rounded-t"
           value={selected || search}
           onChange={(e) => {
-            if (e.target.value === "") onSelect(null);
+            if (e.target.value === "") onSelect(null, null);
             setSearch(e.target.value);
             setSelected(null);
           }}
@@ -82,7 +82,7 @@ const SearchSelect = ({
             onClick={() => {
               setSearch("");
               setSelected(null);
-              onSelect(null);
+              onSelect(null, null);
               inputRef.current?.focus();
             }}
           >
@@ -103,7 +103,7 @@ const SearchSelect = ({
                 key={item.id}
                 className="px-3 py-2 cursor-pointer hover:bg-gray-800"
                 onClick={() => {
-                  onSelect(Number(item.id));
+                  onSelect(Number(item.id), item.name);
                   setSelected(item.name);
                   onClose(); // Cierra al seleccionar
                   inputRef.current?.focus();

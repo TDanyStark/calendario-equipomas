@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useState, useCallback, useMemo } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
@@ -16,6 +16,8 @@ import SubmitModalBtn from "../components/buttons/SubmitModalBtn";
 import SearchSelect from "../components/SearchSelect";
 import ChangeAP from "@/components/ChangeAP";
 import ActivePeriod from "@/components/ChangeAP/ActivePeriod";
+import FilterEnrolls from "@/components/Filters/FilterEnrolls";
+import { useSearchParams } from "react-router-dom";
 
 const entity = "enrolls";
 const entityName = "matriculas";
@@ -24,24 +26,32 @@ const Enrolls = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [editEnroll, setEditEnroll] = useState<EnrollType | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<{
-    studentID: string;
-    studentName: string;
-  }>({ studentID: "", studentName: "" });
+    studentID: null | number;
+    studentName: string | null | undefined;
+  }>({ studentID: 0, studentName: "" });
   const [selectedCourse, setSelectedCourse] = useState<{
-    courseID: string;
-    courseName: string;
-  }>({ courseID: "", courseName: "" });
+    courseID: null | number;
+    courseName: string  | null | undefined;
+  }>({ courseID: 0, courseName: "" });
   const [selectedSemester, setSelectedSemester] = useState<{
-    semesterID: string;
-    semesterName: string;
-  }>({ semesterID: "", semesterName: "" });
+    semesterID: null | number;
+    semesterName: string  | null | undefined;
+  }>({ semesterID: 0, semesterName: "" });
   const [selectedInstrument, setSelectedInstrument] = useState<{
-    instrumentID: string;
-    instrumentName: string;
-  }>({ instrumentID: "", instrumentName: "" });
+    instrumentID: null | number;
+    instrumentName: string  | null | undefined;
+  }>({ instrumentID: 0, instrumentName: "" });
   const [activeSearchSelect, setActiveSearchSelect] = useState<string | null>(
     null
   );
+
+  // Get search params for filters
+  const [searchParams, setSearchParams] = useSearchParams();
+  const courseFilter = searchParams.get("course");
+  const instrumentFilter = searchParams.get("instrument");
+  const semesterFilter = searchParams.get("semester");
+  const query = searchParams.get("query") || "";
+  const [filterActive, setFilterActive] = useState<string | null>(null);
 
   const JWT = useSelector((state: RootState) => state.auth.JWT);
 
@@ -50,7 +60,7 @@ const Enrolls = () => {
   const onSubmit = (data: EnrollType) => {
     const cleanedData = {
       ...data,
-      id: editEnroll?.id || "",
+      id: editEnroll?.id || "0",
       studentID: selectedStudent.studentID,
       studentName: selectedStudent.studentName,
       courseID: selectedCourse.courseID,
@@ -87,10 +97,10 @@ const Enrolls = () => {
   };
 
   const cleanData = () => {
-    setSelectedStudent({ studentID: "", studentName: "" });
-    setSelectedCourse({ courseID: "", courseName: "" });
-    setSelectedSemester({ semesterID: "", semesterName: "" });
-    setSelectedInstrument({ instrumentID: "", instrumentName: "" });
+    setSelectedStudent({ studentID: 0, studentName: "" });
+    setSelectedCourse({ courseID: 0, courseName: "" });
+    setSelectedSemester({ semesterID: 0, semesterName: "" });
+    setSelectedInstrument({ instrumentID: 0, instrumentName: "" });
   };
 
   const {
@@ -185,6 +195,48 @@ const Enrolls = () => {
     []
   );
 
+  // Filter component handlers
+  const onShow = (filter: string) => {
+    if (filterActive === filter) {
+      setFilterActive(null);
+    } else {
+      setFilterActive(filter);
+    }
+  };
+
+  const onSelect = (id: string, entity: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set("page", "1");
+    newParams.set(entity, id);
+    setSearchParams(newParams);
+    setFilterActive(null);
+  };
+
+  const handleClearFilters = () => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete("course");
+    newParams.delete("instrument");
+    newParams.delete("semester");
+    newParams.delete("query");
+    newParams.set("page", "1");
+    setSearchParams(newParams);
+  };
+
+  // Create the custom filter component
+  const filterComponent = (
+    <FilterEnrolls
+      courseFilter={courseFilter || ""}
+      instrumentFilter={instrumentFilter || ""}
+      semesterFilter={semesterFilter || ""}
+      filterActive={filterActive || ""}
+      onShow={onShow}
+      onSelect={onSelect}
+      handleClearFilters={handleClearFilters}
+      setFilterActive={setFilterActive}
+      debouncedQuery={query}
+    />
+  );
+
   return (
     <section className="section_page">
       <Primaryh1>Matriculas</Primaryh1>
@@ -194,7 +246,6 @@ const Enrolls = () => {
         entity={entity}
         entityName={entityName}
         JWT={JWT}
-        filtersProps="enrolls"
         columns={columns}
         onCreate={handleCreate}
         onEdit={handleEdit}
@@ -203,6 +254,7 @@ const Enrolls = () => {
         searchPlaceholder="Buscar matriculas"
         TextButtonCreate="matricula"
         gridTemplateColumns="50px 70px 1fr 1fr 1fr 1fr 100px 130px 130px"
+        filterComponent={filterComponent}
       />
 
       {isOpen && (
@@ -237,7 +289,7 @@ const Enrolls = () => {
                   ) : (
                     <SearchSelect
                       entity="students"
-                      defaultValue={selectedStudent.studentName}
+                      defaultValue={selectedStudent.studentName || ""}
                       onSelect={(id, name) => {
                         setSelectedStudent({
                           studentID: id,
@@ -256,7 +308,7 @@ const Enrolls = () => {
                     entity="courses"
                     defaultValue={editEnroll ? editEnroll.courseName : ""}
                     onSelect={(id, name) => {
-                      setSelectedCourse({ courseID: id, courseName: name });
+                      setSelectedCourse({ courseID: Number(id), courseName: name });
                     }}
                     isActive={activeSearchSelect === "courses"}
                     onFocus={() => setActiveSearchSelect("courses")}

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import {
   Table,
   Header,
@@ -32,7 +32,6 @@ import { useSearchParams } from "react-router-dom";
 import CellItem from "../CellItem";
 import { useDebounce } from "use-debounce";
 import Theme from "@/lib/Theme";
-import FilterEnrolls from "../Filters/FilterEnrolls";
 import { useQueryClient } from "react-query";
 
 interface Column<T> {
@@ -52,8 +51,10 @@ interface DataTablePaginationProps<T> {
   searchPlaceholder?: string;
   TextButtonCreate?: string;
   gridTemplateColumns: string;
-  JWT: string;
+  JWT: string | null;
   filtersProps?: string;
+  filterComponent?: React.ReactNode; // New prop to accept any filter component
+  showSearchBar?: boolean; // Optional prop to control search bar visibility
 }
 
 function DataTablePagination<T extends TableNode>({
@@ -69,7 +70,8 @@ function DataTablePagination<T extends TableNode>({
   TextButtonCreate,
   gridTemplateColumns,
   JWT,
-  filtersProps,
+  filterComponent, // Accepting the custom filter component
+  showSearchBar = true, // Default to showing search bar
 }: DataTablePaginationProps<T>) {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("query") || "";
@@ -77,10 +79,10 @@ function DataTablePagination<T extends TableNode>({
   const courseFilter = searchParams.get("course");
   const instrumentFilter = searchParams.get("instrument");
   const semesterFilter = searchParams.get("semester");
+  const studentFilter = searchParams.get("student");
+  const professorFilter = searchParams.get("professor");
 
   const [debouncedQuery] = useDebounce(query, 500);
-
-  const [filterActive, setFilterActive] = useState<string | null>(null);
 
   // Memoizar los filtros para optimizar
   const filters = React.useMemo(
@@ -88,8 +90,10 @@ function DataTablePagination<T extends TableNode>({
       course: courseFilter || "",
       instrument: instrumentFilter || "",
       semester: semesterFilter || "",
+      student: studentFilter || "",
+      professor: professorFilter || "",
     }),
-    [courseFilter, instrumentFilter, semesterFilter]
+    [courseFilter, instrumentFilter, professorFilter, semesterFilter, studentFilter]
   );
 
   // Actualizar useFetchItems para usar los parámetros de la URL
@@ -134,32 +138,6 @@ function DataTablePagination<T extends TableNode>({
     [totalPages, searchParams, setSearchParams]
   );
 
-  const onSelect = (id: string, filter: string) => {
-    const newParams = new URLSearchParams(searchParams);
-    newParams.set("page", "1");
-    newParams.set(filter, id);
-    setSearchParams(newParams);
-    setFilterActive(null);
-  };
-
-  const onShow = (filter: string) => {
-    if (filterActive === filter) {
-      setFilterActive(null);
-    } else {
-      setFilterActive(filter);
-    }
-  };
-
-  const handleClearFilters = () => {
-    const newParams = new URLSearchParams(searchParams);
-    newParams.delete("course");
-    newParams.delete("instrument");
-    newParams.delete("semester");
-    newParams.delete("query");
-    newParams.set("page", "1"); // Reiniciar la paginación
-    setSearchParams(newParams);
-  };
-
   const tableData = { nodes: data };
 
   const THEME = Theme({ gridTemplateColumns, heightRow });
@@ -192,28 +170,19 @@ function DataTablePagination<T extends TableNode>({
 
   return (
     <>
-      {filtersProps === "enrolls" && (
-        <FilterEnrolls
-          courseFilter={courseFilter || ""}
-          instrumentFilter={instrumentFilter || ""}
-          semesterFilter={semesterFilter || ""}
-          filterActive={filterActive || ""}
-          onShow={onShow}
-          onSelect={onSelect}
-          handleClearFilters={handleClearFilters}
-          setFilterActive={setFilterActive}
-          debouncedQuery={debouncedQuery}
-        />
-      )}
-      <div className={`${filtersProps ? '' : 'pt-6'} flex flex-col gap-3 md:flex-row items-center justify-between select-none`}>
+      {filterComponent && filterComponent}
+      
+      <div className={`${filterComponent ? '' : 'pt-6'} flex flex-col gap-3 md:flex-row items-center justify-between select-none`}>
         <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder={searchPlaceholder}
-            value={query}
-            onChange={handleSearch}
-            className="input-primary w-full max-w-60"
-          />
+          {showSearchBar && (
+            <input
+              type="text"
+              placeholder={searchPlaceholder}
+              value={query}
+              onChange={handleSearch}
+              className="input-primary w-full max-w-60"
+            />
+          )}
           {selectedIds.length > 0 ? (
             <DeleteItemsBtn
               countItems={selectedIds.length}
