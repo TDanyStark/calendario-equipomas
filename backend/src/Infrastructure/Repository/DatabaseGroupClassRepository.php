@@ -18,15 +18,89 @@ class DatabaseGroupClassRepository implements GroupClassRepository
   {
     $this->pdo = $database->getConnection();
   }
-  public function findAll(): array
+  
+  public function findAll(int $limit = 10, int $offset = 0, string $query = '', string $courseId = '', string $instrumentId = '', string $semesterId = '', string $professorId = '', string $studentId = '', int $academicPeriodId = 0): array
   {
-    $stmt = $this->pdo->query("
-        SELECT * FROM {$this->table} 
-        ORDER BY name ASC
-    ");
-
+    $conditions = [];
+    $params = [];
+    
+    // Construir la consulta base
+    $sql = "
+        SELECT DISTINCT gc.* 
+        FROM {$this->table} gc
+        LEFT JOIN group_class_enrollments gce ON gc.id = gce.group_class_id
+        LEFT JOIN group_class_professors gcp ON gc.id = gcp.group_class_id
+        LEFT JOIN enrollments e ON gce.enrollment_id = e.id
+        LEFT JOIN professors p ON gcp.professor_id = p.id
+        LEFT JOIN courses c ON e.course_id = c.id
+        LEFT JOIN instruments i ON e.instrument_id = i.id
+        LEFT JOIN semesters s ON e.semester_id = s.id
+        WHERE 1=1
+    ";
+    
+    // Filtro por periodo académico
+    if ($academicPeriodId > 0) {
+        $conditions[] = "gc.academic_period_id = :academic_period_id";
+        $params['academic_period_id'] = $academicPeriodId;
+    }
+    
+    // Filtro por búsqueda de texto
+    if (!empty($query)) {
+        $conditions[] = "(gc.name LIKE :query OR p.firstName LIKE :query OR p.lastName LIKE :query)";
+        $params['query'] = "%$query%";
+    }
+    
+    // Filtro por curso
+    if (!empty($courseId)) {
+        $conditions[] = "e.course_id = :course_id";
+        $params['course_id'] = $courseId;
+    }
+    
+    // Filtro por instrumento
+    if (!empty($instrumentId)) {
+        $conditions[] = "e.instrument_id = :instrument_id";
+        $params['instrument_id'] = $instrumentId;
+    }
+    
+    // Filtro por semestre
+    if (!empty($semesterId)) {
+        $conditions[] = "e.semester_id = :semester_id";
+        $params['semester_id'] = $semesterId;
+    }
+    
+    // Filtro por profesor
+    if (!empty($professorId)) {
+        $conditions[] = "gcp.professor_id = :professor_id";
+        $params['professor_id'] = $professorId;
+    }
+    
+    // Filtro por estudiante (a través de las inscripciones)
+    if (!empty($studentId)) {
+        $conditions[] = "e.student_id = :student_id";
+        $params['student_id'] = $studentId;
+    }
+    
+    // Agregar condiciones a la consulta
+    if (!empty($conditions)) {
+        $sql .= " AND " . implode(" AND ", $conditions);
+    }
+    
+    // Agregar ordenamiento, límite y offset
+    $sql .= " ORDER BY gc.name ASC LIMIT :limit OFFSET :offset";
+    
+    $stmt = $this->pdo->prepare($sql);
+    
+    // Vincular parámetros
+    foreach ($params as $key => $value) {
+        $stmt->bindValue(":$key", $value);
+    }
+    
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    
+    $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+    
     return array_map(function ($result) {
       return new GroupClass(
         $result['id'],

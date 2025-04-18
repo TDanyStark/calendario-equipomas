@@ -11,7 +11,6 @@ class AvailabilityByRoomGroupClassAction extends GroupClassAction
     protected function action(): Response
     {
         $roomId = (int) ($this->request->getQueryParams()['roomId'] ?? null);
-        $this->logger->info("Room ID: " . $roomId);
         if ($roomId === null || $roomId === "" || $roomId === 0) {
             return $this->respondWithData(['error' => 'Room ID is required']);
         }

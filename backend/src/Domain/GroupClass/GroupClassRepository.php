@@ -7,21 +7,17 @@ namespace App\Domain\GroupClass;
 interface GroupClassRepository
 {
     /**
-     * Obtiene todas las clases grupales con paginación y búsqueda.
+     * @return GroupClass[]
      */
-    public function findAll(): array;
+    public function findAll(int $limit = 10, int $offset = 0, string $query = '', string $courseId = '', string $instrumentId = '', string $semesterId = '', string $professorId = '', string $studentId = '', int $academicPeriodId = 0): array;
 
-    // /**
-    //  * Busca una clase grupal por su ID.
-    //  */
-    // public function findById(int $id): ?GroupClass;
-
+    /**
+     * @return int The ID of the created group class
+     */
     public function create(GroupClass $groupClass): int;
 
-    // public function update(GroupClass $groupClass): bool;
-
-    // public function delete(int $id): bool;
-
+    /**
+     * @return GroupClass[]
+     */
     public function findAvailabilityByRoom(int $roomId, int $academicPeriodId): array;
-
 }
