@@ -2,7 +2,7 @@ import useEscapeKey from "@/hooks/useEscapeKey";
 import SelectWithFetch from "../SelectWithFetch";
 import SelectWithSearchParams from "../SelectWithFetch/SelectWithSearchParams";
 import useClickOutside from "@/hooks/useClickOutside";
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 
 interface Props{
   courseFilter: string;

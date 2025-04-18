@@ -32,6 +32,7 @@ const SelectWithFetch = ({
   const [query] = useDebounce(search, 500);
   const JWT = useSelector((state: RootState) => state.auth.JWT);
   const [hasInitialized, setHasInitialized] = useState(false);
+  const [isLoadingInitial, setIsLoadingInitial] = useState(!!filter);
   // Fetch courses data
   const { data, isLoading, isError } = useGetSelect<ItemType[]>(
     entity,
@@ -48,6 +49,7 @@ const SelectWithFetch = ({
       if (selectedItem) {
         setSearch(selectedItem.name);
         setHasInitialized(true);
+        setIsLoadingInitial(false);
       }
     }
   }, [data, filter, hasInitialized]);
@@ -55,15 +57,16 @@ const SelectWithFetch = ({
   useEffect(() => {
     if (filter === undefined) {
       setSearch("");
+      setIsLoadingInitial(false);
     }
   }, [filter]);
 
   return (
     <div className="relative">
-      {!hasInitialized && search !== "" && (
+      {isLoadingInitial && (
         <Skeleton className="w-64 h-[35px]" />
       )}
-      {(hasInitialized || search === "") && (
+      {!isLoadingInitial && (
         <input
           className="px-3 py-2 border rounded flex justify-between items-center gap-2 w-64 overflow-hidden"
           onClick={onShow}
