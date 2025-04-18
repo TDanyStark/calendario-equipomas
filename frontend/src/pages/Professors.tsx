@@ -72,7 +72,6 @@ const Professors = () => {
     []
   );
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const columns = useMemo(
     () => [
       {
