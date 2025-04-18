@@ -165,31 +165,31 @@ const Enrolls = () => {
     () => [
       {
         label: "ID",
-        renderCell: (item: unknown) => (item as EnrollType).id,
+        renderCell: (item: unknown) => (item as EnrollType).id || "",
       },
       {
         label: "Estudiante",
-        renderCell: (item: unknown) => (item as EnrollType).studentName,
+        renderCell: (item: unknown) => (item as EnrollType).studentName || "",
       },
       {
         label: "Curso",
-        renderCell: (item: unknown) => (item as EnrollType).courseName,
+        renderCell: (item: unknown) => (item as EnrollType).courseName || "",
       },
       {
         label: "Semestre",
-        renderCell: (item: unknown) => (item as EnrollType).semesterName,
+        renderCell: (item: unknown) => (item as EnrollType).semesterName || "",
       },
       {
         label: "Instrumento",
-        renderCell: (item: unknown) => (item as EnrollType).instrumentName,
+        renderCell: (item: unknown) => (item as EnrollType).instrumentName || "",
       },
       {
         label: "PA",
-        renderCell: (item: unknown) => (item as EnrollType).academicPeriodName,
+        renderCell: (item: unknown) => (item as EnrollType).academicPeriodName || "",
       },
       {
         label: "Estado",
-        renderCell: (item: unknown) => (item as EnrollType).status,
+        renderCell: (item: unknown) => (item as EnrollType).status || "",
       },
     ],
     []

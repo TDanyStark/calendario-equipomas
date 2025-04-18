@@ -274,4 +274,6 @@ function DataTablePagination<T extends TableNode>({
   );
 }
 
-export default React.memo(DataTablePagination);
+export default React.memo(DataTablePagination) as <T extends TableNode>(
+  props: DataTablePaginationProps<T> 
+) => JSX.Element;

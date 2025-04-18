@@ -1,5 +1,4 @@
 import { useState, useCallback, useMemo } from "react";
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
@@ -43,13 +42,11 @@ const Professors = () => {
     deleteItems,
   } = useItemMutations<ProfessorType>(entity, JWT, setIsOpen);
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleCreate = useCallback(() => {
     setEditProfessor(null);
     setIsOpen(true);
   }, []);
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleEdit = useCallback(
     (item: ProfessorType) => {
       setEditProfessor(item);
@@ -58,7 +55,6 @@ const Professors = () => {
     []
   );
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleDelete = useCallback(
     (item: ProfessorType) => {
       deleteItem.mutate(item.id);
@@ -67,7 +63,6 @@ const Professors = () => {
     []
   );
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleDeleteSelected = useCallback(
     (selectedIds: React.Key[]) => {
       const stringIds = selectedIds.map((id) => id.toString());
@@ -118,7 +113,7 @@ const Professors = () => {
           Asignar Profesores
         </NavLink>
       </div>
-      {/* @ts-expect-error: no se porque no me reconoce que la estoy usando abajo */}
+
       <DataTablePagination<ProfessorType>
         entity={entity}
         entityName={entityName}
