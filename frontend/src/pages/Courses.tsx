@@ -34,7 +34,6 @@ const Courses = () => {
   // Fetch courses data
   const { data: courses, isLoading, isError } = useFetchItems(entity, JWT);
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const memorizedData = useMemo(() => courses, [courses]);
 
   const { register, handleSubmit, setValue, reset } =
@@ -68,14 +67,12 @@ const Courses = () => {
   const { createItem, updateItem, deleteItem, deleteItems } =
     useItemMutations<CourseType>(entity, JWT);
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleCreate = useCallback(() => {
     setEditCourse(null);
     setIsOpen(true);
     reset();
   }, [reset]);
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleEdit = useCallback(
     (item: CourseType) => {
       setEditCourse(item);
@@ -87,7 +84,6 @@ const Courses = () => {
     [setValue]
   );
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleDelete = useCallback(
     (item: CourseType) => {
       deleteItem.mutate(item.id);
@@ -96,7 +92,6 @@ const Courses = () => {
     []
   );
   
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleDeleteSelected = useCallback(
     (selectedIds: React.Key[]) => {
       const stringIds = selectedIds.map((id) => id.toString());
@@ -106,7 +101,6 @@ const Courses = () => {
     []
   );
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const columns = useMemo(
     () => [
       {
@@ -140,7 +134,6 @@ const Courses = () => {
   return (
     <section className="section_page">
       <Primaryh1>Cursos</Primaryh1>
-      {/* @ts-expect-error: DataTable is a generic component */}
       <DataTable<CourseType>
         data={memorizedData || []}
         columns={columns}

@@ -31,7 +31,6 @@ const Instruments = () => {
   // Fetch instruments data
   const { data: instruments, isLoading, isError } = useFetchItems(entity, JWT);
   
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const memorizedData = useMemo(() => instruments, [instruments]);
   // Manejo del formulario con react-hook-form
   const { register, handleSubmit, setValue, reset } = useForm<InstrumentType>();
@@ -54,14 +53,12 @@ const Instruments = () => {
   const { createItem, updateItem, deleteItem, deleteItems } =
     useItemMutations<InstrumentType>(entity, JWT);
 
-    // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleCreate = useCallback(() => {
     setEditInstrument(null);
     setIsOpen(true);
     reset();
   }, [reset]);
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleEdit = useCallback(
     (item: InstrumentType) => {
       setEditInstrument(item);
@@ -71,7 +68,6 @@ const Instruments = () => {
     [setValue]
   );
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleDelete = useCallback(
     (item: InstrumentType) => {
       deleteItem.mutate((item as InstrumentType).id);
@@ -81,7 +77,6 @@ const Instruments = () => {
     []
   );
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleDeleteSelected = useCallback(
     (selectedIds: React.Key[]) => {
       const stringIds = selectedIds.map((id) => id.toString());
@@ -92,7 +87,6 @@ const Instruments = () => {
     []
   );
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const columns = useMemo(
     () => [
       {
@@ -118,10 +112,8 @@ const Instruments = () => {
   return (
     <section className="section_page">
       <Primaryh1>Instrumentos</Primaryh1>
-      {/* esto lo colocamos porque hay como un bug del editor, dice que Datatable no expera ningun tipo, lo cual es un error dado que recibe ,<T */}
-      {/* @ts-expect-error: DataTable is a generic component */}
-      <DataTable<InstrumentType>
 
+      <DataTable<InstrumentType>
         data={memorizedData || []}
         columns={columns}
         onCreate={handleCreate}

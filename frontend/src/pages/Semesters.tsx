@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import { useState, useCallback, useMemo } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
@@ -31,7 +30,6 @@ const Semesters = () => {
   const { data: semesters, isLoading, isError } = useFetchItems(entity, JWT);
 
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const memorizedData = useMemo(() => semesters, [semesters]);
 
   // Manejo del formulario con react-hook-form
@@ -55,14 +53,12 @@ const Semesters = () => {
   const { createItem, updateItem, deleteItem, deleteItems } =
     useItemMutations<SemesterType>(entity, JWT);
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleCreate = useCallback(() => {
     setEditSemester(null);
     setIsOpen(true);
     reset();
   }, [reset]);
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleEdit = useCallback(
     (item: SemesterType) => {
       setEditSemester(item);
@@ -72,7 +68,6 @@ const Semesters = () => {
     [setValue]
   );
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleDelete = useCallback(
     (item: SemesterType) => {
       deleteItem.mutate((item as SemesterType).id);
@@ -81,7 +76,6 @@ const Semesters = () => {
     []
   );
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const handleDeleteSelected = useCallback(
     (selectedIds: React.Key[]) => {
       const stringIds = selectedIds.map((id) => id.toString());
@@ -91,7 +85,6 @@ const Semesters = () => {
     []
   );
 
-  // @ts-expect-error: no se porque no me reconoce que la estoy usando abajo
   const columns = useMemo(
     () => [
       {
@@ -115,7 +108,6 @@ const Semesters = () => {
   return (
     <section className="section_page">
       <Primaryh1>Semestres</Primaryh1>
-      {/* @ts-expect-error: DataTable is a generic component */}
       <DataTable<SemesterType>
         data={memorizedData || []}
         columns={columns}

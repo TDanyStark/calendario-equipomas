@@ -276,4 +276,6 @@ function DataTable<T extends TableNode>({
   );
 }
 
-export default React.memo(DataTable);
+export default React.memo(DataTable)  as <T extends TableNode>(
+  props: DataTableProps<T> & { ref?: React.Ref<HTMLDivElement> }
+) => JSX.Element;
