@@ -12,6 +12,7 @@ import { RootState } from "@/store/store";
 import ChangeAP from "@/components/ChangeAP";
 import DataTablePagination from "@/components/TablePagination";
 import { GroupClassType } from "@/types/Api";
+import { to12HourFormat } from "@/utils/timeConversionUtils";
 
 const entity = "groupclass";
 // const entityName = "clases grupales";
@@ -78,11 +79,11 @@ const GroupClass = () => {
     },
     {
       label: "Inicio",
-      renderCell: (item: GroupClassType) => item.startTime,
+      renderCell: (item: GroupClassType) => to12HourFormat(item.startTime),
     },
     {
       label: "Fin",
-      renderCell: (item: GroupClassType) => item.endTime,
+      renderCell: (item: GroupClassType) => to12HourFormat(item.endTime),
     },
   ], []);
 

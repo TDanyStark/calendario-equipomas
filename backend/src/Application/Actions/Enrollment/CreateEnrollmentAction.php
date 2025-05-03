@@ -22,10 +22,10 @@ class CreateEnrollmentAction extends EnrollmentAction
 
         $enrollment = new Enrollment(
             "",
-            $data['studentID'],
-            $data['courseID'],
-            $data['semesterID'],
-            $data['instrumentID'],
+            (string) $data['studentID'],
+            (string) $data['courseID'],
+            (string) $data['semesterID'],
+            (string) $data['instrumentID'],
             $academic_periodID,
             $data['status'],
             $data['studentName'] ?? null,
