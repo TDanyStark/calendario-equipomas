@@ -81,6 +81,7 @@ function DataTablePagination<T extends TableNode>({
   const semesterFilter = searchParams.get("semester");
   const studentFilter = searchParams.get("student");
   const professorFilter = searchParams.get("professor");
+  const roomFilter = searchParams.get("room");
 
   const [debouncedQuery] = useDebounce(query, 500);
 
@@ -92,8 +93,9 @@ function DataTablePagination<T extends TableNode>({
       semester: semesterFilter || "",
       student: studentFilter || "",
       professor: professorFilter || "",
+      room: roomFilter || "",
     }),
-    [courseFilter, instrumentFilter, professorFilter, semesterFilter, studentFilter]
+    [courseFilter, instrumentFilter, professorFilter, roomFilter, semesterFilter, studentFilter]
   );
 
   // Actualizar useFetchItems para usar los parámetros de la URL

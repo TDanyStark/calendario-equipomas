@@ -19,7 +19,7 @@ class DatabaseGroupClassRepository implements GroupClassRepository
     $this->pdo = $database->getConnection();
   }
   
-  public function findAll(int $limit = 10, int $offset = 0, string $query = '', string $courseId = '', string $instrumentId = '', string $semesterId = '', string $professorId = '', string $studentId = '', int $academicPeriodId = 0): array
+  public function findAll(int $limit = 10, int $offset = 0, string $query = '', string $courseId = '', string $instrumentId = '', string $semesterId = '', string $professorId = '', string $studentId = '', int $academicPeriodId = 0, string $roomId = ''): array
   {
     // Si no hay un período académico activo, retornar vacío
     if (!$academicPeriodId) {
@@ -69,6 +69,12 @@ class DatabaseGroupClassRepository implements GroupClassRepository
       $whereClause .= ' AND e.StudentID = :student_id';
       $params[':student_id'] = $studentId;
     }
+    
+    // Filtro por salón
+    if (!empty($roomId)) {
+      $whereClause .= ' AND gc.room_id = :room_id';
+      $params[':room_id'] = $roomId;
+    }
 
     // Obtener cantidad total de registros
     $countSql = "
@@ -113,7 +119,7 @@ class DatabaseGroupClassRepository implements GroupClassRepository
       LEFT JOIN instruments i ON e.InstrumentID = i.InstrumentID
       LEFT JOIN semesters s ON e.SemesterID = s.SemesterID
       WHERE {$whereClause}
-      ORDER BY gc.name ASC
+      ORDER BY sd.DayID ASC, gc.start_time ASC
       LIMIT :limit OFFSET :offset
     ";
     

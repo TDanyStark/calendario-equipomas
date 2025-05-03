@@ -10,6 +10,7 @@ interface Props{
   semesterFilter: string;
   studentFilter: string;
   professorFilter: string;
+  roomFilter: string;
   filterActive: string;
   onShow: (entity: string) => void;
   onShowSearchInput: (entity: string) => void;
@@ -24,6 +25,7 @@ const FilterGroupClass = ({
   semesterFilter,
   studentFilter,
   professorFilter,
+  roomFilter,
   filterActive,
   onShow,
   onShowSearchInput,
@@ -72,6 +74,16 @@ const FilterGroupClass = ({
           onShow={() => onShow("semesters")}
           onSelect={(id) => {
             onSelect(id, "semester");
+          }}
+        />
+        <SelectWithFetch
+          entity="rooms"
+          displayName="Salones"
+          filter={roomFilter || undefined}
+          isActive={filterActive === "rooms"}
+          onShow={() => onShow("rooms")}
+          onSelect={(id) => {
+            onSelect(id, "room");
           }}
         />
         {/* students */}

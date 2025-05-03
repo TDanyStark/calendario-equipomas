@@ -26,6 +26,7 @@ const GroupClass = () => {
   const semesterFilter = searchParams.get("semester");
   const studentFilter = searchParams.get("student");
   const professorFilter = searchParams.get("professor");
+  const roomFilter = searchParams.get("room");
   const [filterActive, setFilterActive] = useState<string | null>(null);
 
   const onShow = (filter: string) => {
@@ -54,6 +55,7 @@ const GroupClass = () => {
     newParams.delete("semester");
     newParams.delete("student");
     newParams.delete("professor");
+    newParams.delete("room");
     setSearchParams(newParams);
   };
 
@@ -95,6 +97,7 @@ const GroupClass = () => {
       semesterFilter={semesterFilter || ""}
       studentFilter={studentFilter || ""}
       professorFilter={professorFilter || ""}
+      roomFilter={roomFilter || ""}
       filterActive={filterActive || ""}
       onShow={onShow}
       onShowSearchInput={onShowSearchInput}

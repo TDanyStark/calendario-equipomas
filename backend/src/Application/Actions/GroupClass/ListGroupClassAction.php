@@ -18,6 +18,7 @@ class ListGroupClassAction extends GroupClassAction
         $semesterID = $this->request->getQueryParams()['semester'] ?? '';
         $professorID = $this->request->getQueryParams()['professor'] ?? '';
         $studentID = $this->request->getQueryParams()['student'] ?? '';
+        $roomID = $this->request->getQueryParams()['room'] ?? '';
         
         // Calcula el offset y el límite
         $limit = 10;
@@ -26,7 +27,18 @@ class ListGroupClassAction extends GroupClassAction
         $academic_periodID = $this->academicPeriodRepository->getActivePeriodID();
 
         // Obtiene las clases grupales desde el repositorio con los filtros aplicados
-        $groupClasses = $this->groupClassRepository->findAll($limit, $offset, $query, $courseID, $instrumentID, $semesterID, $professorID, $studentID, $academic_periodID);
+        $groupClasses = $this->groupClassRepository->findAll(
+            $limit, 
+            $offset, 
+            $query, 
+            $courseID, 
+            $instrumentID, 
+            $semesterID, 
+            $professorID, 
+            $studentID, 
+            $academic_periodID,
+            $roomID
+        );
 
         return $this->respondWithData($groupClasses);
     }
