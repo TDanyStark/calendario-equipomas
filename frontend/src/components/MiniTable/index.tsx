@@ -68,6 +68,8 @@ function MiniTable<T extends TableNode>({
   const [checked, setChecked] = useState(false);
   const [waitGetIds, setWaitGetIds] = useState(false);
 
+  console.log("idsSelected", idsSelected);
+
   // Actualizar useFetchItems para usar los parámetros de la URL
   const {
     data: fetchedData,

@@ -112,8 +112,7 @@ const GroupClass = () => {
   };
 
   const handleEdit = (item: GroupClassType) => {
-    console.log("Edit item", item);
-    // Implement edit functionality
+    navigate(`/group-class/edit/${item.id}`);
   };
 
   const handleDelete = (item: GroupClassType) => {

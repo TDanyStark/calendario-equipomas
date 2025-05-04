@@ -119,7 +119,7 @@ class DatabaseGroupClassRepository implements GroupClassRepository
       LEFT JOIN instruments i ON e.InstrumentID = i.InstrumentID
       LEFT JOIN semesters s ON e.SemesterID = s.SemesterID
       WHERE {$whereClause}
-      ORDER BY sd.DayID ASC, gc.start_time ASC
+      ORDER BY room_name ASC, sd.DayID ASC, gc.start_time ASC
       LIMIT :limit OFFSET :offset
     ";
     
@@ -221,7 +221,7 @@ class DatabaseGroupClassRepository implements GroupClassRepository
         foreach ($enrollments as $enrollmentId) {
           $stmtEnrollments->execute([
             'group_class_id' => $groupClassId,
-            'enrollment_id' => $enrollmentId
+            'enrollment_id' => (int)$enrollmentId // Convertir a entero para la base de datos
           ]);
         }
       }
@@ -233,7 +233,7 @@ class DatabaseGroupClassRepository implements GroupClassRepository
         foreach ($professors as $professorId) {
           $stmtProfessors->execute([
             'group_class_id' => $groupClassId,
-            'professor_id' => $professorId
+            'professor_id' => (int)$professorId // Convertir a entero para la base de datos
           ]);
         }
       }
@@ -243,6 +243,78 @@ class DatabaseGroupClassRepository implements GroupClassRepository
     } catch (\Exception $e) {
       $this->pdo->rollBack();
       throw $e;
+    }
+  }
+
+  public function findById(int $id): ?GroupClass
+  {
+    try {
+      // Get main group class data
+      $stmt = $this->pdo->prepare("
+        SELECT gc.*,
+          r.RoomName as room_name,
+          sd.DayDisplayName as day_display_name 
+        FROM {$this->table} gc
+        LEFT JOIN rooms r ON gc.room_id = r.RoomID
+        LEFT JOIN schedule_days sd ON gc.day_id = sd.DayID
+        WHERE gc.id = :id
+      ");
+
+      $stmt->execute([':id' => $id]);
+      $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      if (!$result) {
+        return null;
+      }
+
+      // Get enrollments for this group class
+      $enrollmentsStmt = $this->pdo->prepare("
+        SELECT enrollment_id 
+        FROM group_class_enrollments 
+        WHERE group_class_id = :group_class_id
+      ");
+      $enrollmentsStmt->execute([':group_class_id' => $id]);
+      $enrollments = $enrollmentsStmt->fetchAll(PDO::FETCH_COLUMN);
+      
+      // Convertir los IDs de inscripciones a strings
+      $enrollments = array_map('strval', $enrollments);
+
+      // Get professors for this group class
+      $professorsStmt = $this->pdo->prepare("
+        SELECT professor_id 
+        FROM group_class_professors 
+        WHERE group_class_id = :group_class_id
+      ");
+      $professorsStmt->execute([':group_class_id' => $id]);
+      $professors = $professorsStmt->fetchAll(PDO::FETCH_COLUMN);
+      
+      // Convertir los IDs de profesores a strings
+      $professors = array_map('strval', $professors);
+
+      // Create GroupClass instance with all data
+      $groupClass = new GroupClass(
+        (int)$result['id'],
+        $result['name'],
+        (int)$result['room_id'],
+        (int)$result['academic_period_id'],
+        (int)$result['day_id'],
+        $result['start_time'],
+        $result['end_time'],
+        $professors,
+        $enrollments
+      );
+
+      if (isset($result['room_name'])) {
+        $groupClass->setRoomName($result['room_name']);
+      }
+
+      if (isset($result['day_display_name'])) {
+        $groupClass->setDayDisplayName($result['day_display_name']);
+      }
+
+      return $groupClass;
+    } catch (\Exception $e) {
+      return null;
     }
   }
 

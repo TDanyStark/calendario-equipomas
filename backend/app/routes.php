@@ -82,6 +82,7 @@ use App\Application\Actions\AcademicPeriod\GetSelectedAcademicPeriod;
 use App\Application\Actions\GroupClass\ListGroupClassAction;
 use App\Application\Actions\GroupClass\AvailabilityByRoomGroupClassAction;
 use App\Application\Actions\GroupClass\CreateGroupClassAction;
+use App\Application\Actions\GroupClass\GetGroupClassAction;
 
 
 return function (App $app) {
@@ -188,6 +189,7 @@ return function (App $app) {
             $groupClassGroup->get('', ListGroupClassAction::class);
             $groupClassGroup->get('/availability-by-room', AvailabilityByRoomGroupClassAction::class);
             $groupClassGroup->post('', CreateGroupClassAction::class);
+            $groupClassGroup->get('/{id}', GetGroupClassAction::class);
 
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
     });

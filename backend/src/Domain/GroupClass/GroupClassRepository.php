@@ -20,4 +20,11 @@ interface GroupClassRepository
      * @return GroupClass[]
      */
     public function findAvailabilityByRoom(int $roomId, int $academicPeriodId): array;
+
+    /**
+     * Find a group class by ID with its related enrollments and professors
+     * @param int $id
+     * @return GroupClass|null
+     */
+    public function findById(int $id): ?GroupClass;
 }

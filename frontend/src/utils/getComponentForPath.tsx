@@ -76,8 +76,8 @@ const getComponentForPath = (path: string) => {
       return <Professors />;
     case "/professors/assign":
       return <ProfessorsAssign />;
-      case "/group-class/create":
-    return <GroupClassCreate />;
+    case "/group-class/create":
+      return <GroupClassCreate />;
     case "/group-class/edit/:id":
       return <GroupClassEdit />;
     case "/student-schedule":

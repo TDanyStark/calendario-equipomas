@@ -4,17 +4,20 @@ import { useSelector } from "react-redux";
 import Skeleton from "../Loader/Skeleton";
 import { AvailableSlotType } from "@/types/Api";
 import { useEffect, useState } from "react";
-import { addSecondsToTime, formatToHHMM, generarIntervalos } from "@/utils/timeConversionUtils";
+import { addSecondsToTime, formatToHHMM, generarIntervalos, to12HourFormat } from "@/utils/timeConversionUtils";
 
 interface Props {
   roomId: number | null;
   onChange: (data: { day: number | null; startTime: string | null; endTime: string | null }) => void;
+  defaultDay?: number | null;
+  defaultStartTime?: string | null;
+  defaultEndTime?: string | null;
 }
 
-const SelectDayAndHourCreate = ({ roomId, onChange }: Props) => {
-  const [selectedDay, setSelectedDay] = useState<number | null>(null);
-  const [selectedStartTime, setSelectedStartTime] = useState<string | null>(null);
-  const [selectedEndTime, setSelectedEndTime] = useState<string | null>(null);
+const SelectDayAndHourCreate = ({ roomId, onChange, defaultDay = null, defaultStartTime = null, defaultEndTime = null }: Props) => {
+  const [selectedDay, setSelectedDay] = useState<number | null>(defaultDay);
+  const [selectedStartTime, setSelectedStartTime] = useState<string | null>(defaultStartTime ? to12HourFormat(defaultStartTime) : null);
+  const [selectedEndTime, setSelectedEndTime] = useState<string | null>(defaultEndTime ? to12HourFormat(defaultEndTime) : null);
   const [endTimeOptions, setEndTimeOptions] = useState<string[]>([]);
 
   const JWT = useSelector((state: RootState) => state.auth.JWT);
@@ -27,6 +30,32 @@ const SelectDayAndHourCreate = ({ roomId, onChange }: Props) => {
 
   const availability = data?.availableSlots as AvailableSlotType[];
   const recurrence = data?.recurrence || 30;
+
+  // Efecto para establecer los valores iniciales cuando se cargan los datos
+  useEffect(() => {
+    if (availability && defaultDay && defaultStartTime && defaultEndTime) {
+      setSelectedDay(defaultDay);
+      const daySlots = availability.find(day => day.id === defaultDay)?.slots;
+      
+      if (daySlots) {
+        const start12h = to12HourFormat(defaultStartTime);
+        const end12h = to12HourFormat(defaultEndTime);
+        
+        // Encontrar el slot que contiene la hora de inicio
+        for (const slot of daySlots) {
+          const times = generarIntervalos(slot.start, slot.end, recurrence);
+          if (times.includes(start12h)) {
+            const startIndex = times.indexOf(start12h);
+            const endTimes = times.slice(startIndex + 1);
+            setEndTimeOptions(endTimes);
+            setSelectedStartTime(start12h);
+            setSelectedEndTime(end12h);
+            break;
+          }
+        }
+      }
+    }
+  }, [availability, defaultDay, defaultStartTime, defaultEndTime, recurrence]);
 
   // Procesar las opciones de hora inicial
   const startTimeOptions = selectedDay
