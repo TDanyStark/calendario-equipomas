@@ -318,4 +318,67 @@ class DatabaseGroupClassRepository implements GroupClassRepository
     }
   }
 
+  public function update(GroupClass $groupClass): bool
+  {
+    try {
+      $this->pdo->beginTransaction();
+
+      // Update main group class data
+      $stmt = $this->pdo->prepare("UPDATE {$this->table} 
+        SET name = :name, 
+            room_id = :room_id, 
+            academic_period_id = :academic_period_id, 
+            day_id = :day_id, 
+            start_time = :start_time, 
+            end_time = :end_time 
+        WHERE id = :id");
+
+      $stmt->execute([
+        'name' => $groupClass->getName(),
+        'room_id' => $groupClass->getRoomId(),
+        'academic_period_id' => $groupClass->getAcademicPeriodId(),
+        'day_id' => $groupClass->getDayId(),
+        'start_time' => $groupClass->getStartTime(),
+        'end_time' => $groupClass->getEndTime(),
+        'id' => $groupClass->getId()
+      ]);
+
+      // Update enrollments: first delete existing, then insert new ones
+      $this->pdo->prepare("DELETE FROM group_class_enrollments WHERE group_class_id = :group_class_id")
+        ->execute(['group_class_id' => $groupClass->getId()]);
+
+      $enrollments = $groupClass->getEnrollments();
+      if ($enrollments && count($enrollments) > 0) {
+        $stmtEnrollments = $this->pdo->prepare("INSERT INTO group_class_enrollments (group_class_id, enrollment_id) VALUES (:group_class_id, :enrollment_id)");
+        foreach ($enrollments as $enrollmentId) {
+          $stmtEnrollments->execute([
+            'group_class_id' => $groupClass->getId(),
+            'enrollment_id' => (int)$enrollmentId 
+          ]);
+        }
+      }
+
+      // Update professors: first delete existing, then insert new ones
+      $this->pdo->prepare("DELETE FROM group_class_professors WHERE group_class_id = :group_class_id")
+        ->execute(['group_class_id' => $groupClass->getId()]);
+
+      $professors = $groupClass->getProfessors();
+      if ($professors && count($professors) > 0) {
+        $stmtProfessors = $this->pdo->prepare("INSERT INTO group_class_professors (group_class_id, professor_id) VALUES (:group_class_id, :professor_id)");
+        foreach ($professors as $professorId) {
+          $stmtProfessors->execute([
+            'group_class_id' => $groupClass->getId(),
+            'professor_id' => (int)$professorId
+          ]);
+        }
+      }
+
+      $this->pdo->commit();
+      return true;
+    } catch (\Exception $e) {
+      $this->pdo->rollBack();
+      throw $e;
+    }
+  }
+
 }

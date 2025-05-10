@@ -27,4 +27,11 @@ interface GroupClassRepository
      * @return GroupClass|null
      */
     public function findById(int $id): ?GroupClass;
+    
+    /**
+     * Update an existing group class
+     * @param GroupClass $groupClass
+     * @return bool
+     */
+    public function update(GroupClass $groupClass): bool;
 }

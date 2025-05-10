@@ -76,6 +76,17 @@ class AvailabilityByRoomGroupClassAction extends GroupClassAction
             }
             $availability[$dayId]['slots'] = $newSlots;
         }
+        
+        // Ordenar los slots por hora de inicio
+        foreach ($availability as $dayId => &$dayData) {
+            if (!isset($dayData['slots']) || !is_array($dayData['slots']) || empty($dayData['slots'])) {
+                continue;
+            }
+            
+            usort($dayData['slots'], function($a, $b) {
+                return $a['start'] <=> $b['start'];
+            });
+        }
     
         // Convertir los timestamps a formato "H:i:s"
         foreach ($availability as $dayId => &$dayData) {

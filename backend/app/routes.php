@@ -83,6 +83,7 @@ use App\Application\Actions\GroupClass\ListGroupClassAction;
 use App\Application\Actions\GroupClass\AvailabilityByRoomGroupClassAction;
 use App\Application\Actions\GroupClass\CreateGroupClassAction;
 use App\Application\Actions\GroupClass\GetGroupClassAction;
+use App\Application\Actions\GroupClass\UpdateGroupClassAction;
 
 
 return function (App $app) {
@@ -190,7 +191,7 @@ return function (App $app) {
             $groupClassGroup->get('/availability-by-room', AvailabilityByRoomGroupClassAction::class);
             $groupClassGroup->post('', CreateGroupClassAction::class);
             $groupClassGroup->get('/{id}', GetGroupClassAction::class);
-
+            $groupClassGroup->put('/{id}', UpdateGroupClassAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
     });
 };
