@@ -252,7 +252,8 @@ const GroupClassEdit = () => {
               onChange={onSelectHour} 
               defaultDay={dayId} 
               defaultStartTime={startTime} 
-              defaultEndTime={endTime} 
+              defaultEndTime={endTime}
+              idGroupClassEdit={id ? Number(id) : null}
             />
           )}
           <div>

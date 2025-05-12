@@ -11,6 +11,7 @@ class AvailabilityByRoomGroupClassAction extends GroupClassAction
     protected function action(): Response
     {
         $roomId = (int) ($this->request->getQueryParams()['roomId'] ?? null);
+        $IdGroupClassEdit = (int) ($this->request->getQueryParams()['idGroupClassEdit'] ?? null);
         if ($roomId === null || $roomId === "" || $roomId === 0) {
             return $this->respondWithData(['error' => 'Room ID is required']);
         }
@@ -18,6 +19,12 @@ class AvailabilityByRoomGroupClassAction extends GroupClassAction
         $academic_periodID = $this->academicPeriodRepository->getActivePeriodID();
 
         $groupClassBusy = $this->groupClassRepository->findAvailabilityByRoom($roomId, $academic_periodID);
+        // quitar de groupClassBusy el elementor con IdGroupClassEdit
+        if ($IdGroupClassEdit) {
+            $groupClassBusy = array_filter($groupClassBusy, function ($class) use ($IdGroupClassEdit) {
+                return $class->getId() !== $IdGroupClassEdit;
+            });
+        }
         $systemAvailability = $this->scheduleDayRepository->findAll();
 
         $availableSlots = $this->calculateAvailability($systemAvailability, $groupClassBusy);

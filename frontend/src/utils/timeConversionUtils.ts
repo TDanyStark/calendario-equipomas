@@ -44,7 +44,8 @@ function generarIntervalos(
   recurrencia: number
 ): string[] {
   // Normalizar horas (quitar segundos si existen)
-  const normalizarHora = (hora: string) => hora.split(":").slice(0, 2).join(":");
+  const normalizarHora = (hora: string) =>
+    hora.split(":").slice(0, 2).join(":");
 
   // Convertir hora HH:MM a minutos totales
   const aMinutos = (hora: string) => {
@@ -67,7 +68,14 @@ function generarIntervalos(
       }
     }
 
-    if (isNaN(horas) || isNaN(minutos) || horas < 0 || horas > 23 || minutos < 0 || minutos > 59) {
+    if (
+      isNaN(horas) ||
+      isNaN(minutos) ||
+      horas < 0 ||
+      horas > 23 ||
+      minutos < 0 ||
+      minutos > 59
+    ) {
       throw new Error("Formato de hora no válido");
     }
 
@@ -115,6 +123,5 @@ function generarIntervalos(
     }
   }
 }
-
 
 export { formatToHHMM, to12HourFormat, addSecondsToTime, generarIntervalos };

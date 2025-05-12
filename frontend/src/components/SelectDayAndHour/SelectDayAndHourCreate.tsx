@@ -12,9 +12,10 @@ interface Props {
   defaultDay?: number | null;
   defaultStartTime?: string | null;
   defaultEndTime?: string | null;
+  idGroupClassEdit?: number | null;
 }
 
-const SelectDayAndHourCreate = ({ roomId, onChange, defaultDay = null, defaultStartTime = null, defaultEndTime = null }: Props) => {
+const SelectDayAndHourCreate = ({ roomId, onChange, defaultDay = null, defaultStartTime = null, defaultEndTime = null, idGroupClassEdit }: Props) => {
   const [selectedDay, setSelectedDay] = useState<number | null>(defaultDay);
   const [selectedStartTime, setSelectedStartTime] = useState<string | null>(defaultStartTime ? to12HourFormat(defaultStartTime) : null);
   const [selectedEndTime, setSelectedEndTime] = useState<string | null>(defaultEndTime ? to12HourFormat(defaultEndTime) : null);
@@ -25,7 +26,8 @@ const SelectDayAndHourCreate = ({ roomId, onChange, defaultDay = null, defaultSt
     "groupclass",
     "/availability-by-room",
     roomId,
-    JWT
+    JWT,
+    idGroupClassEdit ? idGroupClassEdit : null
   );
 
   const availability = data?.availableSlots as AvailableSlotType[];
@@ -44,7 +46,8 @@ const SelectDayAndHourCreate = ({ roomId, onChange, defaultDay = null, defaultSt
         // Encontrar el slot que contiene la hora de inicio
         for (const slot of daySlots) {
           const times = generarIntervalos(slot.start, slot.end, recurrence);
-          if (times.includes(start12h)) {
+          if (times.includes(start12h) && times.includes(end12h)) {
+            console.log("times", times);
             const startIndex = times.indexOf(start12h);
             const endTimes = times.slice(startIndex + 1);
             setEndTimeOptions(endTimes);
@@ -75,9 +78,10 @@ const SelectDayAndHourCreate = ({ roomId, onChange, defaultDay = null, defaultSt
     setEndTimeOptions(endTimes);
     setSelectedEndTime(null);
   };
-
+  
+  // le pasamos al padre la hora en formado HH:MM:SS ya que actualmente en el frontend se esta manejando en 12 horas
   useEffect(() => {
-    // le pasamos al padre la hora en formado HH:MM:SS ya que actualmente en el frontend se esta manejando en 12 horas
+    
     onChange({
       day: selectedDay,
       startTime: selectedStartTime && addSecondsToTime(formatToHHMM(selectedStartTime)),
