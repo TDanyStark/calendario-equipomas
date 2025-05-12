@@ -560,4 +560,13 @@ class DatabaseProfessorRepository implements ProfessorRepository
         return ['data' => $professors, 'pages' => $totalPages];
     }
 
+    public function countAssignedToAcademicPeriod(int $academic_periodID): int
+    {
+        $stmt = $this->pdo->prepare("SELECT COUNT(DISTINCT pc.professor_id) 
+                                    FROM professor_contracts pc
+                                    WHERE pc.academic_period_id = :academic_periodID");
+        $stmt->bindValue(':academic_periodID', $academic_periodID, PDO::PARAM_INT);
+        $stmt->execute();
+        return (int) $stmt->fetchColumn();
+    }
 }

@@ -39,4 +39,12 @@ interface EnrollmentRepository
     public function updateByGroup(string $changeTo, string $query, string $courseID, string $instrumentID, string $semesterID): int;
 
     public function findEnrollmentIdsActive(int $academic_periodID): array;
+
+    /**
+     * Counts enrollments by academic period ID.
+     *
+     * @param int $academic_periodID
+     * @return int
+     */
+    public function countByAcademicPeriodId(int $academic_periodID): int;
 }

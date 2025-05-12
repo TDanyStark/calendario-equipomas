@@ -24,4 +24,12 @@ interface ProfessorRepository
     public function seedProfessors(): void;
     public function assignProfessor(string $ID, array $professorInstrumentsArray, array $professorRoomsArray, array $professorAvailabilityArray, ?ProfessorContracts $professorContract = null): void;
     public function getProfessorsWithAssign(int $academicPeriodID, int $limit, int $offset, string $orderDir, string $query, bool $offPagination, bool $onlyWithAssignments): array;
+
+    /**
+     * Counts professors assigned to an academic period.
+     *
+     * @param int $academic_periodID
+     * @return int
+     */
+    public function countAssignedToAcademicPeriod(int $academic_periodID): int;
 }

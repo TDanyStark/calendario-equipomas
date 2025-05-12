@@ -87,6 +87,7 @@ use App\Application\Actions\GroupClass\UpdateGroupClassAction;
 use App\Application\Actions\GroupClass\DeleteGroupClassAction;
 use App\Application\Actions\GroupClass\DeleteMultipleGroupClassesAction;
 
+use App\Application\Actions\Dashboard\GetDashboardStatsAction;
 
 return function (App $app) {
     $app->options('/{routes:.*}', function (Request $request, Response $response) {
@@ -196,6 +197,11 @@ return function (App $app) {
             $groupClassGroup->put('/{id}', UpdateGroupClassAction::class);
             $groupClassGroup->delete('/{id}', DeleteGroupClassAction::class);
             $groupClassGroup->delete('', DeleteMultipleGroupClassesAction::class);
+        })->add($this->get(RoleMiddleware::class)->withRole('admin'));
+
+        // Dashboard Route
+        $group->group('/dashboard', function (Group $dashboardGroup) {
+            $dashboardGroup->get('/stats', GetDashboardStatsAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
     });
 };
