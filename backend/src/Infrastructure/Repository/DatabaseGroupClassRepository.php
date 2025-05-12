@@ -13,6 +13,8 @@ class DatabaseGroupClassRepository implements GroupClassRepository
 {
   private PDO $pdo;
   private string $table = 'group_classes';
+  private string $groupClassProfessorsTable = 'group_class_professors';
+  private string $groupClassEnrollmentsTable = 'group_class_enrollments';
 
   public function __construct(Database $database)
   {
@@ -217,7 +219,7 @@ class DatabaseGroupClassRepository implements GroupClassRepository
       // Insert into group_class_enrollments table
       $enrollments = $groupClass->getEnrollments();
       if ($enrollments) {
-        $stmtEnrollments = $this->pdo->prepare("INSERT INTO group_class_enrollments (group_class_id, enrollment_id) VALUES (:group_class_id, :enrollment_id)");
+        $stmtEnrollments = $this->pdo->prepare("INSERT INTO {$this->groupClassEnrollmentsTable} (group_class_id, enrollment_id) VALUES (:group_class_id, :enrollment_id)");
         foreach ($enrollments as $enrollmentId) {
           $stmtEnrollments->execute([
             'group_class_id' => $groupClassId,
@@ -229,7 +231,7 @@ class DatabaseGroupClassRepository implements GroupClassRepository
       // Insert into group_class_professors table
       $professors = $groupClass->getProfessors();
       if ($professors) {
-        $stmtProfessors = $this->pdo->prepare("INSERT INTO group_class_professors (group_class_id, professor_id) VALUES (:group_class_id, :professor_id)");
+        $stmtProfessors = $this->pdo->prepare("INSERT INTO {$this->groupClassProfessorsTable} (group_class_id, professor_id) VALUES (:group_class_id, :professor_id)");
         foreach ($professors as $professorId) {
           $stmtProfessors->execute([
             'group_class_id' => $groupClassId,
@@ -270,7 +272,7 @@ class DatabaseGroupClassRepository implements GroupClassRepository
       // Get enrollments for this group class
       $enrollmentsStmt = $this->pdo->prepare("
         SELECT enrollment_id 
-        FROM group_class_enrollments 
+        FROM {$this->groupClassEnrollmentsTable} 
         WHERE group_class_id = :group_class_id
       ");
       $enrollmentsStmt->execute([':group_class_id' => $id]);
@@ -282,7 +284,7 @@ class DatabaseGroupClassRepository implements GroupClassRepository
       // Get professors for this group class
       $professorsStmt = $this->pdo->prepare("
         SELECT professor_id 
-        FROM group_class_professors 
+        FROM {$this->groupClassProfessorsTable} 
         WHERE group_class_id = :group_class_id
       ");
       $professorsStmt->execute([':group_class_id' => $id]);
@@ -344,12 +346,12 @@ class DatabaseGroupClassRepository implements GroupClassRepository
       ]);
 
       // Update enrollments: first delete existing, then insert new ones
-      $this->pdo->prepare("DELETE FROM group_class_enrollments WHERE group_class_id = :group_class_id")
+      $this->pdo->prepare("DELETE FROM {$this->groupClassEnrollmentsTable} WHERE group_class_id = :group_class_id")
         ->execute(['group_class_id' => $groupClass->getId()]);
 
       $enrollments = $groupClass->getEnrollments();
       if ($enrollments && count($enrollments) > 0) {
-        $stmtEnrollments = $this->pdo->prepare("INSERT INTO group_class_enrollments (group_class_id, enrollment_id) VALUES (:group_class_id, :enrollment_id)");
+        $stmtEnrollments = $this->pdo->prepare("INSERT INTO {$this->groupClassEnrollmentsTable} (group_class_id, enrollment_id) VALUES (:group_class_id, :enrollment_id)");
         foreach ($enrollments as $enrollmentId) {
           $stmtEnrollments->execute([
             'group_class_id' => $groupClass->getId(),
@@ -359,12 +361,12 @@ class DatabaseGroupClassRepository implements GroupClassRepository
       }
 
       // Update professors: first delete existing, then insert new ones
-      $this->pdo->prepare("DELETE FROM group_class_professors WHERE group_class_id = :group_class_id")
+      $this->pdo->prepare("DELETE FROM {$this->groupClassProfessorsTable} WHERE group_class_id = :group_class_id")
         ->execute(['group_class_id' => $groupClass->getId()]);
 
       $professors = $groupClass->getProfessors();
       if ($professors && count($professors) > 0) {
-        $stmtProfessors = $this->pdo->prepare("INSERT INTO group_class_professors (group_class_id, professor_id) VALUES (:group_class_id, :professor_id)");
+        $stmtProfessors = $this->pdo->prepare("INSERT INTO {$this->groupClassProfessorsTable} (group_class_id, professor_id) VALUES (:group_class_id, :professor_id)");
         foreach ($professors as $professorId) {
           $stmtProfessors->execute([
             'group_class_id' => $groupClass->getId(),
@@ -378,6 +380,66 @@ class DatabaseGroupClassRepository implements GroupClassRepository
     } catch (\Exception $e) {
       $this->pdo->rollBack();
       throw $e;
+    }
+  }
+
+  public function delete(int $id): bool
+  {
+    try {
+        $this->pdo->beginTransaction();
+
+        // Delete related records first to maintain referential integrity
+        $stmtProfessors = $this->pdo->prepare("DELETE FROM {$this->groupClassProfessorsTable} WHERE group_class_id = :id");
+        $stmtProfessors->execute([':id' => $id]);
+
+        $stmtEnrollments = $this->pdo->prepare("DELETE FROM {$this->groupClassEnrollmentsTable} WHERE group_class_id = :id");
+        $stmtEnrollments->execute([':id' => $id]);
+
+        // Then delete the group class itself
+        $stmt = $this->pdo->prepare("DELETE FROM {$this->table} WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        
+        $rowCount = $stmt->rowCount();
+        $this->pdo->commit();
+        
+        return $rowCount > 0;
+    } catch (\Exception $e) {
+        $this->pdo->rollBack();
+        error_log("Error deleting group class: " . $e->getMessage());
+        return false;
+    }
+  }
+
+  public function deleteMultiple(array $ids): int
+  {
+    if (empty($ids)) {
+        return 0;
+    }
+
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    
+    try {
+        $this->pdo->beginTransaction();
+
+        // Delete related records
+        $stmtProfessors = $this->pdo->prepare("DELETE FROM {$this->groupClassProfessorsTable} WHERE group_class_id IN ({$placeholders})");
+        $stmtProfessors->execute($ids);
+
+        $stmtEnrollments = $this->pdo->prepare("DELETE FROM {$this->groupClassEnrollmentsTable} WHERE group_class_id IN ({$placeholders})");
+        $stmtEnrollments->execute($ids);
+
+        // Delete the group classes
+        $stmt = $this->pdo->prepare("DELETE FROM {$this->table} WHERE id IN ({$placeholders})");
+        $stmt->execute($ids);
+        
+        $rowCount = $stmt->rowCount();
+        $this->pdo->commit();
+        
+        return $rowCount;
+    } catch (\Exception $e) {
+        $this->pdo->rollBack();
+        error_log("Error deleting multiple group classes: " . $e->getMessage());
+        return 0;
     }
   }
 

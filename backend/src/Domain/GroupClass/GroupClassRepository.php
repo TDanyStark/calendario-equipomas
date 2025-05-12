@@ -34,4 +34,18 @@ interface GroupClassRepository
      * @return bool
      */
     public function update(GroupClass $groupClass): bool;
+
+    /**
+     * Delete a group class by its ID
+     * @param int $id
+     * @return bool True on success, false on failure or if not found
+     */
+    public function delete(int $id): bool;
+
+    /**
+     * Delete multiple group classes by their IDs
+     * @param int[] $ids
+     * @return int The number of group classes actually deleted
+     */
+    public function deleteMultiple(array $ids): int;
 }

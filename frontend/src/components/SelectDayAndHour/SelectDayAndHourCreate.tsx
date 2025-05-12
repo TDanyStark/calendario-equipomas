@@ -47,7 +47,6 @@ const SelectDayAndHourCreate = ({ roomId, onChange, defaultDay = null, defaultSt
         for (const slot of daySlots) {
           const times = generarIntervalos(slot.start, slot.end, recurrence);
           if (times.includes(start12h) && times.includes(end12h)) {
-            console.log("times", times);
             const startIndex = times.indexOf(start12h);
             const endTimes = times.slice(startIndex + 1);
             setEndTimeOptions(endTimes);

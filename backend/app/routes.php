@@ -84,6 +84,8 @@ use App\Application\Actions\GroupClass\AvailabilityByRoomGroupClassAction;
 use App\Application\Actions\GroupClass\CreateGroupClassAction;
 use App\Application\Actions\GroupClass\GetGroupClassAction;
 use App\Application\Actions\GroupClass\UpdateGroupClassAction;
+use App\Application\Actions\GroupClass\DeleteGroupClassAction;
+use App\Application\Actions\GroupClass\DeleteMultipleGroupClassesAction;
 
 
 return function (App $app) {
@@ -192,6 +194,8 @@ return function (App $app) {
             $groupClassGroup->post('', CreateGroupClassAction::class);
             $groupClassGroup->get('/{id}', GetGroupClassAction::class);
             $groupClassGroup->put('/{id}', UpdateGroupClassAction::class);
+            $groupClassGroup->delete('/{id}', DeleteGroupClassAction::class);
+            $groupClassGroup->delete('', DeleteMultipleGroupClassesAction::class);
         })->add($this->get(RoleMiddleware::class)->withRole('admin'));
     });
 };
