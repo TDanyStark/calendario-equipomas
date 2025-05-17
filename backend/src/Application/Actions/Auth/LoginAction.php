@@ -59,11 +59,11 @@ class LoginAction extends Action
         $user = $this->userRepository->findUserById($id);
 
         if ($user === null) {
-            return $this->respondWithError('Invalid email or password', 401);
+            return $this->respondWithError('Invalid email or password NS', 401);
         }
 
         if ($user->verifyPassword($password) === false) {
-            return $this->respondWithError('Invalid email or password', 401);
+            return $this->respondWithError('Invalid email or password IP', 401);
         }
 
         // Obtener el rol utilizando el RoleRepository
@@ -82,7 +82,7 @@ class LoginAction extends Action
                 }
                 break;
             case 'student':
-                $user = $this->studentRepository->findStudentOfId($id);
+                $user = $this->studentRepository->findStudentById($id);
                 if ($user === null) {
                     return $this->respondWithError('Error al obtener el usuario Error:2', 401);
                 }

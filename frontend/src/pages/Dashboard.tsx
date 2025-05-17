@@ -27,14 +27,14 @@ const Dashboard = () => {
       </h1>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {/* Card 1: Enrollments */}
-        <div className="bg-white shadow-md rounded-lg p-6">
+        <div className="bg-gray-900 shadow-md rounded-lg p-6">
           <div className="mb-4">
-            <h2 className="text-xl font-semibold">Enrollments</h2>
-            <p className="text-sm text-gray-500">Active Academic Period</p>
+            <h2 className="text-xl font-semibold">Matriculas</h2>
+            <p className="text-sm text-gray-500">Periodo Academico Activo</p>
           </div>
           <div>
             {isLoading ? (
-              <Skeleton className="h-10 w-24" />
+              <Skeleton className="h-[36px] w-24" />
             ) : (
               <p className="text-3xl font-bold">{stats?.activePeriodEnrollmentCount ?? 'N/A'}</p>
             )}
@@ -42,14 +42,14 @@ const Dashboard = () => {
         </div>
 
         {/* Card 2: Registered Professors */}
-        <div className="bg-white shadow-md rounded-lg p-6">
+        <div className="bg-gray-900 shadow-md rounded-lg p-6">
           <div className="mb-4">
-            <h2 className="text-xl font-semibold">Registered Professors</h2>
-            <p className="text-sm text-gray-500">Active Academic Period</p>
+            <h2 className="text-xl font-semibold">Profesores Registrados</h2>
+            <p className="text-sm text-gray-500">Periodo Academico Activo</p>
           </div>
           <div>
             {isLoading ? (
-              <Skeleton className="h-10 w-24" />
+              <Skeleton className="h-[36px] w-24" />
             ) : (
               <p className="text-3xl font-bold">{stats?.activePeriodProfessorCount ?? 'N/A'}</p>
             )}
