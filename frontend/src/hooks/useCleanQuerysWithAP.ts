@@ -7,6 +7,7 @@ const useCleanQuerysWithAP = () => {
     queryClient.invalidateQueries("academic-periods");
     queryClient.invalidateQueries("enrolls");
     queryClient.invalidateQueries("professors/assign");
+    queryClient.invalidateQueries("groupclass");
   };
 
   return cleanQuery;
