@@ -32,7 +32,6 @@ import { useSearchParams } from "react-router-dom";
 import CellItem from "../CellItem";
 import { useDebounce } from "use-debounce";
 import Theme from "@/lib/Theme";
-import { useQueryClient } from "react-query";
 
 interface Column<T> {
   label: string;
@@ -105,8 +104,6 @@ function DataTablePagination<T extends TableNode>({
     isError,
     isFetching,
   } = useFetchItemsWithPagination(entity, JWT, page, debouncedQuery, filters);
-  const queryClient = useQueryClient();
-  const cachedData = queryClient.getQueryData([entity, page, debouncedQuery, filters]);
 
   const data: TableNode[] = (fetchedData?.data as TableNode[]) || [];
   const totalPages = fetchedData?.pages || 1;
@@ -226,7 +223,7 @@ function DataTablePagination<T extends TableNode>({
                       <CellSelect item={item} />
                       {columns.map((column) => (
                         <Cell key={column.label} className="text-lg">
-                          <CellItem item={item} column={column} isLoading={isFetching && !cachedData} />
+                          <CellItem item={item} column={column} isLoading={isFetching} />
                         </Cell>
                       ))}
                       <Cell>

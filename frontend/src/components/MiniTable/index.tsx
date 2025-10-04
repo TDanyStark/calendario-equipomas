@@ -173,7 +173,7 @@ function MiniTable<T extends TableNode>({
               checked={checked}
               onChange={handleSelectAll}
             />
-            <label htmlFor="selectAll">Seleccionar Todos</label>
+            <label htmlFor="selectAll" className="cursor-pointer text-nowrap">Seleccionar Todos</label>
           </div>
         </div>
       </div>
