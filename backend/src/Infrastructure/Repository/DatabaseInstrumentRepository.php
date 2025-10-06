@@ -85,7 +85,6 @@ class DatabaseInstrumentRepository implements InstrumentRepository
             FROM instruments i
             WHERE i.InstrumentName LIKE :query
             ORDER BY i.InstrumentName ASC
-            LIMIT 5
         ');
         $stmt->bindParam(':query', $searchQuery, PDO::PARAM_STR);
         $stmt->execute();

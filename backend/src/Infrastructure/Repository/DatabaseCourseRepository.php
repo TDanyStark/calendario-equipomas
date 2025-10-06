@@ -203,7 +203,6 @@ class DatabaseCourseRepository implements CourseRepository
             FROM courses c
             WHERE c.CourseName LIKE :query
             ORDER BY c.CourseName ASC
-            LIMIT 5
         ');
         $stmt->bindParam(':query', $searchQuery, PDO::PARAM_STR);
         $stmt->execute();
