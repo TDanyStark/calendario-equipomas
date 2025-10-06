@@ -1,5 +1,5 @@
 # Deshabilitar el listado de directorios en la carpeta /frontend/
-Options -Indexes
+# Options -Indexes  # Comentado: puede no estar permitido en hosting compartido
 
 RewriteEngine On
 
@@ -7,12 +7,21 @@ RewriteEngine On
 RewriteCond %{REQUEST_URI} ^/api
 RewriteRule ^api/(.*)$ /backend/public/index.php/$1 [L]
 
-# Si la solicitud es a la raíz, redirigir a index.html en frontend/dist
+# Redirigir assets a frontend/assets
+RewriteRule ^assets/(.*)$ /frontend/assets/$1 [L]
+
+# Redirigir images a frontend/images
+RewriteRule ^images/(.*)$ /frontend/images/$1 [L]
+
+# Redirigir vite.svg a frontend/vite.svg
+RewriteRule ^vite\.svg$ /frontend/vite.svg [L]
+
+# Si la solicitud es a la raíz, redirigir a index.html en frontend
 RewriteRule ^$ /frontend/index.html [L]
 
-# Redirigir al frontend si no es /api y no es un archivo o directorio real
+# Redirigir al frontend si no es un archivo o directorio real (SPA fallback)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ /frontend/$1 [L]
+RewriteRule ^(.*)$ /frontend/index.html [L]
 
 

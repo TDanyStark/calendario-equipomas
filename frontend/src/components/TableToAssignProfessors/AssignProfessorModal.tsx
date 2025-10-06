@@ -69,7 +69,7 @@ const AssignProfessorModal: React.FC<AssignProfessorModalProps> = ({
         ...instrument,
         selected: professor 
           ? professor.instruments.some(
-              (profInstrument) => String(profInstrument.InstrumentID) === String(instrument.id)
+              (profInstrument) => String(profInstrument.ProfessorInstrumentID) === String(instrument.id)
             )
           : false
       }));
