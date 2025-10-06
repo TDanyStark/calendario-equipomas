@@ -216,7 +216,7 @@ function TableToAssignProfessors() {
             className="input-primary w-full max-w-60"
           />
           <button
-            className="btn-primary"
+            className="btn-primary text-nowrap"
             onClick={() => {
               const newParams = new URLSearchParams(searchParams);
               newParams.set("page", "1");
